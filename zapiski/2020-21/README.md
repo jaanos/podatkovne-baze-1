@@ -5,3 +5,4 @@
 * [`2020-10-26.md`](2020-10-26.md) - Gnezdene poizvedbe, agregatne funkcije
 * [`2020-11-02.md`](2020-11-02.md) - Stikanje
 * [`2020-11-09.md`](2020-11-09.md) - Spreminjanje podatkov, ustvarjanje tabel
+* [`2020-11-18.md`](2020-11-18.md) - Načrtovanje baz za projekte
