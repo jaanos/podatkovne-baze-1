@@ -22,7 +22,7 @@ class Uporabnik:
     Razred za uporabnika.
     """
 
-    def __init__(self, ime, id=None):
+    def __init__(self, ime, *, id=None):
         """
         Konstruktor uporabnika.
         """
@@ -48,7 +48,7 @@ class Uporabnik:
         try:
             id, zgostitev, sol = conn.execute(sql, [ime]).fetchone()
             if preveri_geslo(geslo, zgostitev, sol):
-                return Uporabnik(ime, id)
+                return Uporabnik(ime, id=id)
         except TypeError:
             pass
         raise LoginError(ime)
@@ -68,7 +68,7 @@ class Film:
     Razred za film.
     """
 
-    def __init__(self, id, naslov, leto, ocena):
+    def __init__(self, naslov, leto, ocena, *, id=None):
         """
         Konstruktor filma.
         """
@@ -97,7 +97,7 @@ class Film:
             LIMIT 10
         """
         for id, naslov, leto, ocena in conn.execute(sql, [leto]):
-            yield Film(id, naslov, leto, ocena)
+            yield Film(naslov, leto, ocena, id=id)
 
     def dodaj_v_bazo(self, reziserji, igralci):
         """
@@ -118,7 +118,7 @@ class Oseba:
     Razred za osebo.
     """
 
-    def __init__(self, ime, id=None):
+    def __init__(self, ime, *, id=None):
         """
         Konstruktor osebe.
         """

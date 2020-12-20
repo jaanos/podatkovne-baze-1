@@ -69,7 +69,7 @@ def dodajanje_osebe():
     Doda osebo z imenom, ki ga vnese uporabnik.
     """
     ime = input('Napiši ime osebe, ki jo želiš dodati: ')
-    oseba = Oseba(None, ime)
+    oseba = Oseba(ime)
     oseba.dodaj_v_bazo()
     print(f'Oseba {ime} dodana z ID-jem {oseba.id}.')
 
@@ -110,7 +110,7 @@ def dodajanje_filma():
         oseba = poisci_osebo()
         igralci.append(oseba)
         print(f"Dodan igralec {oseba.ime}.")
-    film = Film(None, naslov, leto, ocena)
+    film = Film(naslov, leto, ocena)
     film.dodaj_v_bazo(reziserji, igralci)
     print(f'Film {naslov} ({leto}) dodan z ID-jem {film.id}.')
 

@@ -11,20 +11,16 @@ class Tabela:
 
     Polja razreda:
     - ime: ime tabele
-    - podatki: datoteka s podatki ali None
+    - podatki: ime datoteke s podatki ali None
     """
     ime = None
     podatki = None
-    poizvedba = None
-    stolpci = None
 
     def __init__(self, conn):
         """
         Konstruktor razreda.
         """
         self.conn = conn
-        if self.stolpci is not None:
-            self.poizvedba = self.dodajanje(self.stolpci)
 
     def ustvari(self):
         """
@@ -51,8 +47,6 @@ class Tabela:
         with open(self.podatki, encoding=encoding) as datoteka:
             podatki = csv.reader(datoteka)
             stolpci = next(podatki)
-            if self.poizvedba is None:
-                self.poizvedba = self.dodajanje(stolpci)
             for vrstica in podatki:
                 vrstica = {k: None if v == "" else v for k, v in zip(stolpci, vrstica)}
                 self.dodaj_vrstico(**vrstica)
@@ -79,14 +73,10 @@ class Tabela:
         Metoda za dodajanje vrstice.
 
         Argumenti:
-        - podatki: seznam ali slovar s podatki v vrstici
-        - poizvedba: poizvedba, ki naj se zažene
-        - poljubni poimenovani parametri: privzeto se ignorirajo
+        - poimenovani parametri: vrednosti v ustreznih stolpcih
         """
-        if self.poizvedba is None:
-            poizvedba = self.dodajanje(podatki.keys())
-        else:
-            poizvedba = self.poizvedba
+        podatki = {kljuc: vrednost for kljuc, vrednost in podatki.items() if vrednost is not None}
+        poizvedba = self.dodajanje(podatki.keys())
         cur = self.conn.execute(poizvedba, podatki)
         return cur.lastrowid
 
@@ -116,8 +106,11 @@ class Uporabnik(Tabela):
         Dodaj uporabnika.
 
         Če sol ni podana, zašifrira podano geslo.
+
+        Argumenti:
+        - poimenovani parametri: vrednosti v ustreznih stolpcih
         """
-        if podatki["sol"] is None:
+        if podatki.get("sol", None) is None and podatki.get("zgostitev", None) is not None:
             podatki["zgostitev"], podatki["sol"] = sifriraj_geslo(podatki["zgostitev"])
         return super().dodaj_vrstico(**podatki)
 
@@ -127,7 +120,6 @@ class Zanr(Tabela):
     Tabela za žanre.
     """
     ime = "zanr"
-    stolpci = ("naziv", )
 
     def ustvari(self):
         """
@@ -145,7 +137,11 @@ class Zanr(Tabela):
         Dodaj žanr.
 
         Če žanr že obstaja, vrne obstoječi ID.
+
+        Argumenti:
+        - poimenovani parametri: vrednosti v ustreznih stolpcih
         """
+        assert "naziv" in podatki
         cur = self.conn.execute("""
             SELECT id FROM zanr
             WHERE naziv = :naziv;
@@ -163,7 +159,6 @@ class Oznaka(Tabela):
     Tabela za oznake.
     """
     ime = "oznaka"
-    stolpci = ("kratica", )
 
     def ustvari(self):
         """
@@ -180,7 +175,11 @@ class Oznaka(Tabela):
         Dodaj oznako.
 
         Če oznaka že obstaja, je ne dodamo še enkrat.
+
+        Argumenti:
+        - poimenovani parametri: vrednosti v ustreznih stolpcih
         """
+        assert "kratica" in podatki
         cur = self.conn.execute("""
             SELECT kratica FROM oznaka
             WHERE kratica = :kratica;
@@ -232,10 +231,9 @@ class Film(Tabela):
         Dodaj film in pripadajočo oznako.
 
         Argumenti:
-        - podatki: seznam s podatki o filmu
-        - poizvedba: poizvedba za dodajanje filma
+        - poimenovani parametri: vrednosti v ustreznih stolpcih
         """
-        if podatki["oznaka"] is not None:
+        if podatki.get("oznaka", None) is not None:
             self.oznaka.dodaj_vrstico(kratica=podatki["oznaka"])
         return super().dodaj_vrstico(**podatki)
 
@@ -292,7 +290,6 @@ class Pripada(Tabela):
     """
     ime = "pripada"
     podatki = "podatki/zanr.csv"
-    stolpci = ["film", "zanr"]
 
     def __init__(self, conn, zanr):
         """
@@ -325,10 +322,11 @@ class Pripada(Tabela):
         Dodaj pripadnost filma in pripadajoči žanr.
 
         Argumenti:
-        - podatki: seznam s podatki o pripadnosti
-        - poizvedba: poizvedba za dodajanje pripadnosti
+        - podatki: slovar s podatki o pripadnosti
         """
-        podatki["zanr"] = self.zanr.dodaj_vrstico(naziv=podatki["naziv"])
+        if podatki.get("naziv", None) is not None:
+            podatki["zanr"] = self.zanr.dodaj_vrstico(naziv=podatki["naziv"])
+            del podatki["naziv"]
         return super().dodaj_vrstico(**podatki)
 
 
