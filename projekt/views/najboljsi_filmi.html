@@ -1,0 +1,10 @@
+% rebase('osnova.html')
+<h2>Najboljši filmi v letu {{leto}}</h2>
+
+<ol type="I">
+    % for film in filmi:
+    <li>
+        {{film.naslov}} <small>{{film.ocena}}/10</small>
+    </li>
+    % end
+</ol>

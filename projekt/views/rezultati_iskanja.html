@@ -1,0 +1,10 @@
+% rebase('osnova.html')
+<h2>Osebe, ki imajo v imenu "{{iskalni_niz}}"</h2>
+
+<ul>
+    % for oseba in osebe:
+    <li>
+        {{oseba.ime}}
+    </li>
+    % end
+</ul>

@@ -1,0 +1,47 @@
+% rebase('osnova.html')
+<section class="hero">
+    <div class="hero-body">
+        <div style="float: right; height: 100px; overflow: visible">
+            <img src="/static/film.png" style="height: 200px">
+        </div>
+        <div class="container">
+            <h1 class="title">
+                Filmi
+            </h1>
+            <h2 class="subtitle">
+                najboljša stran za filme
+            </h2>
+        </div>
+    </div>
+</section>
+<div>
+    % if ime:
+        Prijavljen uporabnik: {{ime}}
+        (<a href="/odjava/">odjava</a>)
+    % else:
+    <a href="/prijava/">prijava</a> | 
+    <a href="/vpis/">vpis</a>
+    % end
+</div>
+<form action="/isci/">
+    <div class="field">
+        <label class="label">Iskalni niz</label>
+        <div class="control">
+            <input class="input" type="text" placeholder="npr. Hanks ali Smith" name="iskalni_niz">
+        </div>
+    </div>
+
+    <div class="field">
+        <div class="control">
+            <button class="button">Išči!</button>
+        </div>
+</form>
+<a href="/dodaj-osebo/">Dodaj osebo</a>
+<ul>
+    % for leto in leta:
+    <li>
+        Najboljši filmi v letu
+        <a href="/najboljsi/{{leto}}/">{{leto}}</a>
+    </li>
+    % end
+</ul>

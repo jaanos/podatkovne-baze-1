@@ -1,0 +1,26 @@
+% rebase('osnova.html')
+<h2>Prijavi se</h2>
+
+<form method="POST">
+    <div class="field">
+        <label class="label">Uporabniško ime</label>
+        <div class="control">
+            <input class="input" type="text" name="uporabnisko_ime" value="{{ime}}">
+        </div>
+    </div>
+
+    <div class="field">
+        <label class="label">Geslo</label>
+        <div class="control">
+            <input class="input" type="password" name="geslo">
+        </div>
+        % if napaka:
+        <p class="help is-danger">{{napaka}}</p>
+        % end
+    </div>
+
+    <div class="field">
+        <div class="control">
+            <button class="button">Prijavi se!</button>
+        </div>
+</form>

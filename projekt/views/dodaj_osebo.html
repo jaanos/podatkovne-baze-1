@@ -1,0 +1,19 @@
+% rebase('osnova.html')
+<h2>Dodaj osebo</h2>
+
+<form method="POST">
+    <div class="field">
+        <label class="label">Ime</label>
+        <div class="control">
+            <input class="input" type="text" placeholder="npr. Tom Hanks ali Smith" name="ime" value="{{ime}}">
+        </div>
+        % if napaka:
+        <p class="help is-danger">{{napaka}}</p>
+        % end
+    </div>
+
+    <div class="field">
+        <div class="control">
+            <button class="button">Dodaj!</button>
+        </div>
+</form>
