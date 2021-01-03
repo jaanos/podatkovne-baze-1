@@ -68,7 +68,7 @@ class Tabela:
             .format(self.ime, ", ".join(stolpci),
                     ", ".join(PARAM_FMT.format(s) for s in stolpci))
 
-    def dodaj_vrstico(self, /, **podatki):
+    def dodaj_vrstico(self,  **podatki):
         """
         Metoda za dodajanje vrstice.
 
@@ -101,7 +101,7 @@ class Uporabnik(Tabela):
             )
         """)
 
-    def dodaj_vrstico(self, /, **podatki):
+    def dodaj_vrstico(self,  **podatki):
         """
         Dodaj uporabnika.
 
@@ -132,7 +132,7 @@ class Zanr(Tabela):
             );
         """)
 
-    def dodaj_vrstico(self, /, **podatki):
+    def dodaj_vrstico(self,  **podatki):
         """
         Dodaj žanr.
 
@@ -170,7 +170,7 @@ class Oznaka(Tabela):
             );
         """)
 
-    def dodaj_vrstico(self, /, **podatki):
+    def dodaj_vrstico(self,  **podatki):
         """
         Dodaj oznako.
 
@@ -226,7 +226,7 @@ class Film(Tabela):
             );
         """)
 
-    def dodaj_vrstico(self, /, **podatki):
+    def dodaj_vrstico(self,  **podatki):
         """
         Dodaj film in pripadajočo oznako.
 
@@ -317,7 +317,7 @@ class Pripada(Tabela):
             );
         """)
 
-    def dodaj_vrstico(self, /, **podatki):
+    def dodaj_vrstico(self,  **podatki):
         """
         Dodaj pripadnost filma in pripadajoči žanr.
 
