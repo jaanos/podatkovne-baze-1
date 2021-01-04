@@ -8,3 +8,4 @@
 * [`2020-11-18.md`](2020-11-18.md) - Načrtovanje baz za projekte
 * [`2020-11-23.md`](2020-11-23.md) - Ustvarjanje baz za projekte
 * [`2020-12-14.md`](2020-12-14.md) - Vmesniki za bazo v Pythonu
+* [`2021-01-04.md`](2021-01-04.md) - Načrtovanje spletnega vmesnika
