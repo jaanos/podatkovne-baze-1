@@ -1,0 +1,22 @@
+% rebase('osnova.html')
+
+<form>
+    Od: <input type="text" name="od" value="{{od}}" /><br />
+    Do: <input type="text" name="do" value="{{do}}" /><br />
+    <button class="button">Izpiši!</button>
+</form>
+
+<table>
+    <tr>
+        <th>Leto</th>
+        <th>Tema</th>
+        <th>Zmagovalec</th>
+    </tr>
+    % for nobelovec in podatki:
+    <tr>
+        <td>{{nobelovec.leto}}</td>
+        <td>{{nobelovec.tema}}</td>
+        <td>{{nobelovec.zmagovalec}}</td>
+    </tr>
+    % end
+</table>
