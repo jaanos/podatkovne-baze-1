@@ -26,6 +26,12 @@ def zahtevaj_odjavo():
         bottle.redirect('/')
 
 
+def prijavi_uporabnika(uporabnik):
+    bottle.response.set_cookie('uporabnik', uporabnik.ime, path='/', secret=SKRIVNOST)
+    bottle.response.set_cookie('uid', str(uporabnik.id), path='/', secret=SKRIVNOST)
+    bottle.redirect('/')
+
+
 @bottle.get('/static/<filename:path>')
 def static(filename):
     return bottle.static_file(filename, root='static')
@@ -46,10 +52,7 @@ def prijava_post():
     ime = bottle.request.forms['uporabnisko_ime']
     geslo = bottle.request.forms['geslo']
     try:
-        uporabnik = Uporabnik.prijava(ime, geslo)
-        bottle.response.set_cookie('uporabnik', ime, path='/', secret=SKRIVNOST)
-        bottle.response.set_cookie('uid', uporabnik.id, path='/', secret=SKRIVNOST)
-        bottle.redirect('/')
+        prijavi_uporabnika(Uporabnik.prijava(ime, geslo))
     except LoginError:
         return bottle.template(
             'prijava.html',
@@ -82,9 +85,7 @@ def vpis_post():
     try:
         uporabnik = Uporabnik(ime)
         uporabnik.dodaj_v_bazo(geslo1)
-        bottle.response.set_cookie('uporabnik', ime, path='/', secret=SKRIVNOST)
-        bottle.response.set_cookie('uid', uporabnik.id, path='/', secret=SKRIVNOST)
-        bottle.redirect('/')
+        prijavi_uporabnika(uporabnik)
     except IntegrityError:
         return bottle.template(
             'vpis.html',
@@ -96,6 +97,7 @@ def vpis_post():
 @bottle.get('/odjava/')
 def odjava():
     bottle.response.delete_cookie('uporabnik', path='/')
+    bottle.response.delete_cookie('uid', path='/')
     bottle.redirect('/')
 
 
