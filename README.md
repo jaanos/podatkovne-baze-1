@@ -6,4 +6,7 @@ Repozitorij z gradivi za predmet Podatkovne baze 1 (3. letnik Praktične matemat
 
 * Vaje na daljavo iz leta [2020/21](zapiski/2020-21)
 
-## [Vzorčni projekt - filmi](projekt-filmi/)
+## Vzorčni projekti
+
+* [Filmi](projekt-filmi/)
+* [Nobelovci](projekt-nobelovci/)
