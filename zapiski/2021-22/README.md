@@ -6,3 +6,4 @@
 * [`2021-11-04.md`](2021-11-04.md) - Stikanje
 * [`2021-11-15.md`](2021-11-15.md) - Spreminjanje podatkov, ustvarjanje tabel
 * [`2021-11-29.md`](2021-11-29.md) - Načrtovanje baz
+* [`2021-12-06.md`](2021-12-06.md) - Načrtovanje baz za projekte
