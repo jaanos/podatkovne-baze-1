@@ -33,7 +33,7 @@ class Tabela:
         """
         Metoda za brisanje tabele.
         """
-        self.conn.execute("DROP TABLE IF EXISTS {};".format(self.ime))
+        self.conn.execute(f"DROP TABLE IF EXISTS {self.ime};")
 
     def uvozi(self, encoding="UTF-8"):
         """
@@ -55,7 +55,7 @@ class Tabela:
         """
         Metoda za praznjenje tabele.
         """
-        self.conn.execute("DELETE FROM {};".format(self.ime))
+        self.conn.execute(f"DELETE FROM {self.ime};")
 
     def dodajanje(self, stolpci=None):
         """
@@ -64,18 +64,20 @@ class Tabela:
         Argumenti:
         - stolpci: seznam stolpcev
         """
-        return "INSERT INTO {} ({}) VALUES ({});" \
-            .format(self.ime, ", ".join(stolpci),
-                    ", ".join(PARAM_FMT.format(s) for s in stolpci))
+        return f"""
+            INSERT INTO {self.ime} ({", ".join(stolpci)})
+            VALUES ({", ".join(PARAM_FMT.format(s) for s in stolpci)});
+        """
 
-    def dodaj_vrstico(self,  **podatki):
+    def dodaj_vrstico(self, **podatki):
         """
         Metoda za dodajanje vrstice.
 
         Argumenti:
         - poimenovani parametri: vrednosti v ustreznih stolpcih
         """
-        podatki = {kljuc: vrednost for kljuc, vrednost in podatki.items() if vrednost is not None}
+        podatki = {kljuc: vrednost for kljuc, vrednost in podatki.items()
+                   if vrednost is not None}
         poizvedba = self.dodajanje(podatki.keys())
         cur = self.conn.execute(poizvedba, podatki)
         return cur.lastrowid
@@ -101,7 +103,7 @@ class Uporabnik(Tabela):
             )
         """)
 
-    def dodaj_vrstico(self,  **podatki):
+    def dodaj_vrstico(self, **podatki):
         """
         Dodaj uporabnika.
 
@@ -132,7 +134,7 @@ class Zanr(Tabela):
             );
         """)
 
-    def dodaj_vrstico(self,  **podatki):
+    def dodaj_vrstico(self, **podatki):
         """
         Dodaj žanr.
 
@@ -170,7 +172,7 @@ class Oznaka(Tabela):
             );
         """)
 
-    def dodaj_vrstico(self,  **podatki):
+    def dodaj_vrstico(self, **podatki):
         """
         Dodaj oznako.
 
@@ -226,7 +228,7 @@ class Film(Tabela):
             );
         """)
 
-    def dodaj_vrstico(self,  **podatki):
+    def dodaj_vrstico(self, **podatki):
         """
         Dodaj film in pripadajočo oznako.
 
@@ -272,14 +274,9 @@ class Vloga(Tabela):
             CREATE TABLE vloga (
                 film  INTEGER   REFERENCES film (id),
                 oseba INTEGER   REFERENCES oseba (id),
-                tip   CHARACTER CHECK (tip IN ('I',
-                                'R') ),
+                tip   CHARACTER CHECK (tip IN ('I', 'R')),
                 mesto INTEGER,
-                PRIMARY KEY (
-                    film,
-                    oseba,
-                    tip
-                )
+                PRIMARY KEY (film, oseba, tip)
             );
         """)
 
@@ -310,14 +307,11 @@ class Pripada(Tabela):
             CREATE TABLE pripada (
                 film INTEGER REFERENCES film (id),
                 zanr INTEGER REFERENCES zanr (id),
-                PRIMARY KEY (
-                    film,
-                    zanr
-                )
+                PRIMARY KEY (film, zanr)
             );
         """)
 
-    def dodaj_vrstico(self,  **podatki):
+    def dodaj_vrstico(self, **podatki):
         """
         Dodaj pripadnost filma in pripadajoči žanr.
 
