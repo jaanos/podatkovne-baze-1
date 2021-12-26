@@ -152,7 +152,7 @@ class Oseba:
         Vrne vse osebe, ki v imenu vsebujejo dani niz.
         """
         sql = "SELECT id, ime FROM oseba WHERE ime LIKE ?"
-        for id, ime in conn.execute(sql, ['%' + niz + '%']):
+        for id, ime in conn.execute(sql, [f'%{niz}%']):
             yield Oseba(ime=ime, id=id)
 
     def dodaj_v_bazo(self):
