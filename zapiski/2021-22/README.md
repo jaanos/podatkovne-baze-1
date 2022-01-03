@@ -7,5 +7,6 @@
 * [`2021-11-15.md`](2021-11-15.md) - Spreminjanje podatkov, ustvarjanje tabel
 * [`2021-11-29.md`](2021-11-29.md) - Načrtovanje baz
 * [`2021-12-06.md`](2021-12-06.md) - Načrtovanje baz za projekte
-* [`2020-12-13.md`](2021-12-13.md) - SQL in Python, ustvarjanje baz za projekte
-* [`2020-12-20.md`](2021-12-20.md) - Ustvarjanje baz za projekte
+* [`2021-12-13.md`](2021-12-13.md) - SQL in Python, ustvarjanje baz za projekte
+* [`2021-12-20.md`](2021-12-20.md) - Ustvarjanje baz za projekte
+* [`2022-01-03.md`](2022-01-03.md) - Načrtovanje spletnega vmesnika
