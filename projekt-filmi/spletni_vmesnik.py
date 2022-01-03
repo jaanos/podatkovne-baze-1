@@ -1,7 +1,6 @@
 import json
 import random
 import bottle
-from sqlite3 import IntegrityError
 from model import LoginError, Uporabnik, Film, Oseba
 
 NASTAVITVE = 'nastavitve.json'
@@ -86,7 +85,7 @@ def vpis_post():
         uporabnik = Uporabnik(ime)
         uporabnik.dodaj_v_bazo(geslo1)
         prijavi_uporabnika(uporabnik)
-    except IntegrityError:
+    except LoginError:
         return bottle.template(
             'vpis.html',
             napaka='Uporabniško ime že obstaja!',

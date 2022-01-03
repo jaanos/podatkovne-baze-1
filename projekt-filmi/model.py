@@ -1,5 +1,6 @@
 import baza
 import sqlite3
+from sqlite3 import IntegrityError
 from pomozne_funkcije import Seznam
 from geslo import sifriraj_geslo, preveri_geslo
 
@@ -59,8 +60,11 @@ class Uporabnik:
         """
         assert self.id is None
         zgostitev, sol = sifriraj_geslo(geslo)
-        with conn:
-            self.id = uporabnik.dodaj_vrstico(ime=self.ime, zgostitev=zgostitev, sol=sol)
+        try:
+            with conn:
+                self.id = uporabnik.dodaj_vrstico(ime=self.ime, zgostitev=zgostitev, sol=sol)
+        except IntegrityError:
+            raise LoginError(self.ime)
 
 
 class Film:
