@@ -9,5 +9,5 @@ Repozitorij z gradivi za predmet Podatkovne baze 1 (3. letnik Praktične matemat
 
 ## Vzorčni projekti
 
-* [Filmi](projekt-filmi/)
-* [Nobelovci](projekt-nobelovci/)
+* [Filmi](vaje/projekt-filmi/)
+* [Nobelovci](vaje/projekt-nobelovci/)
