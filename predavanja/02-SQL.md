@@ -8,15 +8,14 @@ marp: true
 
 # Kako do podatkov iz baze
 
-* Vsebina tabel je uporabniku dostopna s pomočjo poizvedovalnih jezikov. 
+* Vsebina tabel je uporabniku dostopna s pomočjo poizvedovalnih jezikov.
 * Uveljavil se je standardni jezik **SQL** (*Structured Query Language*, strukturirani poizvedovalni jezik)
-* Enostavno berljiv
+* Enostavno berljiv:
   ```sql
-  SELECT tecajnica.simbol, vp.opis,
-         tecajnica.eTecaj
+  SELECT tecajnica.simbol, vp.opis, tecajnica.eTecaj
     FROM tecajnica LEFT JOIN vp
-          ON tecajnica.simbol = vp.simbol
-   WHERE tecajnica.simbol LIKE 'Z%' AND
+         ON tecajnica.simbol = vp.simbol
+   WHERE tecajnica.simbol LIKE 'Z%' AND 
          tecajnica.datum = '2004-02-26';
   ```
 
@@ -40,7 +39,8 @@ marp: true
 
 ```sql
 SELECT * FROM knjige 
-    WHERE cena > 100.00 ORDER BY naslov;
+ WHERE cena > 100.00
+ ORDER BY naslov;
 ```
 
 ---
@@ -90,6 +90,7 @@ SELECT * FROM knjige
 
   ```sql
   SELECT name AS drzava, population AS st_prebivalcev FROM world;
+
   SELECT name AS "Ime države" FROM world;
   ```
 
@@ -159,20 +160,20 @@ SELECT Ime, Priimek, Kraj FROM T;          -- 4 vrstice
   ```sql
   SELECT name, population / area 
     FROM world
-    WHERE continent = 'Europe';
+   WHERE continent = 'Europe';
 
   SELECT name AS ime_drzave,
-      population / area AS gostota_prebivalstva
+         population / area AS gostota_prebivalstva
     FROM world
-    WHERE continent = 'Europe';
+   WHERE continent = 'Europe';
   ```
 
 * Zaokroži na dve decimalki in upoštevaj le države z več kot 2M prebivalstva.
   ```sql
   SELECT name AS "ime države", 
-      ROUND(population / area, 2) AS "gostota prebivalstva" 
+         ROUND(population / area, 2) AS "gostota prebivalstva" 
     FROM world
-    WHERE continent = 'Europe' AND population > 2000000;
+   WHERE continent = 'Europe' AND population > 2000000;
   ```
 
 ---
@@ -194,7 +195,66 @@ SELECT Ime, Priimek, Kraj FROM T;          -- 4 vrstice
   - Vrni imena evropskih držav, urejena po gostoti prebivalstva.
     ```sql
     SELECT name FROM world
-      WHERE continent = 'Europe'
-      ORDER BY population/area;
+     WHERE continent = 'Europe'
+     ORDER BY population/area;
     ```
   
+---
+
+# `SELECT` - dodatki
+
+* Vrnjeni stolpci so poljubni izrazi!
+  ```sql
+  SELECT naslov, ROUND(cena * 1.10, 2) FROM knjige 
+   WHERE cena * (1 + davek/100.0) > 100.00;
+  ```
+* Dodatki
+  - `AS`: pre(po)imenujemo izhodni stolpec
+  - `ORDER BY`: uredimo vrstice
+  - `DISTINCT`: v končnem rezultatu upoštevamo le različne vrstice
+
+---
+
+# `SELECT` - primer
+
+```sql
+SELECT name, ROUND(population/1000000) AS prebMilijoni
+  FROM world
+ WHERE continent IN ('Asia', 'Europe') AND
+       name LIKE 'C%';
+```
+
+* Razčlenimo:
+  * Izpiši ime in število prebivalcev v milionih. 
+  * Drugi stolpec poimenuj `prebMilijoni`,
+  * Podatke pridobi iz tabele `world`,
+  * Upoštevaj tiste vrstice, kjer je vrednost stolpca `continent` bodisi *Asia* bodisi *Europe* in kjer se vrednost v stolpcu `ime` začne s črko *C*.
+* Pomen:
+  - Izpiši imena in število prebivalcev tistih evropskih in azijskih držav, katerih imena se začnejo s *C*.
+
+---
+
+# Enostavna oblika stavka `SELECT`
+
+```sql
+SELECT * FROM world;
+
+SELECT name, population FROM world;
+
+SELECT name AS "Ime države" FROM world;
+
+SELECT name AS Ime FROM world
+ ORDER BY population DESC;
+
+SELECT DISTINCT continent FROM world;
+
+SELECT 2 FROM world WHERE continent = 'Europe';
+
+SELECT population/area FROM world
+ WHERE continent IN ('Europe', 'Asia', 'Africa') AND
+       area BETWEEN 100000 AND 1000000;
+
+SELECT name FROM world
+ WHERE continent = 'Europe'
+ ORDER BY population/area;
+```

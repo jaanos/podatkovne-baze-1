@@ -5,7 +5,12 @@ marp: true
 # Podatkovne baze 1
 
 * Predavanja:
+  - Janoš Vidali (janos.vidali@fmf.uni-lj.si), kabinet 5.14
+  - ponedeljek 10-12 v predavalnici 3.10,
+  - četrtek 8-9 v predavalnici 3.11
 * Vaje:
+  - Ajda Lampe (ajda.lampe@fmf.uni-lj.si), kabinet 4.27
+  - četrtek 9-11 v predavalnici 3.11
 
 ---
 
