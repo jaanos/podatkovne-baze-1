@@ -2,6 +2,11 @@
 
 Repozitorij z gradivi za predmet Podatkovne baze 1 (3. letnik Praktične matematike)
 
+## [Prosojnice predavanj](predavanja)
+
+* [Uvod](https://jaanos.github.io/podatkovne-baze-1/predavanja/01-uvod.marp.html) ([izročki](predavanja/01-uvod.md))
+* [SQL](https://jaanos.github.io/podatkovne-baze-1/predavanja/02-SQL.marp.html) ([izročki](predavanja/02-SQL.md))
+
 ## [Zapiski z vaj](zapiski)
 
 * Vaje na daljavo iz leta [2020/21](zapiski/2020-21)

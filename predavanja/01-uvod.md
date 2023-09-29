@@ -5,11 +5,11 @@ marp: true
 # Podatkovne baze 1
 
 * Predavanja:
-  - Janoš Vidali (janos.vidali@fmf.uni-lj.si), kabinet 5.14
+  - Janoš Vidali ([janos.vidali@fmf.uni-lj.si](mailto:janos.vidali@fmf.uni-lj.si)), kabinet 5.14
   - ponedeljek 10-12 v predavalnici 3.10,
   - četrtek 8-9 v predavalnici 3.11
 * Vaje:
-  - Ajda Lampe (ajda.lampe@fmf.uni-lj.si), kabinet 4.27
+  - Ajda Lampe ([ajda.lampe@fmf.uni-lj.si](mailto:ajda.lampe@fmf.uni-lj.si)), kabinet 4.27
   - četrtek 9-11 v predavalnici 3.11
 
 ---
@@ -37,7 +37,7 @@ marp: true
   - Dokler poštni naslov ne vsebuje prihoda v novo vrsto ali \|, vse deluje kot namazano ...
   - Res?
 * Iskanje je počasno.
-  - Ali je janos.vidali@fmf.uni-lj.si že na seznamu?
+  - Ali je [janos.vidali@fmf.uni-lj.si](mailto:janos.vidali@fmf.uni-lj.si) že na seznamu?
   - Pregled cele datoteke
 
 ---
