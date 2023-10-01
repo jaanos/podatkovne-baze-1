@@ -9,7 +9,7 @@ marp: true
 # Kako do podatkov iz baze
 
 * Vsebina tabel je uporabniku dostopna s pomočjo poizvedovalnih jezikov.
-* Uveljavil se je standardni jezik **SQL** (*Structured Query Language*, strukturirani poizvedovalni jezik)
+* Uveljavil se je standardni jezik **SQL** (*Structured Query Language*, strukturirani poizvedovalni jezik).
 * Enostavno berljiv:
   ```sql
   SELECT tecajnica.simbol, vp.opis, tecajnica.eTecaj
@@ -52,7 +52,7 @@ SELECT * FROM knjige
   - V izhodu naj bodo vsi stolpci izvorne tabele
 * `tabela`
   - Ime tabele, katere stolpce želimo dobiti
-* Zgledi z http://ucisesql.fmf.uni-lj.si
+* Zgledi z <http://ucisesql.fmf.uni-lj.si>
   ```sql
   SELECT * FROM drzave;
   ```
@@ -72,7 +72,7 @@ SELECT * FROM knjige
 
 * `s1, s2`
   - V izhodno tabelo uvrsti stolpca `s1` in `s2` iz tabele `tabPod`
-* Primer (https://sqlzoo.net/wiki/SELECT_basics):
+* Primer (<https://sqlzoo.net/wiki/SELECT_basics>):
   - Vrni ime in število prebivalcev za vsako posamezno državo
     ```sql
     SELECT name, population FROM world;
@@ -258,3 +258,117 @@ SELECT name FROM world
  WHERE continent = 'Europe'
  ORDER BY population/area;
 ```
+
+---
+
+# Zahtevnejše poizvedbe
+
+* **Izpiši imena držav, ki imajo manj prebivalcev kot Slovenija.**
+* Lahko gremo po korakih
+  * Najprej ugotovimo, koliko prebivalcev ima Slovenija
+    ```sql
+    SELECT population FROM world WHERE name = 'Slovenia';
+    ```
+    - Dobimo rezultat *2117674*
+  * Uporabimo v ustrezni poizvedbi
+    ```sql
+    SELECT name FROM world WHERE population <= 2117674;
+    ```
+---
+
+# S podpoizvedbami
+
+* Kot vrednost v izrazih lahko uporabimo tudi rezultate ukaza `SELECT`
+  ```sql
+  SELECT name FROM world
+   WHERE population <= (
+           SELECT population FROM world  
+            WHERE name = 'Slovenia'
+         );
+  ```
+  * Izračunamo tabelo s stolpcem `population`, kjer upoštevamo le tiste vrstice, kjer je ime države *Slovenia*.
+  * Ker ima ta tabela le eno vrstico, jo lahko uporabimo kot vrednost v zunanji poizvedbi.
+* Ali bomo dobili tudi Slovenijo?
+
+---
+
+# Poizvedbe s podpoizvedbami
+
+* Izpiši imena evropskih držav, ki imajo manj prebivalcev kot Slovenija.
+  ```sql
+  SELECT name FROM world
+   WHERE population < (
+           SELECT population FROM world
+            WHERE name = 'Slovenia'
+         ) AND
+         continent = 'Europe';
+  ```
+* Ali bomo dobili tudi Slovenijo?
+
+---
+
+# Poizvedbe s podpoizvedbami (2)
+
+* Izpiši imena držav, ki imajo število prebivalcev med številom prebivalcev Alžirije in Kanade.
+* Po korakih:
+  * ```sql
+    SELECT population FROM world
+     WHERE name = 'Canada';
+    ```
+    - Dobimo rezultat *40282200*.
+  * ```sql
+    SELECT population FROM world
+     WHERE name = 'Algeria';
+    ```
+    - Dobimo rezultat *45400000*.
+  * ```sql
+    SELECT name FROM world
+     WHERE population BETWEEN 40282200 AND 45400000;
+    ```
+
+---
+
+# Poizvedbe s podpoizvedbami (3)
+
+```sql
+SELECT name FROM world
+ WHERE population BETWEEN (
+         SELECT population FROM world
+          WHERE name = 'Canada'
+       ) AND (
+         SELECT population FROM world
+          WHERE name = 'Algeria'
+       );
+```
+
+---
+
+# Omejitve
+
+* Podpoizvedbe naj bi vračale le en stolpec z eno vrednostjo! Drugače pride do napake.
+  - Npr. če bi v našem primeru imeli dve ali več držav z imenom *Canada*.
+* Z nekaterimi operatorji lahko podpoizvedba vrača tudi več vrstic.
+  - `e [NOT] IN (SELECT ... )` - ali je (ni) vrednost `e` ena izmed vrednosti v stolpcu
+  - `e < ALL (SELECT ...)` - ali je vrednost `e` manjša od vseh vrednosti v stolpcu
+  - `e >= ANY (SELECT ...)` - ali je vrednost `e` večja ali enaka vsaj eni vrednosti v stolpcu
+  - `[NOT] EXISTS (SELECT ...)` - ali podpoizvedba vrne vsaj eno vrstico (oz. nobene)
+
+---
+
+# Primer
+
+* [Tabela]((https://sqlzoo.net/wiki/SELECT_from_Nobel_Tutorial)): `nobel(yr, subject, winner)`
+* Izpiši leta, kjer je bila podeljena Nobelova nagrada za fiziko in ne za kemijo.
+* Kako?
+  - Upoštevamo stolpce, kjer velja `subject = 'physics'`.
+  - Izločimo vrstice, kjer je vrednost v stolpcu `yr` ena od tistih vrednosti, ki nastopajo v stolpcu `yr` pri tistih vrsticah, kjer je `subject = 'chemistry'`.
+* ```sql
+  SELECT DISTINCT yr FROM nobel
+   WHERE subject = 'physics' AND
+         yr NOT IN (
+           SELECT yr FROM nobel
+            WHERE subject = 'chemistry'
+         );
+  ```
+* Zakaj `DISTINCT`?
+  - Lahko je več dobitnikov za fiziko v istem letu!

@@ -6,7 +6,7 @@ marp: true
 
 * Predavanja:
   - Janoš Vidali ([janos.vidali@fmf.uni-lj.si](mailto:janos.vidali@fmf.uni-lj.si)), kabinet 5.14
-  - ponedeljek 10-12 v predavalnici 3.10,
+  - ponedeljek 10-12 v predavalnici 3.10
   - četrtek 8-9 v predavalnici 3.11
 * Vaje:
   - Ajda Lampe ([ajda.lampe@fmf.uni-lj.si](mailto:ajda.lampe@fmf.uni-lj.si)), kabinet 4.27
@@ -34,9 +34,9 @@ marp: true
 * Ni problem:
   - Vsak naslov v svoji vrsti
   - Ali pa ločen z \|
-  - Dokler poštni naslov ne vsebuje prihoda v novo vrsto ali \|, vse deluje kot namazano ...
+  - Dokler poštni naslov ne vsebuje prehoda v novo vrsto ali \|, vse deluje kot namazano ...
   - Res?
-* Iskanje je počasno.
+* Iskanje je počasno
   - Ali je [janos.vidali@fmf.uni-lj.si](mailto:janos.vidali@fmf.uni-lj.si) že na seznamu?
   - Pregled cele datoteke
 
@@ -145,7 +145,7 @@ ACID: **A**tomicity, **C**onsistency, **I**solation, **D**urability
 * DBMS: **D**ata**b**ase **M**anagement **S**ystem
   - Skrbijo za vse navedeno
   - Programski paket (skupek programov), ki omogoča, da ustvarjamo baze ter v bazah hranimo podatke in delamo z njimi
-  - http://en.wikipedia.org/wiki/Database_management_system 
+  - <http://en.wikipedia.org/wiki/Database_management_system>
 * Več tipov baz
   - Hierarhični, mrežni, grafovski, ...
   - Relacijski (Codd, 1970)
@@ -197,7 +197,7 @@ ACID: **A**tomicity, **C**onsistency, **I**solation, **D**urability
 
 # Primeri (2)
 
-- Baza podatkov o državah (http://sqlzoo.net)
+- Baza podatkov o državah (<http://sqlzoo.net>)
 
   `Name`      | `Region`   | `Area` | `Population` | `gdp`
   ----------- | ---------- | ------ | ------------ | ----------
@@ -208,7 +208,7 @@ ACID: **A**tomicity, **C**onsistency, **I**solation, **D**urability
 
 # Primeri (3)
 
-- http://uciSeSql.fmf.uni-lj.si/Nivo1/, tabela `narocnik`
+- <http://uciSeSql.fmf.uni-lj.si/Nivo1/>, tabela `narocnik`
 
   `id_narocnik` [integer] | `ime` [character varying(255)] | `priimek` [character varying(255)] | `naslov` [character varying(255)] | `mesto` [character varying(255)]
   -- | -- | -- | -- | --
