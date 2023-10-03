@@ -99,7 +99,7 @@ SELECT * FROM knjige
 # `SELECT DISTINCT`
 
 * V izhodno tabelo uvrsti le med seboj različne vrstice.
-* Primer: vrni tabelo kontinentov, ki nastopajo v tabeli.
+* Primer: vrni tabelo celin, ki nastopajo v tabeli.
   ```sql
   SELECT DISTINCT continent FROM world;
   ```
@@ -372,3 +372,141 @@ SELECT name FROM world
   ```
 * Zakaj `DISTINCT`?
   - Lahko je več dobitnikov za fiziko v istem letu!
+
+---
+
+# Združevalne funkcije
+
+* `SUM(stolpec)`: vsota vrednosti v stolpcu
+  - Koliko "proizvedemo" v Evropi:
+    ```sql
+    SELECT SUM(gdp) FROM world
+     WHERE continent = 'Europe';
+    ```
+* `AVG(stolpec)`: povprečna vrednost v stolpcu
+  - Povprečno število prebivalcev v Evropi:
+    ```sql
+    SELECT AVG(population) FROM world
+     WHERE continent = 'Europe';
+    ```
+---
+
+# Združevalne funkcije (2)
+
+* `MIN(stolpec)`: minimalna vrednost v stolpcu
+  - Najmanjša površina, ki jo ima neka država v tabeli:
+    ```sql
+    SELECT MIN(area) FROM world;
+    ```
+* `MAX(stolpec)`: maksimalna vrednost v stolpcu
+  - Največje število prebivalcev izmed držav v Afriki:
+    ```sql
+    SELECT MAX(population) FROM world
+     WHERE continent = 'Africa';
+    ```
+* Funkcije `SUM`, `AVG`, `MIN`, `MAX` upoštevajo le vrednosti, ki niso `NULL`!
+
+---
+
+# Združevalne funkcije (3)
+
+* `COUNT(stolpec)`: število vrstic z neničelno vrednostjo v stolpcu
+  - Število filmov z določeno oznako (podatek je v tabeli):
+    ```sql
+    SELECT COUNT(oznaka) FROM film;
+    ```
+* `COUNT(DISTINCT stolpec)`: število različnih vrednosti v stolpcu
+  - Število različnih oznak, ki se pojavijo:
+    ```sql
+    SELECT COUNT(DISTINCT oznaka) FROM film;
+    ```
+* `COUNT(*)`: število vrstic (zapisov)
+  - Število ameriških držav v tabeli (J. in S. Amerika):
+    ```sql
+    SELECT COUNT(*) FROM world
+     WHERE continent LIKE '%America%';
+    ```
+
+---
+
+# Zgled
+
+* Izpišimo seznam afriških držav, katerih ime se začne na *S*, je sestavljeno le iz ene besede in ni *Senegal*.
+  ```sql
+  SELECT * FROM world
+   WHERE name LIKE 'S%' AND
+         continent = 'Africa' AND
+         name NOT LIKE '% %' AND
+         name <> 'Senegal';
+  ```
+* Kakšen je povprečni GDP teh držav?
+  ```sql
+  SELECT AVG(gdp) FROM world
+   WHERE name LIKE 'S%' AND
+         continent = 'Africa' AND
+         name NOT LIKE '% %' AND
+         name <> 'Senegal';
+  ```
+
+---
+
+# Združevalne funkcije in težave
+
+* Zanima nas naslov filma z najkrajšim naslovom.
+  ```sql
+  SELECT naslov, MIN(LENGTH(naslov)) FROM filmi;
+  ```
+  - Dobimo eno vrstico.
+* Je to prav? Je to edini tak film?
+  ```sql
+  SELECT naslov, LENGTH(naslov) AS dolzina FROM film
+  ORDER BY dolzina;
+  ```
+* Prejšnja poizvedba ni v skladu s standardom SQL!
+  - Čeprav jo SQLite dovoli ...
+
+---
+
+# Združevalne funkcije in težave (2)
+
+* Poskusimo podobno na SQLZoo.
+  ```sql
+  SELECT name, MAX(population) FROM world
+   WHERE continent = 'Africa';
+  ```
+* Dobimo napako, npr.
+  ```
+  Mixing of GROUP columns (MIN(),MAX(),COUNT(),...) with no
+  GROUP columns is illegal if there is no GROUP BY clause
+  ```
+* Kaj pravzaprav zahtevamo od RDBMS?
+  - Dobiti želimo vsa imena afriških držav
+  - in še največje prebivalstvo med njimi.
+  - To ne bo šlo, saj želimo imeti en stolpec z več vrsticami in enega z eno samo!
+
+---
+
+# Združevalne funkcije in težave (3)
+
+* Kaj pa takole?
+  ```sql
+  SELECT name, population FROM world
+   WHERE continent = 'Africa' AND
+         population = MAX(population);
+  ```
+* Združevalnih funkcij ne moremo uporabiti pri `WHERE`, saj tukaj preverjamo pogoje na eni vrstici naenkrat!
+
+---
+
+# Združevalne funkcije in težave (4)
+
+* Rešitev?
+* S podpoizvedbo:
+  ```sql
+  SELECT name, population FROM world
+   WHERE continent = 'Africa' AND
+         population = (
+           SELECT MAX(population) FROM world
+            WHERE continent = 'Africa'
+         );
+  ```

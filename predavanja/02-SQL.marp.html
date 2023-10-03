@@ -117,7 +117,7 @@
 <h1 id="select-distinct"><code>SELECT DISTINCT</code></h1>
 <ul>
 <li data-marpit-fragment="1">V izhodno tabelo uvrsti le med seboj različne vrstice.</li>
-<li data-marpit-fragment="2">Primer: vrni tabelo kontinentov, ki nastopajo v tabeli.<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-keyword">DISTINCT</span> continent <span class="hljs-keyword">FROM</span> world;
+<li data-marpit-fragment="2">Primer: vrni tabelo celin, ki nastopajo v tabeli.<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-keyword">DISTINCT</span> continent <span class="hljs-keyword">FROM</span> world;
 </code></pre>
 </li>
 <li data-marpit-fragment="3">Kaj vrneta sledeči poizvedbi?<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> leto <span class="hljs-keyword">FROM</span> film;
@@ -442,6 +442,159 @@
 <ul>
 <li>Lahko je več dobitnikov za fiziko v istem letu!</li>
 </ul>
+</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="24" data-marpit-fragments="2">
+<h1 id="zdru%C5%BEevalne-funkcije">Združevalne funkcije</h1>
+<ul>
+<li data-marpit-fragment="1"><code>SUM(stolpec)</code>: vsota vrednosti v stolpcu
+<ul>
+<li>Koliko &quot;proizvedemo&quot; v Evropi:<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">SUM</span>(gdp) <span class="hljs-keyword">FROM</span> world
+ <span class="hljs-keyword">WHERE</span> continent <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Europe&#x27;</span>;
+</code></pre>
+</li>
+</ul>
+</li>
+<li data-marpit-fragment="2"><code>AVG(stolpec)</code>: povprečna vrednost v stolpcu
+<ul>
+<li>Povprečno število prebivalcev v Evropi:<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">AVG</span>(population) <span class="hljs-keyword">FROM</span> world
+ <span class="hljs-keyword">WHERE</span> continent <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Europe&#x27;</span>;
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="25" data-marpit-fragments="3">
+<h1 id="zdru%C5%BEevalne-funkcije-2">Združevalne funkcije (2)</h1>
+<ul>
+<li data-marpit-fragment="1"><code>MIN(stolpec)</code>: minimalna vrednost v stolpcu
+<ul>
+<li>Najmanjša površina, ki jo ima neka država v tabeli:<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">MIN</span>(area) <span class="hljs-keyword">FROM</span> world;
+</code></pre>
+</li>
+</ul>
+</li>
+<li data-marpit-fragment="2"><code>MAX(stolpec)</code>: maksimalna vrednost v stolpcu
+<ul>
+<li>Največje število prebivalcev izmed držav v Afriki:<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">MAX</span>(population) <span class="hljs-keyword">FROM</span> world
+ <span class="hljs-keyword">WHERE</span> continent <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Africa&#x27;</span>;
+</code></pre>
+</li>
+</ul>
+</li>
+<li data-marpit-fragment="3">Funkcije <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code> upoštevajo le vrednosti, ki niso <code>NULL</code>!</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="26" data-marpit-fragments="3">
+<h1 id="zdru%C5%BEevalne-funkcije-3">Združevalne funkcije (3)</h1>
+<ul>
+<li data-marpit-fragment="1"><code>COUNT(stolpec)</code>: število vrstic z neničelno vrednostjo v stolpcu
+<ul>
+<li>Število filmov z določeno oznako (podatek je v tabeli):<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">COUNT</span>(oznaka) <span class="hljs-keyword">FROM</span> film;
+</code></pre>
+</li>
+</ul>
+</li>
+<li data-marpit-fragment="2"><code>COUNT(DISTINCT stolpec)</code>: število različnih vrednosti v stolpcu
+<ul>
+<li>Število različnih oznak, ki se pojavijo:<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">COUNT</span>(<span class="hljs-keyword">DISTINCT</span> oznaka) <span class="hljs-keyword">FROM</span> film;
+</code></pre>
+</li>
+</ul>
+</li>
+<li data-marpit-fragment="3"><code>COUNT(*)</code>: število vrstic (zapisov)
+<ul>
+<li>Število ameriških držav v tabeli (J. in S. Amerika):<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">FROM</span> world
+ <span class="hljs-keyword">WHERE</span> continent <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;%America%&#x27;</span>;
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="27" data-marpit-fragments="2">
+<h1 id="zgled">Zgled</h1>
+<ul>
+<li data-marpit-fragment="1">Izpišimo seznam afriških držav, katerih ime se začne na <em>S</em>, je sestavljeno le iz ene besede in ni <em>Senegal</em>.<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> world
+ <span class="hljs-keyword">WHERE</span> name <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;S%&#x27;</span> <span class="hljs-keyword">AND</span>
+       continent <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Africa&#x27;</span> <span class="hljs-keyword">AND</span>
+       name <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;% %&#x27;</span> <span class="hljs-keyword">AND</span>
+       name <span class="hljs-operator">&lt;&gt;</span> <span class="hljs-string">&#x27;Senegal&#x27;</span>;
+</code></pre>
+</li>
+<li data-marpit-fragment="2">Kakšen je povprečni GDP teh držav?<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">AVG</span>(gdp) <span class="hljs-keyword">FROM</span> world
+ <span class="hljs-keyword">WHERE</span> name <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;S%&#x27;</span> <span class="hljs-keyword">AND</span>
+       continent <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Africa&#x27;</span> <span class="hljs-keyword">AND</span>
+       name <span class="hljs-keyword">NOT</span> <span class="hljs-keyword">LIKE</span> <span class="hljs-string">&#x27;% %&#x27;</span> <span class="hljs-keyword">AND</span>
+       name <span class="hljs-operator">&lt;&gt;</span> <span class="hljs-string">&#x27;Senegal&#x27;</span>;
+</code></pre>
+</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="28" data-marpit-fragments="3">
+<h1 id="zdru%C5%BEevalne-funkcije-in-te%C5%BEave">Združevalne funkcije in težave</h1>
+<ul>
+<li data-marpit-fragment="1">Zanima nas naslov filma z najkrajšim naslovom.<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> naslov, <span class="hljs-built_in">MIN</span>(LENGTH(naslov)) <span class="hljs-keyword">FROM</span> filmi;
+</code></pre>
+<ul>
+<li>Dobimo eno vrstico.</li>
+</ul>
+</li>
+<li data-marpit-fragment="2">Je to prav? Je to edini tak film?<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> naslov, LENGTH(naslov) <span class="hljs-keyword">AS</span> dolzina <span class="hljs-keyword">FROM</span> film
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> dolzina;
+</code></pre>
+</li>
+<li data-marpit-fragment="3">Prejšnja poizvedba ni v skladu s standardom SQL!
+<ul>
+<li>Čeprav jo SQLite dovoli ...</li>
+</ul>
+</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="29" data-marpit-fragments="3">
+<h1 id="zdru%C5%BEevalne-funkcije-in-te%C5%BEave-2">Združevalne funkcije in težave (2)</h1>
+<ul>
+<li data-marpit-fragment="1">Poskusimo podobno na SQLZoo.<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> name, <span class="hljs-built_in">MAX</span>(population) <span class="hljs-keyword">FROM</span> world
+ <span class="hljs-keyword">WHERE</span> continent <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Africa&#x27;</span>;
+</code></pre>
+</li>
+<li data-marpit-fragment="2">Dobimo napako, npr.<pre is="marp-pre" data-auto-scaling="downscale-only"><code>Mixing of GROUP columns (MIN(),MAX(),COUNT(),...) with no
+GROUP columns is illegal if there is no GROUP BY clause
+</code></pre>
+</li>
+<li data-marpit-fragment="3">Kaj pravzaprav zahtevamo od RDBMS?
+<ul>
+<li>Dobiti želimo vsa imena afriških držav</li>
+<li>in še največje prebivalstvo med njimi.</li>
+<li>To ne bo šlo, saj želimo imeti en stolpec z več vrsticami in enega z eno samo!</li>
+</ul>
+</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="30" data-marpit-fragments="2">
+<h1 id="zdru%C5%BEevalne-funkcije-in-te%C5%BEave-3">Združevalne funkcije in težave (3)</h1>
+<ul>
+<li data-marpit-fragment="1">Kaj pa takole?<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> name, population <span class="hljs-keyword">FROM</span> world
+ <span class="hljs-keyword">WHERE</span> continent <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Africa&#x27;</span> <span class="hljs-keyword">AND</span>
+       population <span class="hljs-operator">=</span> <span class="hljs-built_in">MAX</span>(population);
+</code></pre>
+</li>
+<li data-marpit-fragment="2">Združevalnih funkcij ne moremo uporabiti pri <code>WHERE</code>, saj tukaj preverjamo pogoje na eni vrstici naenkrat!</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="31" data-marpit-fragments="2">
+<h1 id="zdru%C5%BEevalne-funkcije-in-te%C5%BEave-4">Združevalne funkcije in težave (4)</h1>
+<ul>
+<li data-marpit-fragment="1">Rešitev?</li>
+<li data-marpit-fragment="2">S podpoizvedbo:<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> name, population <span class="hljs-keyword">FROM</span> world
+ <span class="hljs-keyword">WHERE</span> continent <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Africa&#x27;</span> <span class="hljs-keyword">AND</span>
+       population <span class="hljs-operator">=</span> (
+         <span class="hljs-keyword">SELECT</span> <span class="hljs-built_in">MAX</span>(population) <span class="hljs-keyword">FROM</span> world
+          <span class="hljs-keyword">WHERE</span> continent <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Africa&#x27;</span>
+       );
+</code></pre>
 </li>
 </ul>
 </section>
