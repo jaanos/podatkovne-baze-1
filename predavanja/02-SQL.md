@@ -1,6 +1,6 @@
 ---
 marp: true
-style: @import url('style.css')
+style: "@import url('style.css')"
 ---
 
 # SQL
@@ -770,8 +770,8 @@ GROUP BY stolpci;
 
 # `GROUP BY` - primer
 
-<div class="columns" style="--cols: 3;">
-<div>
+<span class="columns" style="--cols: 3;">
+<span>
 
 ```sql
 SELECT ... FROM donacije;
@@ -785,8 +785,8 @@ Anja  | 60
 Špela | 390
 Špela | 25
 
-</div>
-<div>
+</span>
+<span>
 
 ```sql
 SELECT ... FROM donacije
@@ -803,8 +803,8 @@ Janez | 62
 Špela | 390
 Špela | 25
 
-</div>
-<div>
+</span>
+<span>
 
 ```sql
 SELECT ... FROM donacije
@@ -820,8 +820,8 @@ Janez | 62
 &nbsp; | &nbsp;
 Špela | 390
 
-</div>
-</div>
+</span>
+</span>
 
 ---
 
@@ -873,8 +873,8 @@ SELECT name, continent, MAX(population) FROM world
 
 # `GROUP BY` in `WHERE`
 
-<div class="columns" style="--cols: 2;">
-<div>
+<span class="columns" style="--cols: 2;">
+<span>
 
 
 * Zanima nas število držav z vsaj 200M prebivalci na vsaki celini.
@@ -885,8 +885,8 @@ SELECT name, continent, MAX(population) FROM world
   WHERE population >= 200000000;
   ```
 
-</div>
-<div>
+</span>
+<span>
 
 *
   `name`        | `population`
@@ -899,8 +899,8 @@ SELECT name, continent, MAX(population) FROM world
   Pakistan      | 241499431
   United States | 335317000
 
-</div>
-</div>
+</span>
+</span>
 
 ---
 
@@ -912,8 +912,8 @@ SELECT continent, COUNT(*) AS stevilo FROM world
  GROUP BY continent;
 ```
 
-<div class="columns" style="--cols: 2;">
-<div>
+<span class="columns" style="--cols: 2;">
+<span>
 
 `continent`   | `stevilo`
 ------------- | ---------
@@ -922,16 +922,16 @@ Asia          | 4
 North America | 1
 South America | 1
 
-</div>
-<div>
+</span>
+<span>
 
 * `WHERE` deluje **pred** združevanjem.
 * Zato smo najprej dobili tabelo s 7 vrsticami.
 * Te smo potem z `GROUP BY` razdelili v skupine po celinah.
 * `COUNT` pa je potem preštel število vrstic v posamezni skupini.
 
-</div>
-</div>
+</span>
+</span>
 
 ---
 
@@ -1037,26 +1037,26 @@ South America | 1
   HAVING COUNT(DISTINCT subject) > 1;
   ```
 
-<div class="columns" style="--cols: 2;">
-<div>
+  <span class="columns" style="--cols: 2;">
+  <span>
 
-`winner`      | `podrocja`
-------------- | ----------
-Linus Pauling | 2
-Marie Curie   | 2
+  `winner`      | `podrocja`
+  ------------- | ----------
+  Linus Pauling | 2
+  Marie Curie   | 2
 
-</div>
-<div>
+  </span>
+  <span>
 
-`yr` | `subject` | `winner`
----- | --------- | -------------
-1962 | Peace     | Linus Pauling
-1954 | Chemistry | Linus Pauling
-1911 | Chemistry | Marie Curie
-1903 | Physics   | Marie Curie
+  `yr` | `subject` | `winner`
+  ---- | --------- | -------------
+  1962 | Peace     | Linus Pauling
+  1954 | Chemistry | Linus Pauling
+  1911 | Chemistry | Marie Curie
+  1903 | Physics   | Marie Curie
 
-</div>
-</div>
+  </span>
+  </span>
 
 ---
 
@@ -1064,7 +1064,7 @@ Marie Curie   | 2
 
 * Pri `GROUP BY` lahko uporabimo tudi več stolpcev (ključev).
   
-  <small>
+  <span class="small">
 
   Ime    | Starost | Kraj
   ------ | ------- | ---------
@@ -1081,7 +1081,8 @@ Marie Curie   | 2
   SELECT ... FROM t GROUP BY kraj;          -- 3 skupine
   SELECT ... FROM t GROUP BY starost, kraj; -- 6 skupin
   ```
-  </small>
+
+  </span>
 
 ---
 
