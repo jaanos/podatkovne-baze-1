@@ -876,7 +876,6 @@ SELECT name, continent, MAX(population) FROM world
 <span class="columns" style="--cols: 2;">
 <span>
 
-
 * Zanima nas število držav z vsaj 200M prebivalci na vsaki celini.
 * Takih držav je 7:
   
@@ -888,7 +887,8 @@ SELECT name, continent, MAX(population) FROM world
 </span>
 <span>
 
-*
+* Dobimo:
+  
   `name`        | `population`
   ------------- | ------------
   Brazil        | 203062512
