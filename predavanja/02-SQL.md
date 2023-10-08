@@ -1,5 +1,6 @@
 ---
 marp: true
+style: @import url('style.css')
 ---
 
 # SQL
@@ -126,12 +127,12 @@ Miha  | Slovenski | 12        | Celje
 </small>
 
 ```sql
-SELECT DISTINCT Kraj FROM T;               -- 2 vrstici
-SELECT DISTINCT Priimek, Kraj FROM T;      -- 3 vrstice
-SELECT DISTINCT Ime, Priimek, Kraj FROM T; -- 4 vrstice
-SELECT Kraj FROM T;                        -- 4 vrstice
-SELECT Priimek, Kraj FROM T;               -- 4 vrstice
-SELECT Ime, Priimek, Kraj FROM T;          -- 4 vrstice
+SELECT DISTINCT Kraj FROM t;               -- 2 vrstici
+SELECT DISTINCT Priimek, Kraj FROM t;      -- 3 vrstice
+SELECT DISTINCT Ime, Priimek, Kraj FROM t; -- 4 vrstice
+SELECT Kraj FROM t;                        -- 4 vrstice
+SELECT Priimek, Kraj FROM t;               -- 4 vrstice
+SELECT Ime, Priimek, Kraj FROM t;          -- 4 vrstice
 ```
 
 ---
@@ -140,7 +141,7 @@ SELECT Ime, Priimek, Kraj FROM T;          -- 4 vrstice
 
 * Zanimajo nas le podatki o evropskih državah.
   ```sql
-  SELECT * FROM world WHERE continent = 'Europe'
+  SELECT * FROM world WHERE continent = 'Europe';
   ```
 * **Konstantni nizi v enojnih narekovajih!**
 * Možni relacijski operatorji:
@@ -225,7 +226,7 @@ SELECT name, ROUND(population/1000000) AS prebMilijoni
 ```
 
 * Razčlenimo:
-  * Izpiši ime in število prebivalcev v milionih. 
+  * Izpiši ime in število prebivalcev v milijonih. 
   * Drugi stolpec poimenuj `prebMilijoni`,
   * Podatke pridobi iz tabele `world`,
   * Upoštevaj tiste vrstice, kjer je vrednost stolpca `continent` bodisi *Asia* bodisi *Europe* in kjer se vrednost v stolpcu `ime` začne s črko *C*.
@@ -375,6 +376,51 @@ SELECT name FROM world
 
 ---
 
+# `WITH`
+
+* Zanimajo nas filmi, ki so dobili enake ocene kot Filmi, da te kap
+  ```sql
+  SELECT naslov, ocena FROM film 
+   WHERE ocena IN (
+           SELECT ocena FROM film 
+            WHERE naslov LIKE 'Scary Movie%' OR
+                  naslov = 'Film da te kap'
+         );
+  ```
+* Z določilom `WITH` si lahko pripravimo podpoizvedbo in se nanjo sklicujemo z določenim imenom.
+  ```sql
+  WITH ocene_strasnih_filmov AS (
+    SELECT ocena FROM film
+     WHERE naslov LIKE 'Scary Movie%' OR 
+           naslov = 'Film da te kap'
+  )
+  SELECT naslov, ocena FROM film
+   WHERE ocena IN ocene_strasnih_filmov;
+  ```
+
+---
+
+# `WITH` (2)
+
+* Navedemo lahko tudi več podpoizvedb in se nanje sklicujemo kot na tabele:
+```sql
+WITH gospodarji_prstanov AS (
+  SELECT * FROM film
+   WHERE naslov LIKE 'Gospodar prstanov%'
+),
+leta_gospodarjev AS (
+  SELECT leto FROM gospodarji_prstanov
+),
+ocene_gospodarjev AS (
+  SELECT ocena FROM gospodarji_prstanov
+)
+SELECT * FROM film
+ WHERE leto IN leta_gospodarjev AND 
+       ocena IN ocene_gospodarjev;
+```
+
+---
+
 # Združevalne funkcije
 
 * `SUM(stolpec)`: vsota vrednosti v stolpcu
@@ -509,4 +555,548 @@ SELECT name FROM world
            SELECT MAX(population) FROM world
             WHERE continent = 'Africa'
          );
+  ```
+
+---
+
+# Še en zgled
+
+* Poišči imena tistih držav, ki imajo bruto družbeni proizvod večji od katerekoli evropske države.
+* Spet uporabimo podpoizvedbo:
+  ```sql
+  SELECT name FROM world 
+   WHERE gdp > (
+           SELECT MAX(gdp) FROM world 
+            WHERE continent = 'Europe'
+         );
+  ```
+* Naša poizvedba se bere tako:
+  - Poišči imena tistih držav, ki imajo bruto družbeni proizvod večji od največjega GDP evropskih držav.
+
+---
+
+# Še en zgled (2)
+
+* Ali lahko napišemo poizvedbo, ki se bo brala tako, kot smo vprašali?
+* Če za relacijskim operatorjem uporabimo določilo `ALL`, mora biti pogoj izpolnjen za vse rezultate podpoizvedbe.
+  ```sql
+  SELECT name FROM world 
+   WHERE gdp > ALL (
+           SELECT gdp FROM world 
+            WHERE continent = 'Europe'
+         );
+  ```
+  - <small>SQLite tega **ne** podpira!</small>
+* Kaj pa, če je med rezultati podpoizvedbe `NULL`?
+  
+---
+
+# Primerjanje z `NULL`
+
+* Operacije z `NULL` vračajo `NULL`!
+* Izjema: `IS [NOT] NULL`:
+  ```sql
+  SELECT name FROM world 
+   WHERE gdp > ALL (
+           SELECT gdp FROM world 
+            WHERE continent = 'Europe' AND
+                  gdp IS NOT NULL
+         );
+  ```
+
+---
+
+# In sedaj nekaj zapletenega
+
+* Izpiši ime, celino in število prebivalcev vseh tistih držav, ki so na celini, kjer ima vsaka država manj kot 30M prebivalcev.
+* Gremo po delčkih.
+  - Osnovni `SELECT` bo enostaven:
+    ```sql
+    SELECT name, continent, population FROM world
+     WHERE continent IN (
+             -- seznam ustreznih celin
+           );
+    ```
+
+---
+
+# Kako dobiti seznam celin
+
+* Kako preveriti, ali imajo vse države na določeni celini manj kot 30M prebivalcev?
+* Poskusimo z `MAX` za Evropo.
+  ```sql
+  SELECT continent FROM world
+   WHERE 30000000 > (
+           SELECT MAX(population) FROM world
+            WHERE continent = 'Europe'
+         );
+  ```
+* Dobimo prazno tabelo.
+  - Prav, saj ima največja evropska država 146M prebivalcev.
+  - Za nobeno vrstico pogoj ni izpolnjen.
+
+---
+
+# Ustrezna celina
+
+* "Ročno" preverimo, da je taka celina *Insular Oceania*.
+* Torej bi moralo biti tole v redu za vse države v Oceaniji.
+ ```sql
+  SELECT continent FROM world
+   WHERE 30000000 > (
+           SELECT MAX(population) FROM world
+            WHERE continent = 'Insular Oceania'
+         );
+  ```
+* Dobimo ogromno tabelo!
+  - Če uporabimo `COUNT`, vidimo, da dobimo VSE države (194).
+  - Za vsako vrstico je pogoj izpolnjen!
+* Hočemo, da sta kontinenta "zunaj" in "znotraj" enaka.
+
+---
+
+# Kombiniranje notranje in zunanje poizvedbe
+
+* Poglejmo si to poizvedbo:
+  ```sql
+  SELECT continent, name, population FROM world AS t1
+   WHERE population >= ALL (
+           SELECT population FROM world AS t2
+            WHERE t1.continent = t2.continent
+         );
+  ```
+* Kaj pomeni `world AS t1`?
+  - Tabelo `world` smo preimenovali v `t1`.
+  - Sedaj lahko torej uporabimo ime `t1` za sklicevanje na tabelo `world` iz zunanje poizvedbe.
+  - `t1.continent`: stolpec `continent` iz tabele `t1`.
+
+---
+
+# Kombiniranje notranje in zunanje poizvedbe (2)
+
+* Imamo torej dve kopiji tabele `world`:
+  - `t1` v zunanji poizvedbi, in
+  - `t2` v podpoizvedbi.
+* Lahko si predstavljamo, da imamo dvojno zanko čez vrstice tabele `world`:
+  - `t1` se nanaša na trenutno vrstico v zunanji zanki,
+  - `t2` se nanaša na trenutno vrstico v notranji zanki.
+* Dobimo torej države z največjim številom prebivalcev na vsaki celini.
+
+---
+
+# Ustrezna celina (2)
+
+* Poskusimo torej:
+  ```sql
+  SELECT continent FROM world AS t1
+   WHERE 30000000 > ALL (
+           SELECT population FROM world AS t2
+            WHERE t1.continent = t2.continent
+         );
+  ```
+* Dobimo vrstico za vsako državo na ustrezni celini.
+  - Lahko bi uporabili `DISTINCT`, saj nas zanima samo seznam celin.
+
+---
+
+# Končna rešitev
+
+```sql
+SELECT name, continent, population FROM world
+ WHERE continent IN (
+         SELECT continent FROM world AS t1
+          WHERE 30000000 > ALL (
+                  SELECT population FROM world AS t2
+                   WHERE t1.continent = t2.continent
+                )
+       );
+```
+
+* Bi šlo enostavneje?
+  ```sql
+  SELECT name, continent, population FROM world AS t1
+   WHERE 30000000 > ALL (
+           SELECT population FROM world AS t2
+            WHERE t1.continent = t2.continent
+         );
+  ```
+
+---
+
+# Velike države
+
+* Poišči tiste države (s pripadajočimi celinami), ki imajo več kot 3x toliko prebivalcev, kot jih imajo ostale države na tej celini.
+* Ideja: poiskati maksimalno število prebivalcev med tistimi državami na istem kontinentu (potrebni bosta dve kopiji tabele), ki nimajo istega imena kot ta država.
+* ```sql
+  SELECT name, continent FROM world AS t1
+   WHERE population > (
+           SELECT 3 * MAX(population) FROM world AS t2
+            WHERE t1.continent = t2.continent AND 
+                  t1.name <> t2.name
+         );
+  ```
+
+---
+
+# Združevalne funkcije in skupine podatkov
+
+* Denimo, da nas zanima maksimalno število prebivalcev države na vsaki celini.
+* To lahko naredimo s podpoizvedbo:
+  ```sql
+  SELECT continent, population FROM world AS t1
+   WHERE population >= ALL (
+           SELECT population FROM world AS t2
+            WHERE t1.continent = t2.continent
+         );
+  ```
+* Težava: delamo dvojno zanko.
+  - Ali bi znali sprogramirati brez gnezdenja zank?
+
+---
+
+# `GROUP BY`
+
+```sql
+SELECT ... FROM tabela
+...
+GROUP BY stolpci;
+```
+
+* Vrstice v tabeli razdelimo v skupine glede na navedene stolpce oziroma izraze.
+* Združevalne funkcije potem delujejo za vsako skupino posebej.
+  - Poizvedba vrne toliko vrstic, kolikor je skupin.
+
+---
+
+# `GROUP BY` - primer
+
+<div class="columns" style="--cols: 3;">
+<div>
+
+```sql
+SELECT ... FROM donacije;
+```
+
+Ime   | Prispevek
+----- | ---------
+Anja  | 25
+Janez | 62
+Anja  | 60
+Špela | 390
+Špela | 25
+
+</div>
+<div>
+
+```sql
+SELECT ... FROM donacije
+ GROUP BY ime;
+```
+
+Ime   | Prispevek
+----- | ---------
+Anja  | 25
+Anja  | 60
+&nbsp; | &nbsp;
+Janez | 62
+&nbsp; | &nbsp;
+Špela | 390
+Špela | 25
+
+</div>
+<div>
+
+```sql
+SELECT ... FROM donacije
+ GROUP BY prispevek/100;
+```
+
+Ime   | Prispevek
+----- | ---------
+Anja  | 25
+Anja  | 60
+Janez | 62
+Špela | 25
+&nbsp; | &nbsp;
+Špela | 390
+
+</div>
+</div>
+
+---
+
+# Primer
+
+* Maksimalno število prebivalcev države na vsaki celini z `GROUP BY`:
+  ```sql
+  SELECT MAX(population) FROM world
+   GROUP BY continent;
+  ```
+* Zanimajo nas tudi celine, ki jim pripadajo dobljene številke.
+  ```sql
+  SELECT continent, MAX(population) FROM world
+   GROUP BY continent;
+  ```
+
+---
+
+# Izbor stolpcev
+
+```sql
+SELECT ime, prispevek FROM donacije GROUP BY ime;
+
+SELECT ime, prispevek FROM donacije GROUP BY prispevek / 100;
+```
+
+* Zgornja stavka nista v skladu s standardom SQL!
+* Če uporabimo `GROUP BY`, bo v izhodu **ena** vrstica za vsako skupino.
+* Standard prepoveduje uporabo stolpcev, ki niso navedeni pri `GROUP BY`, izven združevalnih funkcij.
+* Kaj točno se zgodi ob izvedbi zgornjih stavkov, je odvisno od RDBMS.
+
+---
+
+# Napake
+
+```sql
+SELECT name, continent, MAX(population) FROM world
+ GROUP BY continent;
+```
+
+* Zakaj to ni OK?
+* SQLZoo vrne
+  ```
+  Error:
+  'gisq.world.name' isn't in GROUP BY
+  ```
+
+---
+
+# `GROUP BY` in `WHERE`
+
+<div class="columns" style="--cols: 2;">
+<div>
+
+
+* Zanima nas število držav z vsaj 200M prebivalci na vsaki celini.
+* Takih držav je 7:
+  
+  ```sql
+  SELECT name, population FROM world
+  WHERE population >= 200000000;
+  ```
+
+</div>
+<div>
+
+*
+  `name`        | `population`
+  ------------- | ------------
+  Brazil        | 203062512
+  China         | 1411750000
+  India         | 1392329000
+  Indonesia     | 277749853
+  Nigeria       | 216783400
+  Pakistan      | 241499431
+  United States | 335317000
+
+</div>
+</div>
+
+---
+
+# `GROUP BY` in `WHERE` (2)
+
+```sql
+SELECT continent, COUNT(*) AS stevilo FROM world 
+ WHERE population >= 200000000
+ GROUP BY continent;
+```
+
+<div class="columns" style="--cols: 2;">
+<div>
+
+`continent`   | `stevilo`
+------------- | ---------
+Africa        | 1
+Asia          | 4
+North America | 1
+South America | 1
+
+</div>
+<div>
+
+* `WHERE` deluje **pred** združevanjem.
+* Zato smo najprej dobili tabelo s 7 vrsticami.
+* Te smo potem z `GROUP BY` razdelili v skupine po celinah.
+* `COUNT` pa je potem preštel število vrstic v posamezni skupini.
+
+</div>
+</div>
+
+---
+
+# Filtriranje skupin
+
+* Zanimajo nas tiste celine, na katerih živi vsaj 500M prebivalcev.
+* Šlo bi brez uporabe `GROUP BY`:
+  ```sql
+  SELECT DISTINCT continent FROM world AS t1
+   WHERE 500000000 <= (
+           SELECT SUM(population) FROM world AS t2
+            WHERE t1.continent = t2.continent
+         );
+  ```
+  - Spet delamo dvojno zanko!
+
+---
+
+# Filtriranje skupin (2)
+
+* Poskusimo še z `GROUP BY`.
+* Izpišimo najprej prebivalstvo vsake celine.
+  ```sql
+  SELECT continent, SUM(population) FROM world
+   GROUP BY continent;
+  ```
+* Ali lahko uporabimo `WHERE`?
+  * Ne - ta deluje pred združevanjem!
+
+---
+
+# `GROUP BY` in `HAVING`
+
+* Z določilom `HAVING` filtriramo skupine, nastale pri združevanju.
+  ```sql
+  SELECT continent FROM world
+   GROUP BY continent
+  HAVING SUM(population) >= 500000000;
+  ```
+  - Najprej tabelo razdelimo na skupine po celinah.
+  - `SUM(population)` potem seštejo prebivalstvo na posamezni celini.
+  - Pogoj pri `HAVING` preverja vrstice, ki jo dobimo za vsako skupino.
+* Pri `HAVING` smemo uporabiti tiste stolpce/izraze, ki jih lahko ob uporabi `GROUP BY` izberemo za stolpce dobljene tabele.
+
+---
+
+# Še en zgled
+
+* [Tabela]((https://sqlzoo.net/wiki/SELECT_from_Nobel_Tutorial)): `nobel(yr, subject, winner)`
+* Izpiši tista leta po letu 1970, ko je Nobelovo nagrado iz fizike (*Physics*) dobil le en posameznik.
+  ```sql
+  SELECT yr FROM nobel 
+   WHERE subject = 'Physics' AND
+         yr > 1970
+   GROUP BY yr  
+  HAVING COUNT(yr) = 1;
+  ```
+
+---
+
+# In še en zgled
+
+* Kateri posamezniki so dobili Nobelovo nagrado na dveh ali več področjih?
+  ```sql
+  SELECT winner, COUNT(subject) FROM nobel
+   GROUP BY winner
+  HAVING COUNT(subject) > 1;
+  ```
+
+  `winner`                                 | `COUNT(subject)`
+  ---------------------------------------- | ----------------
+  Frederick Sanger                         | 2
+  International Committee of the Red Cross | 3
+  John Bardeen                             | 2
+  Linus Pauling                            | 2
+  Marie Curie                              | 2
+
+* Je to v redu?
+
+---
+
+# Preverimo
+
+* Kako bi dobili še ostale podatke zanje?
+  ```sql
+  SELECT * FROM nobel
+   WHERE winner IN (
+           SELECT winner FROM nobel
+            GROUP BY winner
+           HAVING COUNT(subject) > 1
+         );
+  ```
+* Dejansko smo dobili tiste, ki so dobili Nobelovo nagrado več kot enkrat (ne glede na področje).
+
+---
+
+# Popravimo
+
+* Šteti želimo *različna* področja.
+  ```sql
+  SELECT winner, COUNT(DISTINCT subject) AS podrocja FROM nobel
+   GROUP BY winner
+  HAVING COUNT(DISTINCT subject) > 1;
+  ```
+
+<div class="columns" style="--cols: 2;">
+<div>
+
+`winner`      | `podrocja`
+------------- | ----------
+Linus Pauling | 2
+Marie Curie   | 2
+
+</div>
+<div>
+
+`yr` | `subject` | `winner`
+---- | --------- | -------------
+1962 | Peace     | Linus Pauling
+1954 | Chemistry | Linus Pauling
+1911 | Chemistry | Marie Curie
+1903 | Physics   | Marie Curie
+
+</div>
+</div>
+
+---
+
+# Več ključev
+
+* Pri `GROUP BY` lahko uporabimo tudi več stolpcev (ključev).
+  
+  <small>
+
+  Ime    | Starost | Kraj
+  ------ | ------- | ---------
+  Janez  | 18      | Kranj
+  Metka  | 18      | Kranj
+  Peter  | 20      | Kranj
+  Pavel  | 21      | Ljubljana
+  Ivana  | 18      | Ljubljana
+  Silva  | 19      | Ljubljana
+  Srečko | 20      | Celje
+
+  ```sql
+  SELECT ... FROM t GROUP BY starost;       -- 4 skupine
+  SELECT ... FROM t GROUP BY kraj;          -- 3 skupine
+  SELECT ... FROM t GROUP BY starost, kraj; -- 6 skupin
+  ```
+  </small>
+
+---
+
+# Zgled
+
+* Prikaži tista leta in področja, kjer so bile v istem letu podeljene 3 nagrade ali več. Upoštevaj le leta po letu 2000.
+* Skupino sestavlja par (leto, področje).
+  - `GROUP BY yr, subject`
+  - ali `GROUP BY subject, yr`
+* Z `WHERE yr > 2000` bomo omejili leta.
+* S `HAVING COUNT(*) >= 3` bomo upoštevali le skupine z vsaj tremi vrsticami.
+  ```sql
+  SELECT yr, subject FROM nobel
+   WHERE yr > 2000
+   GROUP BY yr, subject
+  HAVING COUNT(*) >= 3
+   ORDER BY yr;
   ```
