@@ -361,7 +361,7 @@ SELECT name FROM world
 * [Tabela]((https://sqlzoo.net/wiki/SELECT_from_Nobel_Tutorial)): `nobel(yr, subject, winner)`
 * Izpiši leta, kjer je bila podeljena Nobelova nagrada za fiziko in ne za kemijo.
 * Kako?
-  - Upoštevamo stolpce, kjer velja `subject = 'physics'`.
+  - Upoštevamo vrstice, kjer velja `subject = 'physics'`.
   - Izločimo vrstice, kjer je vrednost v stolpcu `yr` ena od tistih vrednosti, ki nastopajo v stolpcu `yr` pri tistih vrsticah, kjer je `subject = 'chemistry'`.
 * ```sql
   SELECT DISTINCT yr FROM nobel
@@ -378,7 +378,7 @@ SELECT name FROM world
 
 # `WITH`
 
-* Zanimajo nas filmi, ki so dobili enake ocene kot Filmi, da te kap
+* Zanimajo nas filmi, ki so dobili enake ocene kot Filmi, da te kap.
   ```sql
   SELECT naslov, ocena FROM film 
    WHERE ocena IN (
@@ -500,7 +500,7 @@ SELECT * FROM film
 
 * Zanima nas naslov filma z najkrajšim naslovom.
   ```sql
-  SELECT naslov, MIN(LENGTH(naslov)) FROM filmi;
+  SELECT naslov, MIN(LENGTH(naslov)) FROM film;
   ```
   - Dobimo eno vrstico.
 * Je to prav? Je to edini tak film?
@@ -651,7 +651,7 @@ SELECT * FROM film
 * Dobimo ogromno tabelo!
   - Če uporabimo `COUNT`, vidimo, da dobimo VSE države (194).
   - Za vsako vrstico je pogoj izpolnjen!
-* Hočemo, da sta kontinenta "zunaj" in "znotraj" enaka.
+* Hočemo, da sta celini "zunaj" in "znotraj" enaki.
 
 ---
 
@@ -726,7 +726,7 @@ SELECT name, continent, population FROM world
 # Velike države
 
 * Poišči tiste države (s pripadajočimi celinami), ki imajo več kot 3x toliko prebivalcev, kot jih imajo ostale države na tej celini.
-* Ideja: poiskati maksimalno število prebivalcev med tistimi državami na istem kontinentu (potrebni bosta dve kopiji tabele), ki nimajo istega imena kot ta država.
+* Ideja: poiskati maksimalno število prebivalcev med tistimi državami na isti celini (potrebni bosta dve kopiji tabele), ki nimajo istega imena kot ta država.
 * ```sql
   SELECT name, continent FROM world AS t1
    WHERE population > (
