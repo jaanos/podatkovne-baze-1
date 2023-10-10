@@ -358,7 +358,7 @@ SELECT name FROM world
 
 # Primer
 
-* [Tabela]((https://sqlzoo.net/wiki/SELECT_from_Nobel_Tutorial)): `nobel(yr, subject, winner)`
+* [Tabela](https://sqlzoo.net/wiki/SELECT_from_Nobel_Tutorial): `nobel(yr, subject, winner)`
 * Izpiši leta, kjer je bila podeljena Nobelova nagrada za fiziko in ne za kemijo.
 * Kako?
   - Upoštevamo vrstice, kjer velja `subject = 'physics'`.
@@ -980,7 +980,7 @@ South America | 1
 
 # Še en zgled
 
-* [Tabela]((https://sqlzoo.net/wiki/SELECT_from_Nobel_Tutorial)): `nobel(yr, subject, winner)`
+* [Tabela](https://sqlzoo.net/wiki/SELECT_from_Nobel_Tutorial): `nobel(yr, subject, winner)`
 * Izpiši tista leta po letu 1970, ko je Nobelovo nagrado iz fizike (*Physics*) dobil le en posameznik.
   ```sql
   SELECT yr FROM nobel 
@@ -1101,3 +1101,273 @@ South America | 1
   HAVING COUNT(*) >= 3
    ORDER BY yr;
   ```
+
+---
+
+# Združevanje tabel
+
+<span class="columns" style="--cols: 2;">
+<span>
+
+* Denimo, da imamo sledeči tabeli o olimpijskih igrah.
+
+  <span class="small">
+
+  Leto | Kraj
+  ---- | -------
+  1896 | Atene
+  1948 | London
+  2004 | Atene
+  2008 | Beijing
+  2012 | London
+
+  Kraj    | Država
+  ------- | ----------------
+  Atene   | Grčija
+  London  | Velika Britanija
+  Beijing | Kitajska
+
+  </span>
+
+</span>
+<span>
+
+* V kateri državi so bile OI leta 2004?
+* Za vsako državo nas zanima, kolikokrat je priredila OI.
+* Da odgovorimo, potrebujemo podatke **obeh** tabel.
+
+  Leto | Kraj    | Država
+  ---- | ------- | ----------------
+  1896 | Atene   | Grčija
+  1948 | London  | Velika Britanija
+  2004 | Atene   | Grčija
+  2008 | Beijing | Kitajska
+  2012 | London  | Velika Britanija
+
+</span>
+</span>
+
+---
+
+# Združevanje tabel (2)
+
+* Seveda moramo računati na nepopolne podatke ...
+
+<span class="columns" style="--cols: 2;">
+<span>
+
+  <span class="small">
+
+  Leto | Kraj
+  ---- | -------
+  1896 | Atene
+  1948 | London
+  2004 | Atene
+  2008 | Beijing
+  2012 | London
+
+  Kraj   | Država
+  ------ | ----------------
+  Atene  | Grčija
+  London | Velika Britanija
+  Sydney | Avstralija
+
+  </span>
+
+</span>
+<span>
+
+Leto   | Kraj    | Država
+------ | ------- | ----------------
+1896   | Atene   | Grčija
+1948   | London  | Velika Britanija
+2004   | Atene   | Grčija
+2008   | Beijing |
+2012   | London  | Velika Britanija
+&nbsp; | Sydney  | Avstralija
+
+</span>
+</span>
+
+---
+
+# `SELECT` in več tabel
+
+* "Prave" baze torej običajno sestavlja več tabel.
+* Pogosto želimo kot rezultat dobiti podatke, ki se nahajajo v več tabelah.
+
+  <span class="columns small" style="--cols: 2;">
+  <span>
+
+  `ID` | `ImePriimek` | `Posta`
+  ---- | ------------ | -------
+  MK1  | Miha Kranjc  | 1000
+  MH1  | Maja Hrust   | 2000
+  LS1  | Lidija Svet  | 1000
+  MK2  | Mitja Kern   | 3000
+
+  `Posta` | `Kraj`
+  ------- | ---------
+  1000    | Ljubljana
+  2000    | Maribor
+  3000    | Celje
+
+  </span>
+  <span>
+
+  `ID` | `ImePriimek` | `Posta` | `Kraj`
+  ---- | ------------ | ------- | ---------
+  MK1  | Miha Kranjc  | 1000    | Ljubljana
+  MH1  | Maja Hrust   | 2000    | Maribor
+  LS1  | Lidija Svet  | 1000    | Ljubljana
+  MK2  | Mitja Kern   | 3000    | Celje
+
+  </span>
+  </span>
+
+---
+
+# Združevanja tabel
+
+* Navedemo lahko več tabel:
+  ```sql
+  SELECT * FROM zaposleni, posta;
+  ```
+* Dobimo kartezični produkt, torej $mn$ zapisov (kjer sta $m$ in $n$ števili zapisov v prvi in drugi tabeli).
+  - V primeru zaposlenih: $4 \cdot 3 = 12$ zapisov!
+  - Kot da bi vsak živel v *vsakem* kraju!
+* Včasih je to čisto smiselno!
+  - Seznam deklet
+  - Seznam fantov
+  - Kartezični produkt: možni pari
+
+---
+
+# Sklicevanje na stolpce
+
+* Kako do določenih stolpcev?
+  ```sql
+  SELECT ImePriimek, Posta, Kraj FROM zaposleni, posta;
+  ```
+* Od kod dobimo vrednost stolpca `Posta`?
+  - Če imamo tak stolpec v več tabelah, dobimo napako!
+* Navedemo lahko, iz katere tabele naj bo nek stolpec:
+  ```sql
+  SELECT ImePriimek, posta.Posta, Kraj FROM zaposleni, posta;
+  ```
+  - Torej `tabela.stolpec`.
+  - Če ni možnosti za zmedo (ime stolpca se pojavi le v eni od navedenih tabel), lahko ime tabele izpustimo.
+
+---
+
+# Združevanje z omejevanjem
+
+* Izberimo samo zapise, kjer se poštni številki ujemata:
+  ```sql
+  SELECT * FROM zaposleni, posta
+  WHERE zaposleni.Posta = posta.Posta;
+  ```
+* Ker smo uporabili `*`, dobimo vse stolpce iz obeh tabel.
+  
+  `ID` | `ImePriimek` | `Posta` | `Posta` | `Kraj`
+  ---- | ------------ | ------- | ------- | ---------
+  MK1  | Miha Kranjc  | 1000    | 1000    | Ljubljana
+  MH1  | Maja Hrust   | 2000    | 2000    | Maribor
+  LS1  | Lidija Svet  | 1000    | 1000    | Ljubljana
+  MK2  | Mitja Kern   | 3000    | 3000    | Celje
+
+  - Stolpec `Posta` dobimo iz obeh tabel!
+
+---
+
+# Izbor določenih vrednosti
+
+* Denimo, da nas zanimajo podatki o točno določenem zaposlenem.
+  ```sql
+  SELECT * FROM zaposleni, posta
+  WHERE zaposleni.Posta = posta.Posta AND
+        ID = 'MK1';
+  ```
+* Pogoji v `WHERE`:
+  - preverjanje ujemanja vrstic (`zaposleni.Posta = posta.Posta`)
+  - vsebinsko filtriranje rezultatov (`ID = 'MK1'`)
+* Želimo ločiti filtriranje zaradi vsebine in zaradi združevanja!
+
+---
+
+# Notranji stik (`INNER JOIN`)
+
+* Zaradi preglednosti lahko ločimo obe vrsti filtriranja:
+  ```sql
+  SELECT * FROM zaposleni
+   INNER JOIN posta
+           ON zaposleni.Posta = posta.Posta
+   WHERE ID = 'MK1';
+  ```
+  - Določilo `INNER` lahko izpustimo.
+* Če obstajajo vrstice, za katere pogoj za združevanje ni nikoli resničen (npr. neke poštne številke zaposlenega ni v tabeli `posta`), teh vrstic ne bo v izhodu!
+
+---
+
+# Zunanji stik (`OUTER JOIN`)
+
+* Želimo dobiti tudi vrstice iz prve tabele, ki nimajo para v drugi tabeli (in/ali obratno).
+  ```sql
+  SELECT * FROM oi
+    LEFT OUTER JOIN kraj
+                 ON oi.kraj = kraj.kraj;
+  ```
+  - `LEFT [OUTER] JOIN` - ohrani vse vrstice iz prve tabele
+  - `RIGHT [OUTER] JOIN` - ohrani vse vrstice iz druge tabele
+  - `FULL [OUTER] JOIN` - ohrani vse vrstice iz obeh tabel
+* Vrstice, za katere pogoj pri `ON` ni nikoli izpolnjen, se ohranijo, vrednosti v stolpcih iz druge tabele pa dobijo vrednosti `NULL`.
+* Filtriranje z `WHERE` se zgodi po združevanju (in lahko izloči prej ohranjene vrstice).
+
+---
+
+# Druge možnosti združevanja
+
+* Pogoj pri `ON` je lahko poljuben (ne nujno ujemanje po stolpcih)!
+* Če združujemo po istoimeskih stolpcih, lahko namesto pogoja pri `ON` naštejemo stolpce z določilom `USING`:
+  ```sql
+  SELECT * FROM zaposleni
+   INNER JOIN posta USING (Posta);
+  ```
+  - Če združujemo po več stolpcih, jih naštejemo med oklepaji, ločene z vejicami.
+  - Našteti stolpci se v izhodu **ne** podvojijo!
+* Če združujemo po *vseh* istoimeskih stolpcih, lahko uporabimo `NATURAL JOIN`:
+  ```sql
+  SELECT * FROM oi
+  NATURAL LEFT OUTER JOIN kraj;
+  ```
+
+---
+
+# Več tabel
+
+* Baza [filmov](https://sqlzoo.net/wiki/More_JOIN_operations) na SQLZoo
+  - `movie(id, title, yr, score, votes, director)`
+  - `actor(id, name)`
+  - `casting(movieid, actorid, ord)`
+* Izpiši naslove filmov, kjer je igral *John Wayne*.
+* Za naslove potrebujemo tabelo `movie`.
+* Imena igralcev so v tabeli `actor`.
+* Tabela `casting` povezuje igralce in filme.
+  - Odnos tipa več-na-več med tabelama `movie` in `actor` (igralec je igral v več filmih, filmi pa imajo več igralcev)
+
+---
+
+# Združevanje
+
+```sql
+SELECT title FROM movie
+  JOIN casting ON movie.id = movieid
+  JOIN actor   ON actorid = actor.id
+ WHERE actor.name = 'John Wayne';
+```
+
+* Najprej sestavimo tabelo z združevanjem, nato jo filtriramo z `WHERE`.
+  - Vzamemo vrstico tabele `movie`.
+  - Združimo jo s tistimi vrsticami tabele `casting`, ki imajo vrednost v stolpcu `movieid` enako vrednosti stolpca `id` tabele `movie`.
+  - Dobljene vrstice združimo s tistimi vrsticami tabele `actor`, ki imajo vrednost v stolpcu `id` enako vrednosti stolpca `actorid` tabele `casting`.
+  - Od dobljenih vrstic vzamemo le tiste, kjer je vrednost stolpca `name` v tabeli `actor` enaka *John Wayne*.
