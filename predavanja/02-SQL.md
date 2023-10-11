@@ -641,7 +641,7 @@ SELECT * FROM film
 
 * "Ročno" preverimo, da je taka celina *Insular Oceania*.
 * Torej bi moralo biti tole v redu za vse države v Oceaniji.
- ```sql
+  ```sql
   SELECT continent FROM world
    WHERE 30000000 > (
            SELECT MAX(population) FROM world
@@ -1104,7 +1104,7 @@ South America | 1
 
 ---
 
-# Združevanje tabel
+# Stikanje tabel
 
 <span class="columns" style="--cols: 2;">
 <span>
@@ -1149,9 +1149,9 @@ South America | 1
 
 ---
 
-# Združevanje tabel (2)
+# Stikanje tabel (2)
 
-* Seveda moramo računati na nepopolne podatke ...
+- Seveda moramo računati na nepopolne podatke ...
 
 <span class="columns" style="--cols: 2;">
 <span>
@@ -1227,7 +1227,7 @@ Leto   | Kraj    | Država
 
 ---
 
-# Združevanja tabel
+# Kartezični produkt
 
 * Navedemo lahko več tabel:
   ```sql
@@ -1260,7 +1260,7 @@ Leto   | Kraj    | Država
 
 ---
 
-# Združevanje z omejevanjem
+# Stikanje z omejevanjem
 
 * Izberimo samo zapise, kjer se poštni številki ujemata:
   ```sql
@@ -1285,13 +1285,13 @@ Leto   | Kraj    | Država
 * Denimo, da nas zanimajo podatki o točno določenem zaposlenem.
   ```sql
   SELECT * FROM zaposleni, posta
-  WHERE zaposleni.Posta = posta.Posta AND
-        ID = 'MK1';
+   WHERE zaposleni.Posta = posta.Posta AND
+         ID = 'MK1';
   ```
 * Pogoji v `WHERE`:
   - preverjanje ujemanja vrstic (`zaposleni.Posta = posta.Posta`)
   - vsebinsko filtriranje rezultatov (`ID = 'MK1'`)
-* Želimo ločiti filtriranje zaradi vsebine in zaradi združevanja!
+* Želimo ločiti filtriranje zaradi vsebine in zaradi stikanja!
 
 ---
 
@@ -1305,7 +1305,7 @@ Leto   | Kraj    | Država
    WHERE ID = 'MK1';
   ```
   - Določilo `INNER` lahko izpustimo.
-* Če obstajajo vrstice, za katere pogoj za združevanje ni nikoli resničen (npr. neke poštne številke zaposlenega ni v tabeli `posta`), teh vrstic ne bo v izhodu!
+* Če obstajajo vrstice, za katere pogoj za stikanje ni nikoli resničen (npr. neke poštne številke zaposlenega ni v tabeli `posta`), teh vrstic ne bo v izhodu!
 
 ---
 
@@ -1321,21 +1321,21 @@ Leto   | Kraj    | Država
   - `RIGHT [OUTER] JOIN` - ohrani vse vrstice iz druge tabele
   - `FULL [OUTER] JOIN` - ohrani vse vrstice iz obeh tabel
 * Vrstice, za katere pogoj pri `ON` ni nikoli izpolnjen, se ohranijo, vrednosti v stolpcih iz druge tabele pa dobijo vrednosti `NULL`.
-* Filtriranje z `WHERE` se zgodi po združevanju (in lahko izloči prej ohranjene vrstice).
+* Filtriranje z `WHERE` se zgodi po stikanju (in lahko izloči prej ohranjene vrstice).
 
 ---
 
-# Druge možnosti združevanja
+# Druge možnosti stikanja
 
 * Pogoj pri `ON` je lahko poljuben (ne nujno ujemanje po stolpcih)!
-* Če združujemo po istoimeskih stolpcih, lahko namesto pogoja pri `ON` naštejemo stolpce z določilom `USING`:
+* Če stikamo po istoimeskih stolpcih, lahko namesto pogoja pri `ON` naštejemo stolpce z določilom `USING`:
   ```sql
   SELECT * FROM zaposleni
    INNER JOIN posta USING (Posta);
   ```
-  - Če združujemo po več stolpcih, jih naštejemo med oklepaji, ločene z vejicami.
+  - Če stikamo po več stolpcih, jih naštejemo med oklepaji, ločene z vejicami.
   - Našteti stolpci se v izhodu **ne** podvojijo!
-* Če združujemo po *vseh* istoimeskih stolpcih, lahko uporabimo `NATURAL JOIN`:
+* Če stikamo po *vseh* istoimeskih stolpcih, lahko uporabimo `NATURAL JOIN`:
   ```sql
   SELECT * FROM oi
   NATURAL LEFT OUTER JOIN kraj;
@@ -1357,7 +1357,7 @@ Leto   | Kraj    | Država
 
 ---
 
-# Združevanje
+# Stikanje
 
 ```sql
 SELECT title FROM movie
@@ -1366,8 +1366,422 @@ SELECT title FROM movie
  WHERE actor.name = 'John Wayne';
 ```
 
-* Najprej sestavimo tabelo z združevanjem, nato jo filtriramo z `WHERE`.
+* Najprej sestavimo tabelo z stikanjem, nato jo filtriramo z `WHERE`.
   - Vzamemo vrstico tabele `movie`.
-  - Združimo jo s tistimi vrsticami tabele `casting`, ki imajo vrednost v stolpcu `movieid` enako vrednosti stolpca `id` tabele `movie`.
-  - Dobljene vrstice združimo s tistimi vrsticami tabele `actor`, ki imajo vrednost v stolpcu `id` enako vrednosti stolpca `actorid` tabele `casting`.
+  - Staknemo jo s tistimi vrsticami tabele `casting`, ki imajo vrednost v stolpcu `movieid` enako vrednosti stolpca `id` tabele `movie`.
+  - Dobljene vrstice staknemo s tistimi vrsticami tabele `actor`, ki imajo vrednost v stolpcu `id` enako vrednosti stolpca `actorid` tabele `casting`.
   - Od dobljenih vrstic vzamemo le tiste, kjer je vrednost stolpca `name` v tabeli `actor` enaka *John Wayne*.
+
+---
+
+# Igralci v filmu Velikan
+
+* Zanima nas, kdo je poleg Jamesa Deana še igral v filmu Velikan (*Giant*).
+* Zasedbo dobimo iz tabele `casting`.
+  - Tu so le ID-ji filmov in igralcev!
+* Potrebujemo ID filma, poznamo pa le njegov naslov, ki se nahaja v tabeli `movie`.
+* Imena igralcev bomo dobili iz tabele `actor`.
+* Uredili bomo po vrstnem redu igralcev v filmu (`casting.ord`).
+  ```sql
+  SELECT name FROM movie
+    JOIN casting ON movie.id = movieid
+    JOIN actor   ON actor.id = actorid
+  WHERE title = 'Giant' AND
+        name <> 'James Dean'
+  ORDER BY ord;
+  ```
+
+---
+
+# Največje zvezde
+
+* Kateri igralci so bili glavni igralci v vsaj 10 filmih?
+* V tabeli `casting` se pojavijo vsaj desetkrat z `ord = 1`.
+  - `WHERE ord = 1`
+  - `HAVING COUNT(*) >= 10`
+* Imena igralcev bomo dobili iz tabele `actor`.
+* Podatkov o filmih ne bomo potrebovali!
+  ```sql
+  SELECT name FROM actor
+    JOIN casting ON actorid = id
+   WHERE ord = 1
+   GROUP BY id, name
+  HAVING COUNT(*) >= 10;
+  ```
+* Kaj pa, če nas zanima tudi, v koliko filmih so bili glavni igralci?
+
+---
+
+# Glavni igralci
+
+* Zanimajo nas naslovi in glavni igralci vseh tistih filmov, kjer Al Pacino *ni* bil v glavni vlogi.
+* Potrebujemo podatke iz vseh treh tabel!
+* Zanimajo nas le tiste vrstice, kjer imamo glavnega igralca ...
+  - `WHERE ord = 1`
+* in to ni *Al Pacino*!
+  - `AND name <> 'Al Pacino'`
+* Mora pa Al Pacino biti med igralci.
+  ```sql
+  AND movie.id IN (
+    -- seznam ID-jev filmov, kjer je igral Al Pacino
+  )
+  ```
+
+---
+
+# Seznam filmov z Alom Pacinom
+
+* Potrebujemo tabeli `casting` in `actor`.
+* Od filmov potrebujemo samo ID - ta se nahaja v `casting`!
+* Zanimajo nas samo vrstice, kjer je igralec *Al Pacino*.
+  ```sql
+  SELECT movieid FROM casting
+    JOIN actor ON actor.id = actorid
+   WHERE actor.name = 'Al Pacino';
+  ```
+
+---
+
+# Rešitev
+
+```sql
+SELECT title, name FROM movie
+  JOIN casting ON movie.id = movieid
+  JOIN actor   ON actor.id = actorid
+ WHERE ord = 1 AND
+       name <> 'Al Pacino' AND
+       movie.id IN (
+         SELECT movieid FROM casting
+           JOIN actor ON actor.id = actorid
+          WHERE actor.name = 'Al Pacino'
+    );
+ 
+```
+
+---
+
+# Vrstni red izvajanja
+
+```sql
+SELECT [DISTINCT]                       -- 8
+    stolpci, združevalne_funkcije       -- 7
+  FROM leva_tabela                      -- 1
+[LEFT] JOIN                             -- 3
+       desna_tabela ON pogoji_stikanja  -- 2
+ WHERE vsebinski_pogoji                 -- 4
+ GROUP BY ključi_skupin                 -- 5
+HAVING pogoji_skupin                    -- 6
+ ORDER BY ključi_urejanja               -- 9
+ LIMIT število;                         -- 10
+```
+
+---
+
+# Primer
+
+* Imamo tabeli `narocnik` in `narocilo`.
+
+  <span class="columns small" style="--cols: 2;">
+  <span>
+
+  `narocnik_id` | `ime`  | `priimek`
+  ------------- | ------ | ---------
+  1             | Damjan | Kmetec
+  2             | Aljaž  | Kmetec
+  3             | Špela  | Prezelj
+  4             | Metka  | Kmetec
+  
+  </span>
+  <span>
+
+  `narocilo_id` | `narocnik_id` | `kolicina`
+  ------------- | ------------- | ----------
+  1             | 1             | 2
+  2             | 1             | 1
+  3             | 3             | 1
+  4             | 4             | 4
+
+  </span>
+  </span>
+
+* Želimo dobiti število naročil vsakega naročnika s priimkom *Kmetec*, ki je naročil največ tri kose, urejeno naraščajoče po številu naročil.
+
+  <span class="small">
+
+  `narocnik_id` | `ime`  | `priimek` | `stevilo` | `skupna_kolicina`
+  ------------- | ------ | --------- | --------- | -----------------
+  2             | Aljaž  | Kmetec    | 0         | 0
+  1             | Damjan | Kmetec    | 2         | 3
+
+  </span>
+
+---
+
+# Poizvedba
+
+```sql
+SELECT narocnik_id, ime, priimek,
+         COUNT(narocilo_id) AS stevilo,
+         COALESCE(SUM(kolicina), 0) AS skupna_kolicina
+  FROM narocnik
+  LEFT OUTER JOIN
+       narocilo USING (narocnik_id)
+ WHERE priimek = 'Kmetec'
+ GROUP BY narocnik_id, ime, priimek
+HAVING COALESCE(SUM(kolicina), 0) <= 3
+ ORDER BY stevilo;
+```
+
+---
+
+# Stikanje
+
+```sql
+...
+FROM narocnik LEFT OUTER JOIN narocilo USING (narocnik_id)
+...
+```
+<span class="small">
+
+`narocnik_id` | `ime`  | `priimek` | `narocilo_id` | `kolicina`
+------------- | ------ | --------- | ------------- | ----------
+1             | Damjan | Kmetec    | 1             | 2
+1             | Damjan | Kmetec    | 2             | 1
+2             | Aljaž  | Kmetec    | `NULL`        | `NULL`
+3             | Špela  | Prezelj   | 3             | 1
+4             | Metka  | Kmetec    | 4             | 4
+
+</span>
+
+---
+
+# Filtriranje
+
+```sql
+...
+WHERE priimek = 'Kmetec'
+...
+```
+<span class="small">
+
+`narocnik_id` | `ime`  | `priimek` | `narocilo_id` | `kolicina`
+------------- | ------ | --------- | ------------- | ----------
+1             | Damjan | Kmetec    | 1             | 2
+1             | Damjan | Kmetec    | 2             | 1
+2             | Aljaž  | Kmetec    | `NULL`        | `NULL`
+4             | Metka  | Kmetec    | 4             | 4
+
+</span>
+
+---
+
+# Združevanje
+
+```sql
+...
+GROUP BY narocnik_id, ime, priimek
+...
+```
+<span class="small">
+
+`narocnik_id` | `ime`  | `priimek` | `narocilo_id` | `kolicina`
+------------- | ------ | --------- | ------------- | ----------
+1             | Damjan | Kmetec    | 1             | 2
+&nbsp;        | &nbsp; | &nbsp;    | 2             | 1
+2             | Aljaž  | Kmetec    | `NULL`        | `NULL`
+4             | Metka  | Kmetec    | 4             | 4
+
+</span>
+
+---
+
+# Filtriranje skupin
+
+```sql
+...
+HAVING COALESCE(SUM(kolicina), 0) <= 3
+...
+```
+
+<span class="small">
+
+`narocnik_id` | `ime`      | `priimek`  | `narocilo_id` | `kolicina` | `skupna_kolicina`
+------------- | ---------- | ---------- | ------------- | ---------- | -----------------
+1             | Damjan     | Kmetec     | 1             | 2          | 3
+&nbsp;        | &nbsp;     | &nbsp;     | 2             | 1
+2             | Aljaž      | Kmetec     | `NULL`        | `NULL`     | 0
+~~4~~         | ~~Metka~~  | ~~Kmetec~~ | 4             | 4          | 4
+
+</span>
+
+---
+
+# Izračun stolpcev
+
+```sql
+SELECT narocnik_id, ime, priimek,
+         COUNT(narocilo_id) AS stevilo,
+         COALESCE(SUM(kolicina), 0) AS skupna_kolicina
+...
+```
+
+`narocnik_id` | `ime`  | `priimek` | `stevilo` | `skupna_kolicina`
+------------- | ------ | --------- | --------- | -----------------
+1             | Damjan | Kmetec    | 2         | 3
+2             | Aljaž  | Kmetec    | 1         | 0
+
+
+---
+
+# Urejanje
+
+```sql
+...
+ ORDER BY stevilo;
+```
+
+`narocnik_id` | `ime`  | `priimek` | `stevilo` | `skupna_kolicina`
+------------- | ------ | --------- | --------- | -----------------
+2             | Aljaž  | Kmetec    | 1         | 0
+1             | Damjan | Kmetec    | 2         | 3
+
+---
+
+# Še nekaj primerov
+
+* Baza filmov (SQLite)
+* V katerih žanrih je posnetih največ filmov?
+* Podatki v tabeli `pripada` - film ima lahko več žanrov!
+* Imena žanrov so v tabeli `zanr`.
+* ```sql
+  SELECT naziv, COUNT(*) AS stevilo
+    FROM pripada
+    JOIN zanr ON zanr = id
+   GROUP BY id, naziv
+   ORDER BY stevilo DESC;
+  ```
+
+---
+
+# Povprečna ocena in dolžina po žanrih
+
+* Ocene in dolžine so v tabeli `film`.
+* ```sql
+  SELECT naziv,
+         AVG(ocena) AS povprecna_ocena,
+         AVG(dolzina) AS povprecna_dolzina
+    FROM film
+    JOIN pripada ON film.id = film
+    JOIN zanr ON zanr = zanr.id
+   GROUP BY zanr.id, naziv
+   ORDER BY povprecna_ocena DESC;
+  ```
+
+---
+
+# Filmi z več kot enim režiserjem
+
+```sql
+SELECT naslov, COUNT(*) AS st_reziserjev
+  FROM vloga
+  JOIN film ON film = id
+ WHERE tip = 'R'
+ GROUP BY naslov
+HAVING st_reziserjev > 1
+ ORDER BY st_reziserjev DESC;
+```
+
+* Zakaj je to narobe?
+* Pravilno:
+  ```sql
+  SELECT naslov, COUNT(*) AS st_reziserjev
+    FROM vloga
+    JOIN film ON film = id
+  WHERE tip = 'R'
+  GROUP BY id, naslov
+  HAVING st_reziserjev > 1
+  ORDER BY st_reziserjev DESC;
+  ```
+
+---
+
+# Romantične komedije
+
+* Zanimajo nas filmi, ki imajo med žanri *Comedy* in *Romance*.
+* Poskusimo:
+  ```sql
+  SELECT film FROM pripada
+   WHERE zanr = 4 AND zanr = 8;
+  ```
+  - Zakaj to ni OK?
+* Želimo tiste filme, za katere obstaja tako vrstica z `zanr = 4` kot tudi z `zanr = 8`!
+
+---
+
+# Romantične komedije (2)
+
+* Dobimo ID-je vseh filmov, za katere se pojavita oba žanra.
+  ```sql
+  SELECT film FROM pripada
+    JOIN zanr ON zanr = id
+   WHERE naziv IN ('Comedy', 'Romance')
+   GROUP BY film
+  HAVING COUNT(*) = 2;
+  ```
+* Lahko bi uporabili kot podpoizvedbo, ali pa staknemo zraven še tabelo `filmi`.
+  ```sql
+  SELECT naslov FROM film
+    JOIN pripada ON film.id = film
+    JOIN zanr ON zanr = zanr.id
+   WHERE naziv IN ('Comedy', 'Romance')
+   GROUP BY film.id, naslov
+  HAVING COUNT(*) = 2;
+  ```
+
+---
+
+# Igralec in režiser v istem filmu
+
+```sql
+SELECT naslov, ime FROM film
+  JOIN vloga ON film.id = film
+  JOIN oseba ON oseba = oseba.id
+ GROUP BY film.id, naslov, oseba.id, ime
+HAVING COUNT(*) = 2;
+```
+
+* Deluje, ker sta edini vlogi igralec in režiser.
+* Kaj pa, če bi lahko imeli več vlog, pa nas vseeno zanimata samo ti dve?
+* Ali pa če se nekdo večkrat pojavi kot igralec (npr. več likov v istem filmu)?
+
+---
+
+# Igralec in režiser v istem filmu (2)
+
+```sql
+WITH reziser AS (
+       SELECT * FROM vloga
+        WHERE tip = 'R'
+     ),
+     igralec AS (
+       SELECT * FROM vloga
+        WHERE tip = 'I'
+     )
+SELECT naslov, ime FROM reziser
+  JOIN igralec USING (oseba, film)
+  JOIN film ON film.id = film
+  JOIN oseba ON oseba.id = oseba;
+```
+
+---
+
+# Kaj počne ta poizvedba?
+
+```sql
+SELECT film.*
+  FROM pripada AS prvi
+  JOIN pripada AS drugi USING (film)
+  JOIN film ON id = film
+WHERE prvi.zanr = 4 AND drugi.zanr = 8 AND oznaka <> 'R'
+ORDER BY film.glasovi DESC;
+```
