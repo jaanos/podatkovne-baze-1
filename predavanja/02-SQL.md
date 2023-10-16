@@ -1785,3 +1785,219 @@ SELECT film.*
 WHERE prvi.zanr = 4 AND drugi.zanr = 8 AND oznaka <> 'R'
 ORDER BY film.glasovi DESC;
 ```
+
+---
+
+# Ustvarjanje baz
+
+```sql
+CREATE DATABASE baza;
+```
+
+* Moramo imeti ustrezne pravice na RDBMS!
+* V SQLite ta korak ni potreben - baza se ustvari kot datoteka.
+
+---
+
+# Ustvarjanje tabel
+
+```sql
+CREATE TABLE tabela (
+  stolpec1 tip
+    [PRIMARY KEY]                       -- glavni ključ
+    [NOT NULL]                          -- prepovedana vrednost NULL
+    [UNIQUE]                            -- enolične vrednosti v stolpcu
+    [CHECK (pogoj)]                     -- pogoj, ki mora veljati za stolpec
+    [DEFAULT (vrednost)]                -- privzeta vrednost
+    [REFERENCES druga_tabela(stolpec)], -- tuji ključ
+  [PRIMARY KEY (st1, st2, ...),]        -- glavni ključ iz več stolpcev
+  [UNIQUE (st1, st2, ...),]             -- enolične vrednosti v več stolpcih
+  [CHECK (pogoj),]                      -- pogoj, ki vključuje več stolpcev
+  [FOREIGN KEY (st1, st2, ...)          -- tuji ključ iz več stolpcev
+     REFERENCES druga_tabela(s1, s2, ...),]
+  ...
+);
+```
+
+* Različni RDBMS poznajo še druga določila, npr. `AUTOINCREMENT` pri SQLite.
+
+---
+
+# Podatkovni tipi
+
+* Številski tipi:
+  - `integer` ipd. - cela števila
+  - `numeric(p, s)`, `decimal(p, s)`, `real`, ... - decimalna števila
+* Besedilni tipi:
+  - `char(n)`, `varchar(n)` - nizi dolžine natanko/največ `n` znakov
+  - `text` - poljubno besedilo
+* Časovni tipi (oblika [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601)):
+  - `date` - datum v obliki `YYYY-MM-DD`
+  - `time` - čas v obliki `hh:mm:ss`
+  - `datetime` - datum in čas v obliki `YYYY-MM-DD hh:mm:ss`
+* Detajli se razlikujejo med različnimi RDBMS.
+
+---
+
+# Omejitve
+
+* RDBMS lahko ob spreminjanju podatkov v bazi preverja, ali držijo omejitve, predpisane ob ustvarjanju tabele.
+  - Če ne držijo, ne dovoli zaključka transakcije.
+* `PRIMARY KEY` (glavni ključ) - stolpec (ali več njih), katerega vrednost enolično določa vrstico.
+  - Lahko je samo en!
+  - Vrednosti se ne smejo ponavljati in ne smejo biti `NULL`.
+* `NOT NULL` - vrednosti v stolpcu morajo obstajati (niso `NULL`).
+* `UNIQUE` (enoličnost) - vrednosti v stolpcu (ali več njih) se ne smejo ponavljati.
+  - Vrednost `NULL` se lahko pojavi tudi večkrat (če ni prepovedana z `NOT NULL`)!
+
+---
+
+# Omejitve (2)
+
+* `CHECK` - pogoj, ki mora veljati v vsaki vrstici tabele.
+* `FOREIGN KEY`/`REFERENCES` - tuji ključ oz. referenca na drugo tabelo.
+  - V stolpcu (ali več njih) se smejo pojaviti samo tiste vrednosti, ki se pojavijo kot vrednosti v stolpcu (ali več njih) tabele, na katero se sklicujemo.
+  - Lahko se pojavijo tudi vrednosti `NULL` (če niso prepovedane z `NOT NULL`).
+* Mogoče je nastaviti (odvisno od RDBMS), kaj se zgodi ob kršitvi omejitve.
+  - Za tuje ključe je mogoče določiti tudi, kdaj se preverijo - takoj ali ob koncu transakcije.
+
+---
+
+# Privzete vrednosti
+
+* Včasih so določene vrednosti stolpca zelo pogoste.
+  - Primer: število kosov artikla ob dodajanju v košarico je 1.
+  - Še en primer: ob dodajanju v tabelo naj se zapiše trenutni čas.
+* Če pri vstavljanju podatka ne navedemo, se uporabi privzeta vrednost.
+* Poseben primer: avtomatsko številčenje.
+  - V SQLite uporabimo določilo `AUTOINCREMENT` takoj za `PRIMARY KEY` pri stolpcu tipa `ìnteger`;
+  - Nekateri RDBMS v ta namen uporabijo števce.
+
+---
+
+# Primer (SQLite)
+
+```sql
+CREATE TABLE kupec (
+  id_kupec        integer  PRIMARY KEY AUTOINCREMENT,
+  uporabnisko_ime text     NOT NULL UNIQUE,
+  ime             text     NOT NULL,
+  priimek         text     NOT NULL,
+  naslov          text,
+  datum_rojstva   date     CHECK (datum_rojstva < DATETIME('now', '-18 years')),
+                           -- kupec mora biti starejši od 18 let
+  CHECK (LENGTH(ime) + LENGTH(priimek) <= 30)
+);
+
+CREATE TABLE narocilo (
+  id_narocilo     integer  PRIMARY KEY AUTOINCREMENT,
+  id_kupec        integer  NOT NULL REFERENCES kupec(id_kupec),
+  stevilo         integer  DEFAULT (1),
+  datum           datetime DEFAULT (DATETIME('now'))
+);
+```
+
+---
+
+# Vstavljanje podatkov
+
+```sql
+INSERT INTO tabela [(stolpec1, stolpec2, ...)]
+VALUES (vrednost1, vrednost2, ...), ...;
+```
+
+* Za vsak naveden nabor vstavi **eno** vrstico v navedeno tabelo.
+  - Obstoječe vrstice ostanejo nespremenjene.
+* Vstavljene vrstice bodo imele v naštetih stolpcih ustrezne naštete vrednosti.
+  - Če kateri od stolpcev tabele ni naštet, se uporabi njegova privzeta vrednost oziroma `NULL`.
+* Če stolpcev ne naštejemo, se smatra, da smo našteli vse stolpce v vrstnem redu iz definicije tabele.
+
+---
+
+# Vstavljanje izpeljanih podatkov
+
+```sql
+INSERT INTO tabela [(stolpec1, stolpec2, ...)]
+SELECT ...;
+```
+
+* V navedeno tabelo vstavimo vrstice iz rezultata navedenega stavka `SELECT`.
+  - Rezultat mora imeti ustrezno število stolpcev!
+* Stavek `SELECT` je lahko poljuben (`WHERE`, `JOIN`, `GROUP BY`, `WITH`, ...).
+
+---
+
+# Primeri
+
+```sql
+INSERT INTO kupec (uporabnisko_ime, ime, priimek, datum_rojstva)
+VALUES ('janez', 'Janez', 'Novak', '1978-03-24'); -- dobi id_kupec = 1
+
+INSERT INTO kupec (uporabnisko_ime, ime, priimek, datum_rojstva)
+VALUES ('micka', 'Micka', 'Kovač', '2008-07-11'); -- napaka!
+
+INSERT INTO kupec (uporabnisko_ime, ime, priimek, datum_rojstva)
+VALUES ('micka', 'Micka', 'Kovač', '1998-07-11'); -- dobi id_kupec = 2
+
+INSERT INTO narocilo (id_kupec)
+SELECT id_kupec FROM kupec
+ WHERE priimek = 'Novak';  -- ena vrstica, dobi id_narocilo = 1
+
+INSERT INTO narocilo (id_kupec, stevilo)
+VALUES (1, 3), (2, 4), (2, 2), (3, 6), (1, 5); -- napaka!
+
+INSERT INTO narocilo (id_kupec, stevilo)
+VALUES (1, 3), (2, 4), (2, 2), (1, 5); -- dobijo id_narocilo = 2, 3, 4, 5
+```
+
+---
+
+# Spreminjanje obstoječih podatkov
+
+```sql
+UPDATE tabela
+   SET stolpec1 = vrednost1, stolpec2 = vrednost2, ...
+ WHERE pogoj;
+```
+
+* Spreminjamo obstoječe vrstice v navedeni tabeli - njihovo število ostane nespremenjeno.
+* Pogoj `WHERE` določa, katere vrstice bomo spremenili.
+  - Lahko ga izpustimo - tedaj spreminjamo vse vrstice.
+* S `SET` povemo, kako spremenimo stolpce v izbranih vrsticah.
+  - Vrednosti lahko sestavimo iz obstoječih vrednosti v trenutni vrstici.
+
+---
+
+# Brisanje podatkov
+
+```sql
+DELETE FROM tabela
+ WHERE pogoj;
+```
+
+* Iz navedene tabele pobrišemo vrstice, ki ustrezajo pogoju.
+* Če izpustimo `WHERE`, bomo pobrisali vse vrstice!
+
+---
+
+# Primeri
+
+```sql
+UPDATE narocilo
+   SET stevilo = stevilo - 1
+ WHERE id_kupec = 1;
+
+DELETE FROM narocilo
+ WHERE stevilo < 1;
+```
+
+---
+
+# Spremembe in transakcije
+
+* Spomnimo: ko se transakcija uspešno zaključi, so nastale spremembe stalne.
+  - Nimamo možnosti razveljavitve!
+* Če ne poskrbimo za kontrolo transakcij, šteje vsak stavek `INSERT`/`UPDATE`/`DELETE` kot ena transakcija.
+* Posledica: spremenjenih in pobrisanih vrstic ne bomo mogli vedno povrniti!
+  - Če še nismo zaključili transakcije, jo lahko prekličemo in se tako vrnemo na prvotno stanje.
+* Če med izvajanjem stavka pride do kakršnekoli napake, ostane stanje nespremenjeno.
