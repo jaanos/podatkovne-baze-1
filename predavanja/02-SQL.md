@@ -881,7 +881,7 @@ SELECT name, continent, MAX(population) FROM world
   
   ```sql
   SELECT name, population FROM world
-  WHERE population >= 200000000;
+   WHERE population >= 200000000;
   ```
 
 </span>
