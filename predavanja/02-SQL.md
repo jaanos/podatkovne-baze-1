@@ -1628,7 +1628,7 @@ SELECT narocnik_id, ime, priimek,
 `narocnik_id` | `ime`  | `priimek` | `stevilo` | `skupna_kolicina`
 ------------- | ------ | --------- | --------- | -----------------
 1             | Damjan | Kmetec    | 2         | 3
-2             | Aljaž  | Kmetec    | 1         | 0
+2             | Aljaž  | Kmetec    | 0         | 0
 
 
 ---
@@ -1642,7 +1642,7 @@ SELECT narocnik_id, ime, priimek,
 
 `narocnik_id` | `ime`  | `priimek` | `stevilo` | `skupna_kolicina`
 ------------- | ------ | --------- | --------- | -----------------
-2             | Aljaž  | Kmetec    | 1         | 0
+2             | Aljaž  | Kmetec    | 0         | 0
 1             | Damjan | Kmetec    | 2         | 3
 
 ---
