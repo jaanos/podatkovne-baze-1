@@ -1993,6 +1993,24 @@ DELETE FROM narocilo
 
 ---
 
+# Transakcije
+
+* Začetek transakcije:
+  ```sql
+  BEGIN [TRANSACTION];
+  ```
+* Potrditev transakcije:
+  ```sql
+  END [TRANSACTION];
+  COMMIT;
+  ```
+* Preklic transakcije:
+  ```sql
+  ROLLBACK;
+  ```
+
+---
+
 # Spremembe in transakcije
 
 * Spomnimo: ko se transakcija uspešno zaključi, so nastale spremembe stalne.

@@ -6,6 +6,7 @@ Repozitorij z gradivi za predmet Podatkovne baze 1 (3. letnik Praktične matemat
 
 * [Uvod](https://jaanos.github.io/podatkovne-baze-1/predavanja/01-uvod.marp.html) ([izročki](predavanja/01-uvod.md))
 * [SQL](https://jaanos.github.io/podatkovne-baze-1/predavanja/02-SQL.marp.html) ([izročki](predavanja/02-SQL.md))
+* [Načrtovanje podatkovnih baz](https://jaanos.github.io/podatkovne-baze-1/predavanja/03-nacrtovanje.marp.html) ([izročki](predavanja/03-nacrtovanje.md))
 
 ## [Zapiski z vaj](zapiski)
 
