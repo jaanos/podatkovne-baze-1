@@ -1782,8 +1782,10 @@ SELECT film.*
   FROM pripada AS prvi
   JOIN pripada AS drugi USING (film)
   JOIN film ON id = film
-WHERE prvi.zanr = 4 AND drugi.zanr = 8 AND oznaka <> 'R'
-ORDER BY film.glasovi DESC;
+ WHERE prvi.zanr = 4 AND
+       drugi.zanr = 8 AND
+       oznaka <> 'R'
+ ORDER BY film.glasovi DESC;
 ```
 
 ---

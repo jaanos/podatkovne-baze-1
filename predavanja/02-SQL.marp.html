@@ -2568,8 +2568,10 @@ GROUP columns is illegal if there is no GROUP BY clause
   <span class="hljs-keyword">FROM</span> pripada <span class="hljs-keyword">AS</span> prvi
   <span class="hljs-keyword">JOIN</span> pripada <span class="hljs-keyword">AS</span> drugi <span class="hljs-keyword">USING</span> (film)
   <span class="hljs-keyword">JOIN</span> film <span class="hljs-keyword">ON</span> id <span class="hljs-operator">=</span> film
-<span class="hljs-keyword">WHERE</span> prvi.zanr <span class="hljs-operator">=</span> <span class="hljs-number">4</span> <span class="hljs-keyword">AND</span> drugi.zanr <span class="hljs-operator">=</span> <span class="hljs-number">8</span> <span class="hljs-keyword">AND</span> oznaka <span class="hljs-operator">&lt;&gt;</span> <span class="hljs-string">&#x27;R&#x27;</span>
-<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> film.glasovi <span class="hljs-keyword">DESC</span>;
+ <span class="hljs-keyword">WHERE</span> prvi.zanr <span class="hljs-operator">=</span> <span class="hljs-number">4</span> <span class="hljs-keyword">AND</span>
+       drugi.zanr <span class="hljs-operator">=</span> <span class="hljs-number">8</span> <span class="hljs-keyword">AND</span>
+       oznaka <span class="hljs-operator">&lt;&gt;</span> <span class="hljs-string">&#x27;R&#x27;</span>
+ <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> film.glasovi <span class="hljs-keyword">DESC</span>;
 </code></pre>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="96" data-marpit-fragments="2" data-style="@import url('style.css')" style="--style:@import url('style.css');">
