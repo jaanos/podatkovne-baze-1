@@ -10,7 +10,7 @@ style: "@import url('style.css')"
 * Mera za pravilnost načrtovane sheme podatkovne baze je realni svet.
   - Od tod sledi, da mora vsebina podatkovne baze odražati podatke, pravila in izjeme iz realnega sveta.
 
-  ![h:280px](slike/nacrtovanje.png)
+  ![h:260px](slike/nacrtovanje.png)
 
 ---
 
