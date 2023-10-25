@@ -85,6 +85,8 @@ Pri sodelovanju morajo načrtovalci podatkovnih baz in uporabniki govoriti 'isti
 
 # Konceptualni nivo načrtovanja
 
+Izhodišče:
+
 * Opis problema v pisni ali ustni obliki ter zahteve oz. želje uporabnikov
 * Dokumentacija (predpisana/zakonska ali interna)
 * Datotečna struktura (če obstaja)
@@ -172,7 +174,7 @@ Izpitni rok | Datum, na katerega je za nek predmet in določeno ciljno skupino (
 
 ---
 
-# Odnosi ena na več (1:N)
+# Odnosi ena na več (1:*n*)
 
 * Vsaki entiteti prvega entitetnega ustreza ena entiteta drugega entitetnega tipa, vsaka entiteta drugega entitetnega tipa pa lahko ustreza nič ali več entitetam prvega entitetnega tipa.
   - V relacijski podatkovni bazi predstavimo tako, da v prvi tabeli dodamo stolpec z referenco na drugo tabelo.
@@ -183,11 +185,197 @@ Izpitni rok | Datum, na katerega je za nek predmet in določeno ciljno skupino (
 
 ---
 
-# Odnosi več na več (M:N)
+# Odnosi več na več (*m*:*n*)
 
-* Več entitet prvega entitetnega tipa lahko ustreza več entitetam drugega entitetnega tipa in obratno.
+* Vsaki entiteti prvega entitetnega tipa lahko ustreza več entitet drugega entitetnega tipa in obratno.
   - V relacijski podatkovni bazi predstavimo z vmesno (povezovalno) tabelo, katere glavni ključ sestoji iz referenc (tujih ključev) na tabeli za vsak entitetni tip.
 * Primer:
   - Študent : Predavatelj
   - Odnos: posluša predavanja / predava
     + Vsak študent posluša predavanja več predavateljev, vsak predavatelj predava več študentom
+
+---
+
+# Konceptualni nivo načrtovanja
+
+Postopek:
+
+* Identifikacija entitetnih tipov
+* Identifikacija odnosov
+* Identifikacija atributov (ime, opis, privzeta vrednost, ...)
+* Opredelitev domen (zaloge vrednosti)
+* Določitev kandidatnih ključev in primarnega ključa
+* Specializacija/posplošitev entitetnih tipov (po potrebi)
+* Risanje ER diagrama
+* Konzultacija z uporabniki
+
+---
+
+# Primer opisa sistema
+
+* Podan je naslednji opis sistema.
+  - Obstajajo osebe, ki jih opišemo z imenom, priimkom, starostjo, krajem bivanja in krajem rojstva. Osebe so lahko moškega in ženskega spola. Za moške nas zanima še vojaški čin, če ga ima, za ženske pa dekliški priimek. Za kraj nas zanima še čas bivanja v kraju (leta bivanja) in število prebivalstva. Tako za kraj rojstva kot tudi kraj bivanja nas zanima država, v kateri se nahaja. Poleg imena države nas zanima še število prebivalstva države.
+
+* Izdelajmo konceptualni model.
+
+---
+
+# ER diagram
+
+(angl. *entity-relationship diagram*, tudi *entitetno-odnosni diagram*)
+
+![h:350px](slike/er-ljudje.png)
+
+* **Entitetne tipe** predstavimo s **pravokotniki**.
+* **Atribute** predstavimo z **elipsami**.
+* **Odnose** predstavimo z **rombi**.
+
+---
+
+# Orodja
+
+* Papir in svinčnik
+* Orodja, ki podpirajo le konceptualno modeliranje (risanje ER diagramov):
+  - [Creately](http://creately.com/)
+  - [Dia Diagram Editor](http://dia-installer.de/)
+  - ...
+* Orodja, kjer je ER diagram le ena od faz:
+  - [Case Studio 2](http://case-studio.en.softonic.com/)
+  - [DB Designer](https://www.fabforce.net/dbdesigner4/)
+  - [Open Model Sphere](http://www.modelsphere.com/org/)
+  - ...
+
+---
+
+# Entitetni tip - primeri risanja
+
+<span class="columns small" style="--cols: 2;">
+<span>
+
+![w:400px](slike/entiteta-chen.png)
+
+![w:400px](slike/entiteta-tipi.png)
+
+</span>
+<span>
+
+![w:400px](slike/entiteta-uml.png)
+
+</span>
+</span>
+
+---
+
+# Števnosti odnosov
+
+* Za vsak entitetni tip v nekem odnosu lahko določimo največje in najmanjše število, kolikokrat se posamezna entiteta pojavi v odnosu.
+  * Najmanj: 0 (neobvezni odnos - tanka črta) ali 1 (obvezni odnos - debela črta)
+  * Največ: 1 (puščica v smeri odnosa) ali *n* (poljubno mnogo - brez puščice)
+  * Označujemo tudi z (*min*, *max*).
+* Primera:
+
+  <span class="columns small" style="--cols: 2;">
+  <span>
+
+  ![](slike/odnos-11-0n.png)
+
+  </span>
+  <span>
+
+  ![](slike/odnos-01-1n.png)
+
+  </span>
+  </span>
+
+---
+
+# Vranja notacija
+
+(angl. *crow's foot notation*)
+
+* Odnose predstavimo s povezavami med entitetnimi tipi.
+* S simboli pri entitetnem tipu, koliko entitet povezanega entitetnega tipa je v odnosu z njim.
+
+  <span class="columns small" style="--cols: 2;">
+  <span>
+
+  ![](slike/cfn-11-0n.png)
+
+  </span>
+  <span>
+
+  ![](slike/cfn-01-1n.png)
+
+  </span>
+  </span>
+
+* Dandanes najpogosteje uporabljana notacija.
+* Slabosti:
+  - Odnosi ne morejo imeti atributov.
+  - Možni so samo dvojiški odnosi.
+
+---
+
+# Primer - šola
+
+![w:1000px](slike/er-sola.png)
+
+---
+
+# Primer - knjižnica
+
+![w:1000px](slike/er-knjiznica.png)
+
+* Kakšne so težave s tem modelom?
+
+---
+
+# Logični nivo načrtovanja
+
+* Izhajamo iz konceptualnega modela.
+* Postopek:
+  * Identifikacija tabel (entitetni tipi, odnosi)
+  * Normalizacija podatkov (vsaj do 3. normalne oblike)
+  * Transakcije (model mora omogočati vse transakcije, ki jih zahteva uporabnik)
+  * Polni ER diagram
+  * Definiranje integritetnih omejitev
+  * Konzultacija z uporabniki
+  * Predvideti je potrebno tudi bodoči razvoj!
+* Orodja: Oracle Designer, Power Designer, DBDesigner, ...
+
+---
+
+# Identifikacija tabel
+
+* Za vsak entitetni tip naredimo tabelo.
+  - Atribute predstavimo s stolpci tabele.
+  - Če nimamo ustreznega glavnega ključa, ga dodamo (npr. zaporedni ID)
+  - Pazimo, da je v vsaki celici samo en podatek!
+* Odnos z največjo števnostjo 1 pri enem entitetnem tipu lahko predstavimo s tujim ključem na tabelo za drugi entitetni tip.
+  - Kam gredo atributi takega odnosa?
+* Odnos z najmanjšo števnostjo 0 pri vseh entitetnih tipih lahko predstavimo s povezovalno tabelo.
+  - Glavni ključ sestoji iz tujih ključev na ustrezne tabele, atribute predstavimo s stolpci v tabeli.
+  - Običajno uporabimo taki pristop tudi pri odnosih več na več z najmanjšo števnostjo 1.
+
+---
+
+# Integritetne omejitve
+
+* Obvezni vnos podatka - `NOT NULL`
+* Omejitev domene atributa - npr. spol je lahko *M* ali *Ž*
+* Entitetna omejitev - glavni ključ ne more imeti vrednosti `NULL`
+* Referenčna integriteta - tuji ključi
+* Omejitve na nivoju uporabnikov - vloge, ki jim lahko določamo pravila dostopa do podatkov v podatkovni bazi
+
+---
+
+# Logični model - primer
+
+```
+oseba   (#id_osebe, ime, priimek, starost, kraj_rojstva->kraj(id_kraja))
+moski   (#id_osebe->oseba(id_osebe), vojaski_cin)
+zenska  (#id_osebe->oseba(id_osebe), dekliski_priimek)
+kraj    (#id_kraja, ime, prebivalstvo, drzava->drzava(id_drzave))
+drzava  (#id_drzave, ime, prebivalstvo)
+bivanje (#id_osebe->oseba(id_osebe), #id_kraja->kraj(id_kraja), leta)
+```
