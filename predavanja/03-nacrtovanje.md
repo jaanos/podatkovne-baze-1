@@ -41,10 +41,10 @@ Zgradbo podatkovnih baz opisuje trinivojska arhitektura [ANSI-SPARC](https://en.
   - Načrtovalec problemskega področja načeloma ne pozna.
   - Zato se mora najprej seznaniti in potem podrobno spoznati domeno problema in bodoče aplikacije.
 * Pravila in izjeme
-  - Poleg pravil v realnem svetu obstaja tudi veliko izjem
+  - Poleg pravil v realnem svetu obstaja tudi veliko izjem.
   - Realni svet in njegovo okolje sta dinamična sistema, ki se pogosto spreminjata.
   - Načrtovalec mora pri svojem delu mora upoštevati vsa pravila in tudi vse izjeme.
-  - Hkrati mora narediti sistem dovolj fleksibilno shemo, ki bo prilagojena bodočim spremembam.
+  - Hkrati mora narediti dovolj fleksibilno shemo, ki bo prilagojena bodočim spremembam.
 * Velikost
   - Načrti PB so pogosto zelo kompleksni.
   - Zato so za človeka (načrtovalca) težko obvladljivi.
@@ -98,10 +98,10 @@ Izhodišče:
 * Celovit pogled na izdelavo konceptualnega modela
 * Možni koraki konceptualnega načrtovanja:
   - K1.1: Identificiraj entitetne tipe
-  - K1.2: Identificiraj povezave
+  - K1.2: Identificiraj odnose
   - K1.3: Identificiraj in z entitetnimi tipi poveži atribute
   - K1.4: Atributom določi domene
-  - K1.5: Določi kandidate za ključe; izmed kandidatov izberi primarni ključ
+  - K1.5: Določi kandidate za ključe; izmed kandidatov izberi glavni ključ
   - K1.6: Po potrebi uporabi elemente razširjenega ER diagrama
   - K1.7: Preveri, če v modelu obstajajo odvečni elementi
   - K1.8: Preveri, če model “zdrži” transakcije
@@ -176,12 +176,12 @@ Izpitni rok | Datum, na katerega je za nek predmet in določeno ciljno skupino (
 
 # Odnosi ena na več (1:*n*)
 
-* Vsaki entiteti prvega entitetnega ustreza ena entiteta drugega entitetnega tipa, vsaka entiteta drugega entitetnega tipa pa lahko ustreza nič ali več entitetam prvega entitetnega tipa.
-  - V relacijski podatkovni bazi predstavimo tako, da v prvi tabeli dodamo stolpec z referenco na drugo tabelo.
+* Vsaki entiteti prvega entitetnega ustreza nič ali več entitet drugega entitetnega tipa, vsaka entiteta drugega entitetnega tipa pa ustreza eni entiteti prvega entitetnega tipa.
+  - V relacijski podatkovni bazi predstavimo tako, da v drugi tabeli dodamo stolpec z referenco na prvo tabelo.
 * Primer:
-  - Oseba : Naslov
-  - Odnos: ima stalni naslov : je stalni naslov
-    + Vsaka ima le en stalni naslov, na istem naslovu pa je lahko več oseb.
+  - Naslov : Oseba
+  - Odnos: je stalni naslov : ima stalni naslov
+    + Vsaka oseba ima le en stalni naslov, na istem naslovu pa je lahko več oseb.
 
 ---
 
@@ -204,7 +204,7 @@ Postopek:
 * Identifikacija odnosov
 * Identifikacija atributov (ime, opis, privzeta vrednost, ...)
 * Opredelitev domen (zaloge vrednosti)
-* Določitev kandidatnih ključev in primarnega ključa
+* Določitev kandidatnih ključev in glavnega ključa
 * Specializacija/posplošitev entitetnih tipov (po potrebi)
 * Risanje ER diagrama
 * Konzultacija z uporabniki
@@ -294,7 +294,7 @@ Postopek:
 (angl. *crow's foot notation*)
 
 * Odnose predstavimo s povezavami med entitetnimi tipi.
-* S simboli pri entitetnem tipu, koliko entitet povezanega entitetnega tipa je v odnosu z njim.
+* S simboli pri entitetnem tipu povemo, koliko entitet povezanega entitetnega tipa je v odnosu z njim.
 
   <span class="columns small" style="--cols: 2;">
   <span>
@@ -310,7 +310,7 @@ Postopek:
   </span>
 
 * Dandanes najpogosteje uporabljana notacija.
-* Slabosti:
+* Pomanjkljivosti:
   - Odnosi ne morejo imeti atributov.
   - Možni so samo dvojiški odnosi.
 
@@ -355,7 +355,7 @@ Postopek:
   - Kam gredo atributi takega odnosa?
 * Odnos z najmanjšo števnostjo 0 pri vseh entitetnih tipih lahko predstavimo s povezovalno tabelo.
   - Glavni ključ sestoji iz tujih ključev na ustrezne tabele, atribute predstavimo s stolpci v tabeli.
-  - Običajno uporabimo taki pristop tudi pri odnosih več na več z najmanjšo števnostjo 1.
+  - Običajno uporabimo tak pristop tudi pri odnosih več na več z najmanjšo števnostjo 1.
 
 ---
 
