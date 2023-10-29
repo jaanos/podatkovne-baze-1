@@ -349,7 +349,7 @@ Postopek:
 
 * Za vsak entitetni tip naredimo tabelo.
   - Atribute predstavimo s stolpci tabele.
-  - Če nimamo ustreznega glavnega ključa, ga dodamo (npr. zaporedni ID)
+  - Če nimamo ustreznega glavnega ključa, ga dodamo (npr. zaporedni ID).
   - Pazimo, da je v vsaki celici samo en podatek!
 * Odnos z največjo števnostjo 1 pri enem entitetnem tipu lahko predstavimo s tujim ključem na tabelo za drugi entitetni tip.
   - Kam gredo atributi takega odnosa?
@@ -379,3 +379,413 @@ kraj    (#id_kraja, ime, prebivalstvo, drzava->drzava(id_drzave))
 drzava  (#id_drzave, ime, prebivalstvo)
 bivanje (#id_osebe->oseba(id_osebe), #id_kraja->kraj(id_kraja), leta)
 ```
+
+---
+
+# Anomalije in normalizacija podatkov
+
+* Denimo, da trgovina hrani podatke o prenosnikih, ki jih prodaja:
+  
+  <span class="small">
+
+  Model          | Cena | Proizvajalec | Spletna stran | Pomoč
+  -------------- | ---- | ------------ | ------------- | ----------------------------
+  Inspiron B120  | 499€ | Dell         | http://www.dell.com    | support@dell.com
+  Inspiron B130  | 599€ | Dell         | http://www.dell.com    | support@dell.com
+  Inspiron E1705 | 949€ | Dell         | http://www.dell.com    | support@dell.com
+  Satellite A100 | 549€ | Toshiba      | http://www.toshiba.com | support@toshiba.com
+  Satellite P100 | 934€ | Toshiba      | http://www.toshiba.com | support@toshiba.com
+
+  </span>
+
+* Kakšne so težave?
+  - Npr. spremeni so naslov servisa pri Dellu.
+  - Ali pa Toshiba spremeni strukturo spletnih strani.
+
+---
+
+# Napake in potrata prostora
+
+<span class="small">
+
+* Z ustreznimi stavki `UPDATE` lahko sočasno popravimo podatke v vseh ustreznih vrsticah - načeloma je to počasi!
+* Lahko se zgodi, da bomo posamezne vrstice vstavljali ali popravljali ročno in bo čez čas tabela izgledala tako:
+
+  Model          | Cena | Proizvajalec | Spletna stran              | Pomoč
+  -------------- | ---- | ------------ | -------------------------- | -------------------
+  Inspiron B120  | 499€ | Del          | http://www.dell.com        | supp@dell.com
+  Inspiron B130  | 599€ | Dell         | http://www.dell.com/laptop | supportLT@dell.com
+  Inspiron E1705 | 949€ | DELL         | http://www.dell.com        | support@dell.com
+  Satellite A100 | 549€ | To šiba      | http://www.toshiba.com     | support@toshiba.com
+  Satellite P100 | 934€ | Toshiba      | https://www.toshiba.com    | support@toshiba.eu
+
+* Poleg tega isti podatek po nepotrebnem vodimo večkrat!
+
+</span>
+
+---
+
+# Rešitev
+
+* Podatke porazdelimo po več tabelah.
+* Poskrbimo, da še vedno podatke lahko pravilno uporabljamo.
+* Primer:
+  - V tabeli strank hranimo le poštno številko.
+  - Če potrebujemo še kraj, potem iz druge tabele s pari (poštna številka, kraj) dobimo ustrezno ime kraja.
+
+---
+
+# Zgled
+
+<span class="columns" style="--cols: 2;">
+<span>
+
+* Ustvarimo tabeli proizvajalcev in izdelkov.
+* Odnos med njima (tipa ena na več) ohranimo z referenco (dodamo ustrezen stolpec).
+
+</span>
+<span class="small">
+
+* Izdelki:
+
+  Model          | Cena | ID proizvajalca
+  -------------- | ---- | ---------------
+  Inspiron B120  | 499€ | 1
+  Inspiron B130  | 599€ | 1
+  Inspiron E1705 | 949€ | 1
+  Satellite A100 | 549€ | 2
+  Satellite P100 | 934€ | 2
+
+</span>
+</span>
+
+<span class="small">
+
+* Proizvajalci:
+
+  ID proizvajalca | Proizvajalec | Spletna stran          | Pomoč
+  --------------- | ------------ | ---------------------- | -------------------
+  1               | Dell         | http://www.dell.com    | support@dell.com
+  2               | Toshiba      | http://www.toshiba.com | support@toshiba.com
+
+</span>
+
+---
+
+# Kaj želimo doseči?
+
+* Preverimo poimenovanje atributov
+  - Imena stolpcev naj ustrezajo njihovi vsebini.
+  - V tabelah naj ne bo atributov (stolpcev), ki pripadajo različnim entitetnim tipom.
+* Zmanjšamo podvajanje podatkov
+  - Anomalije pri posodabljanju podatkov
+    + Isti podatek vodimo večkrat
+  - Anomalije pri vstavljanju podatkov
+    + Kako vstaviti podatke, če del podatkov manjka?
+    + Možnost vstavljanja nekonsistentnih podatkov
+  - Anomalije pri brisanju podatkov
+    + Izguba podatkov
+* Anomalije rešujemo z dekompozicijo - eno tabelo razbijemo v več.
+
+---
+
+# Funkcijske odvisnosti in ključi
+
+* Naj bosta $X, Y$ podmnožici množice atributov tabele.
+* Množica $Y$ je *funkcijsko odvisna* od množice $X$ (pišemo $X \to Y$), če nabor vrednosti atributov iz $X$ enolično določa vrednost vsakega atributa iz $Y$.
+  - Funkcijska odvisnost $X \to Y$ je *trivialna*, če velja $Y \subseteq X$.
+  - Funkcijska odvisnost $X \to Y$ je *tranzitivna*, če obstaja množica $Z$, da veljata netrivialni funkcijski odvisnosti $X \to Z$ in $Z \to Y$.
+* Primera:
+  - EMŠO enolično določa ime, priimek in datum rojstva osebe.
+  - Dan, ura in predavalnica enolično določajo predmet in izvajalca.
+* Množica $X$ je *nadključ*, če so vsi atributi tabele funkcijsko odvisni od $X$.
+* Množica $X$ je *(kandidat za) ključ*, če je nadključ in nobena njena prava podmnožica ni nadključ.
+  - Izmed kandidatov za ključ izberemo glavni ključ tabele.
+
+---
+
+# Prva normalna oblika (1NF)
+
+* Tabela je v prvi normalni obliki, če so vsi njeni atributi atomarni - vsaka celica vsebuje le eno vrednost.
+* Primer:
+  
+  <span class="small">
+
+  <u>Predmet</u>   | Profesor  | Smer
+  ---------------- | --------- | -------------------------------
+  Seminar I        | J. Moder  | Pedagoška
+  Analiza III      | B. Novak  | Teoretična, Uporabna
+  Računalništvo II | K. Perko  | Uporabna
+  Fizika           | M. Jazbec | Pedagoška, Uporabna, Teoretična
+
+  - Glavni ključ: *Predmet*
+
+  </span>
+
+* V stolpcu *Smer* se lahko pojavi več vrednosti - tabela ni v prvi normalni obliki!
+
+---
+
+# Dekompozicija
+
+<span class="columns small" style="--cols: 2;">
+<span>
+
+<u>Predmet</u>   | Profesor
+---------------- | ---------
+Seminar I        | J. Moder
+Analiza III      | B. Novak
+Računalništvo II | K. Perko
+Fizika           | M. Jazbec
+
+</span>
+<span>
+
+<u>Predmet</u>   | <u>Smer</u>
+---------------- | -----------
+Seminar I        | Pedagoška
+Analiza III      | Teoretična
+Analiza III      | Uporabna
+Računalništvo II | Uporabna
+Fizika           | Pedagoška
+Fizika           | Uporabna
+Fizika           | Teoretična
+
+</span>
+</span>
+
+---
+
+# Druga normalna oblika (2NF)
+
+* Tabela je v drugi normalni obliki, če je v prvi normalni obliki in nima netrivialnih funkcijskih odvisnosti od prave podmnožice kakšnega kandidata za ključ.
+* Primer:
+
+  <span class="small">
+
+  <u>Predmet</u>       | <u>Profesor</u> | Dan        | Ura   | Kabinet
+  -------------------- | --------------- | ---------- | ----- | -------
+  Seminar I            | J. Moder        | Sreda      | 10:00 | 23
+  Analiza III          | B. Novak        | Četrtek    | 12:00 | 34
+  Računalništvo II     | K. Perko        | Sreda      |  9:00 | 12
+  Uvod v programiranje | K. Perko        | Ponedeljek | 11:00 | 12
+  Fizika               | M. Jazbec       | Torek      | 14:00 | 17
+
+  - Glavni ključ: *Predmet*, *Profesor*
+  - Atribut *Kabinet* je odvisen le od atributa *Profesor* - tabela ni v drugi normalni obliki!
+
+  </span>
+
+---
+
+# Dekompozicija
+
+* Do težave pride, če npr. profesor zamenja kabinet - moramo popraviti povsod!
+
+  <span class="columns small" style="grid-template-columns: 1.5fr 0.5fr">
+  <span>
+
+  <u>Predmet</u>       | <u>Profesor</u> | Dan        | Ura
+  -------------------- | --------------- | ---------- | -----
+  Seminar I            | J. Moder        | Sreda      | 10:00
+  Analiza III          | B. Novak        | Četrtek    | 12:00
+  Računalništvo II     | K. Perko        | Sreda      |  9:00
+  Uvod v programiranje | K. Perko        | Ponedeljek | 11:00
+  Fizika               | M. Jazbec       | Torek      | 14:00
+
+  </span>
+  <span>
+
+  <u>Profesor</u> | Kabinet
+  --------------- | -------
+  J. Moder        | 23
+  B. Novak        | 34
+  K. Perko        | 12
+  M. Jazbec       | 17
+
+  </span>
+  </span>
+
+* V praksi je pogosto en sam kandidat za ključ, ta pa sestoji iz enega stolpca - taka tabela je že v drugi normalni obliki.
+
+---
+
+# Tretja normalna oblika (3NF)
+
+* Tabela je v tretji normalni obliki, če je v drugi normalni obliki in nima tranzitivnih funkcijskih odvisnosti od kakšnega kandidata za ključ.
+* Primer:
+
+  <span class="small">
+
+  <u>Predmet</u>       | Profesor  | Dan        | Ura   | Kabinet
+  -------------------- | --------- | ---------- | ----- | -------
+  Seminar I            | J. Moder  | Sreda      | 10:00 | 23
+  Analiza III          | B. Novak  | Četrtek    | 12:00 | 34
+  Računalništvo II     | K. Perko  | Sreda      |  9:00 | 12
+  Uvod v programiranje | K. Perko  | Ponedeljek | 11:00 | 12
+  Fizika               | M. Jazbec | Torek      | 14:00 | 17
+
+  - Glavni ključ: *Predmet*
+  - Atribut *Kabinet* je odvisen od atributa *Profesor*, ta pa od atributa *Predmet* - tabela ni v tretji normalni obliki!
+
+  </span>
+
+---
+
+# Dekompozicija
+
+* Spet bodo težave, če profesor zamenja kabinet.
+
+  <span class="columns small" style="grid-template-columns: 1.5fr 0.5fr">
+  <span>
+
+  <u>Predmet</u>       | Profesor  | Dan        | Ura
+  -------------------- | --------- | ---------- | -----
+  Seminar I            | J. Moder  | Sreda      | 10:00
+  Analiza III          | B. Novak  | Četrtek    | 12:00
+  Računalništvo II     | K. Perko  | Sreda      |  9:00
+  Uvod v programiranje | K. Perko  | Ponedeljek | 11:00
+  Fizika               | M. Jazbec | Torek      | 14:00
+
+  </span>
+  <span>
+
+  <u>Profesor</u> | Kabinet
+  --------------- | -------
+  J. Moder        | 23
+  B. Novak        | 34
+  K. Perko        | 12
+  M. Jazbec       | 17
+
+  </span>
+  </span>
+
+* Običajno normaliziramo (vsaj) do tretje normalne oblike.
+  - Obstajajo tudi višje normalne oblike, npr. Boyce-Coddova normalna oblika.
+
+---
+
+# Primer ustvarjanja baze
+
+* Narediti želimo bazo, ki bo hranila podatke o kinu.
+* Grobe zahteve: vedeti moramo, kateri filmi se trenutno vrtijo, v katerih dvoranah se vrtijo in kako velike so dvorane.
+
+---
+
+# Konceptualni model
+
+<span class="columns small" style="grid-template-columns: 0.75fr 0.5fr">
+<span>
+
+* ER diagram:
+  
+  ![](slike/er-kino.png)
+
+</span>
+<span>
+
+* Tri tabele:
+  - Film
+  - Dvorana
+  - Spored
+
+* Dodatne omejitve:
+  - Naslov in leto enolično določata film.
+  - Ob enem terminu se v posamezni dvorani lahko predvaja le en film.
+  - Leto mora biti po 1900.
+  - Dolžina filma in kapaciteta dvorane morata biti pozitivni.
+  - Vsi atributi so obvezni.
+
+</span>
+</span>
+
+---
+
+# Logični model (SQLite)
+
+```sql
+CREATE TABLE film (
+  id         integer  PRIMARY KEY AUTOINCREMENT,
+  naslov     text     NOT NULL,
+  leto       integer  NOT NULL CHECK (leto > 1900),
+  dolzina    integer  NOT NULL CHECK (dolzina > 0),
+  UNIQUE (naslov, leto)
+);
+
+CREATE TABLE dvorana (
+  id         integer  PRIMARY KEY AUTOINCREMENT,
+  kapaciteta integer  NOT NULL CHECK (kapaciteta > 0) 
+);
+
+CREATE TABLE spored (
+  id         integer  PRIMARY KEY AUTOINCREMENT,
+  film       integer  NOT NULL REFERENCES film(id),
+  dvorana    integer  NOT NULL REFERENCES dvorana(id),
+  termin     datetime NOT NULL,
+  UNIQUE (dvorana, termin)
+);
+```
+
+---
+
+# Primer: banka
+
+* Hraniti želimo podatke o komitentih banke ter njihovih računih in transakcijah.
+  - Za komitenta hranimo EMŠO, ime, priimek in naslov.
+  - Vsak komitent ima lahko več računov.
+  - Za vsako transakcijo na nekem računu beležimo znesek, čas in neobvezen opis.
+
+---
+
+# Konceptualni model
+
+![h:600px](slike/er-banka.png)
+
+---
+
+# Logični model (SQLite)
+
+<span class="columns small" style="--cols: 2;">
+<span>
+
+```sql
+CREATE TABLE kraj (
+  posta    integer PRIMARY KEY,
+  kraj     text    NOT NULL
+);
+
+CREATE TABLE oseba (
+  emso     text    PRIMARY KEY,
+  ime      text    NOT NULL,
+  priimek  text    NOT NULL,
+  ulica    text    NOT NULL,
+  posta    integer NOT NULL
+             REFERENCES kraj(posta)
+);
+```
+
+</span>
+<span>
+
+```sql
+CREATE TABLE racun (
+  stevilka integer PRIMARY KEY
+                   AUTOINCREMENT,
+  lastnik  text    NOT NULL
+             REFERENCES oseba(emso)
+);
+
+CREATE TABLE transakcija (
+  id       integer   PRIMARY KEY
+                     AUTOINCREMENT,
+  racun    integer   NOT NULL
+             REFERENCES racun(stevilka),
+  znesek   integer   NOT NULL, 
+  cas      timestamp NOT NULL
+             DEFAULT CURRENT_TIMESTAMP,
+  opis     text
+);
+```
+
+</span>
+</span>
