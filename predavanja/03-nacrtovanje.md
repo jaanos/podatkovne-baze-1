@@ -474,6 +474,8 @@ bivanje (#id_osebe->oseba(id_osebe), #id_kraja->kraj(id_kraja), leta)
 
 # Kaj želimo doseči?
 
+<span class="small">
+
 * Preverimo poimenovanje atributov
   - Imena stolpcev naj ustrezajo njihovi vsebini.
   - V tabelah naj ne bo atributov (stolpcev), ki pripadajo različnim entitetnim tipom.
@@ -487,9 +489,13 @@ bivanje (#id_osebe->oseba(id_osebe), #id_kraja->kraj(id_kraja), leta)
     + Izguba podatkov
 * Anomalije rešujemo z dekompozicijo - eno tabelo razbijemo v več.
 
+</span>
+
 ---
 
 # Funkcijske odvisnosti in ključi
+
+<span class="small">
 
 * Naj bosta $X, Y$ podmnožici množice atributov tabele.
 * Množica $Y$ je *funkcijsko odvisna* od množice $X$ (pišemo $X \to Y$), če nabor vrednosti atributov iz $X$ enolično določa vrednost vsakega atributa iz $Y$.
@@ -501,6 +507,8 @@ bivanje (#id_osebe->oseba(id_osebe), #id_kraja->kraj(id_kraja), leta)
 * Množica $X$ je *nadključ*, če so vsi atributi tabele funkcijsko odvisni od $X$.
 * Množica $X$ je *(kandidat za) ključ*, če je nadključ in nobena njena prava podmnožica ni nadključ.
   - Izmed kandidatov za ključ izberemo glavni ključ tabele.
+
+</span>
 
 ---
 
