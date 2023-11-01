@@ -399,7 +399,7 @@ bivanje (#id_osebe->oseba(id_osebe), #id_kraja->kraj(id_kraja), leta)
   </span>
 
 * Kakšne so težave?
-  - Npr. spremeni so naslov servisa pri Dellu.
+  - Npr. spremeni se naslov servisa pri Dellu.
   - Ali pa Toshiba spremeni strukturo spletnih strani.
 
 ---
@@ -408,7 +408,7 @@ bivanje (#id_osebe->oseba(id_osebe), #id_kraja->kraj(id_kraja), leta)
 
 <span class="small">
 
-* Z ustreznimi stavki `UPDATE` lahko sočasno popravimo podatke v vseh ustreznih vrsticah - načeloma je to počasi!
+* Z ustreznimi stavki `UPDATE` lahko sočasno popravimo podatke v vseh ustreznih vrsticah - načeloma je to počasno!
 * Lahko se zgodi, da bomo posamezne vrstice vstavljali ali popravljali ročno in bo čez čas tabela izgledala tako:
 
   Model          | Cena | Proizvajalec | Spletna stran              | Pomoč
@@ -549,15 +549,15 @@ Fizika           | M. Jazbec
 </span>
 <span>
 
-<u>Predmet</u>   | <u>Smer</u>
----------------- | -----------
-Seminar I        | Pedagoška
-Analiza III      | Teoretična
-Analiza III      | Uporabna
-Računalništvo II | Uporabna
-Fizika           | Pedagoška
-Fizika           | Uporabna
-Fizika           | Teoretična
+<u>Predmet</u> $\to$ | <u>Smer</u>
+-------------------- | -----------
+Seminar I            | Pedagoška
+Analiza III          | Teoretična
+Analiza III          | Uporabna
+Računalništvo II     | Uporabna
+Fizika               | Pedagoška
+Fizika               | Uporabna
+Fizika               | Teoretična
 
 </span>
 </span>
@@ -593,13 +593,13 @@ Fizika           | Teoretična
   <span class="columns small" style="grid-template-columns: 1.5fr 0.5fr">
   <span>
 
-  <u>Predmet</u>       | <u>Profesor</u> | Dan        | Ura
-  -------------------- | --------------- | ---------- | -----
-  Seminar I            | J. Moder        | Sreda      | 10:00
-  Analiza III          | B. Novak        | Četrtek    | 12:00
-  Računalništvo II     | K. Perko        | Sreda      |  9:00
-  Uvod v programiranje | K. Perko        | Ponedeljek | 11:00
-  Fizika               | M. Jazbec       | Torek      | 14:00
+  <u>Predmet</u>       | <u>Profesor</u> $\to$ | Dan        | Ura
+  -------------------- | --------------------- | ---------- | -----
+  Seminar I            | J. Moder              | Sreda      | 10:00
+  Analiza III          | B. Novak              | Četrtek    | 12:00
+  Računalništvo II     | K. Perko              | Sreda      |  9:00
+  Uvod v programiranje | K. Perko              | Ponedeljek | 11:00
+  Fizika               | M. Jazbec             | Torek      | 14:00
 
   </span>
   <span>
@@ -647,13 +647,13 @@ Fizika           | Teoretična
   <span class="columns small" style="grid-template-columns: 1.5fr 0.5fr">
   <span>
 
-  <u>Predmet</u>       | Profesor  | Dan        | Ura
-  -------------------- | --------- | ---------- | -----
-  Seminar I            | J. Moder  | Sreda      | 10:00
-  Analiza III          | B. Novak  | Četrtek    | 12:00
-  Računalništvo II     | K. Perko  | Sreda      |  9:00
-  Uvod v programiranje | K. Perko  | Ponedeljek | 11:00
-  Fizika               | M. Jazbec | Torek      | 14:00
+  <u>Predmet</u>       | Profesor $\to$ | Dan        | Ura
+  -------------------- | -------------- | ---------- | -----
+  Seminar I            | J. Moder       | Sreda      | 10:00
+  Analiza III          | B. Novak       | Četrtek    | 12:00
+  Računalništvo II     | K. Perko       | Sreda      |  9:00
+  Uvod v programiranje | K. Perko       | Ponedeljek | 11:00
+  Fizika               | M. Jazbec      | Torek      | 14:00
 
   </span>
   <span>
