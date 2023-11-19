@@ -94,7 +94,7 @@ Potrebovali bomo sledeče:
   kazalec.execute(sql)        # izvedemo ukaz
   zapisi = kazalec.fetchall() # preberemo tabelo z rezultati
   for vrstica in zapisi:
-      print(vrstica[0])      # ime je prvi element nabora
+      print(vrstica[0])       # ime je prvi element nabora
   kazalec.close()
   povezava.close()
   ```
@@ -241,3 +241,36 @@ conn.close()
     ```
 * Z metodo `executescript` lahko izvajamo več ukazov SQL (ločeni s `;`).
   - Parametrov ne moremo navajati.
+
+---
+
+# Pridobivanje ID-ja vstavljene vrstice
+
+* Denimo, da imamo tabelo z glavnim ključem, ki se sam generira.
+  ```sql
+  CREATE TABLE tabela (
+    id integer PRIMARY KEY AUTOINCREMENT,
+    stolpec text ...
+  );
+  ```
+* Na kurzorju izvedemo ukaz za vstavljanje vrstice.
+  ```python
+  cur.execute("INSERT INTO tabela (stolpec) VALUES (?);", [vrednost])
+  ```
+* Vrednost glavnega ključa vstavljene vrstice dobimo s `cur.lastrowid`.
+  - SQLite v vsako tabelo doda (skrit) stolpec `rowid` (če ne zahtevamo drugače).
+
+---
+
+# Uvoz podatkov iz datoteke CSV
+
+* Če imamo podatke v datoteki CSV, jih lahko v Python uvozimo z vgrajeno knjižnico `csv`, npr.
+  ```python
+  import csv
+
+  with open("nobel.csv") as f:
+      rd = csv.reader(f)
+      next(rd) # izpustimo prvo vrstico z naslovi stolpcev
+      for vrstica in rd:
+          # obdelamo vrstico - shranimo, uvozimo v bazo, ...
+  ```
