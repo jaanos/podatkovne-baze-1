@@ -274,3 +274,17 @@ conn.close()
       for vrstica in rd:
           # obdelamo vrstico - shranimo, uvozimo v bazo, ...
   ```
+
+---
+
+# Organizacija kode
+
+Pri pisanju aplikacij kodo organiziramo po shemi MVC.
+
+* _**M**odel_: podatkovni model aplikacije
+  - Programski opis entitet, odnosov in atributov
+  - Skrbi za komunikacijo s podatkovno bazo
+  - Neodvisen od uporabniškega vmesnika
+* _**V**iew_: vizualna predstavitev informacij
+  - Tekstovna predstavitev, spletna stran, ...
+* _**C**ontroller_: obdelava podatkov, prejetih od uporabnika
