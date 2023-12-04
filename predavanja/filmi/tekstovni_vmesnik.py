@@ -23,21 +23,30 @@ def izpisi_vloge(igralec):
     (kot režiser ali igralec).
     """
     print(igralec.ime)
-    for naslov, leto, tip_vloge in igralec.poisci_vloge():
+    for film, tip_vloge in igralec.poisci_vloge():
         vloga = VLOGE[tip_vloge]
-        print(f'- {naslov} ({leto}, {vloga})')
+        print(f'- {film.naslov} ({film.leto}, {vloga})')
 
 
-def vnesi_izbiro(moznosti):
+def vnesi_izbiro(moznosti, izpis=lambda x: x):
     """
     Prikaži možne izbire in vrni izbrano.
 
     POZOR: brez kontrole pravilnosti!!!  TODO
     """
     for i, moznost in enumerate(moznosti, 1):
-        print(f'{i}) {moznost}')
-    izbira = int(input('> ')) - 1
-    return moznosti[izbira]
+        print(f'{i}) {izpis(moznost)}')
+    while True:
+        vnos = input('> ')
+        try:
+            if vnos == '':
+                raise KeyboardInterrupt
+            izbira = int(vnos) - 1
+            if izbira < 0:
+                raise IndexError
+            return moznosti[izbira]
+        except (ValueError, IndexError):
+            print("Napačna izbira, poskusi znova!")
 
 
 def poisci_osebo():
@@ -69,18 +78,24 @@ def najboljsi_filmi():
     if filmi == []:
         print(f'Za leto {leto} ni podatkov o filmih')
         return
-    for mesto, film in enumerate(filmi, 1):
-        print(f'{mesto}) {film.naslov} ({film.ocena}/10)')
+    film = vnesi_izbiro(filmi, lambda film: f'{film.naslov} ({film.ocena}/10)')
+    print(film)
 
 
 def glavni_meni():
     print('Pozdravljen v bazi filmov!')
     while True:
         print('Kaj bi rad delal?')
-        izbira = vnesi_izbiro(MOZNOSTI)
+        try:
+            izbira = vnesi_izbiro(MOZNOSTI)
+        except KeyboardInterrupt:
+            izbira = SEL_DOMOV
         if izbira == ISKAL_OSEBO:
-            oseba = poisci_osebo()
-            izpisi_vloge(oseba)
+            try:
+                oseba = poisci_osebo()
+                izpisi_vloge(oseba)
+            except KeyboardInterrupt:
+                continue
         elif izbira == POGLEDAL_DOBRE_FILME:
             najboljsi_filmi()
         elif izbira == SEL_DOMOV:
