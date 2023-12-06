@@ -11,6 +11,7 @@ Repozitorij z gradivi za predmet Podatkovne baze 1 (3. letnik Praktične matemat
   - [Python in SQLite](https://nbviewer.org/github/jaanos/podatkovne-baze-1/blob/main/predavanja/jupyter/python-sqlite.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jaanos/podatkovne-baze-1/HEAD?labpath=predavanja/jupyter/python-sqlite.ipynb)
   - [Kako iz programa v Pythonu do baze](https://nbviewer.org/github/jaanos/podatkovne-baze-1/blob/main/predavanja/jupyter/nobel.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jaanos/podatkovne-baze-1/HEAD?labpath=predavanja/jupyter/nobel.ipynb)
   - [Primer modela in tekstovnega vmesnika](https://nbviewer.org/github/jaanos/podatkovne-baze-1/blob/main/predavanja/filmi/filmi.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jaanos/podatkovne-baze-1/HEAD?labpath=predavanja/filmi/filmi.ipynb)
+* [Spletne aplikacije](https://jaanos.github.io/podatkovne-baze-1/predavanja/05-spletne-aplikacije.marp.html) ([izročki](predavanja/05-spletne-aplikacije.md))
 
 ## [Zapiski z vaj](zapiski)
 

@@ -11,3 +11,4 @@
   - [Primer modela in tekstovnega vmesnika](https://nbviewer.org/github/jaanos/podatkovne-baze-1/blob/main/predavanja/filmi/filmi.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jaanos/podatkovne-baze-1/HEAD?labpath=predavanja/filmi/filmi.ipynb)
     + [`model.py`](filmi/model.py)
     + [`tekstovni_vmesnik.py`](filmi/tekstovni_vmesnik.py)
+* [Spletne aplikacije](https://jaanos.github.io/podatkovne-baze-1/predavanja/05-spletne-aplikacije.marp.html) ([izročki](05-spletne-aplikacije.md))
