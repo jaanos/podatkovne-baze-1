@@ -192,10 +192,10 @@ www.google.com has IPv6 address 2a00:1450:400d:80e::2004
 <li data-marpit-fragment="3"><code>&lt;head&gt;</code> - glava dokumenta
 <ul>
 <li><code>&lt;title&gt;</code> - naslov dokumenta</li>
-<li><code>&lt;meta&gt;</code> - metapodatki (kodiranje znakov, način prikaza, ...)</li>
+<li><code>&lt;meta /&gt;</code> - metapodatki (kodiranje znakov, način prikaza, ...)</li>
 <li><code>&lt;script&gt;</code> - skripta v jeziku JavaScript</li>
 <li><code>&lt;style&gt;</code> - deklaracija stilov v obliki CSS</li>
-<li><code>&lt;link&gt;</code> - zunanja datoteka (stili v CSS, ikone, ...)</li>
+<li><code>&lt;link /&gt;</code> - zunanja datoteka (stili v CSS, ikone, ...)</li>
 </ul>
 </li>
 <li data-marpit-fragment="4"><code>&lt;body&gt;</code> - telo dokumenta</li>
@@ -240,6 +240,45 @@ www.google.com has IPv6 address 2a00:1450:400d:80e::2004
 <li><code>submit</code> - gumb za pošiljanje obrazca</li>
 </ul>
 </li>
+</ul>
+</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="13" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+<h1 id="oblikovanje-spletnih-strani">Oblikovanje spletnih strani</h1>
+<ul>
+<li data-marpit-fragment="1">Izgled posameznih elementov določamo s stili, opisanimi v jeziku CSS (<em>Cascading Style Sheets</em>).</li>
+<li data-marpit-fragment="2">Stile navajamo z značko <code>&lt;style&gt;</code> ali v posebni datoteki s končnico <code>.css</code>, ki jo vključimo z <code>&lt;link rel=&quot;stylesheet&quot; href=&quot;stil.css&quot; type=&quot;text/css&quot;&gt;</code>.</li>
+<li data-marpit-fragment="3">Osnovna sintaksa:<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-css">selektor {
+  lastnost1: vrednost1;
+  lastnost2: vrednost2;
+  ...
+}
+</code></pre>
+<ul>
+<li>Lastnosti (kar je znotraj <code>{}</code>) lahko navedemo tudi v atributu <code>style</code> pri posamezni znački.</li>
+</ul>
+</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="14" data-marpit-fragments="5" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+<h1 id="selektorji-v-css">Selektorji v CSS</h1>
+<ul>
+<li data-marpit-fragment="1"><code>značka</code>: element tipa <code>&lt;značka&gt;</code></li>
+<li data-marpit-fragment="2"><code>.razred</code>: element z atributom <code>class=&quot;razred&quot;</code>
+<ul>
+<li>Element ima lahko tudi več razredov (ločeni s presledki).</li>
+</ul>
+</li>
+<li data-marpit-fragment="3"><code>#oznaka</code>: element z atributom <code>id=&quot;oznaka&quot;</code></li>
+<li data-marpit-fragment="4">Selektorje lahko tudi kombiniramo:
+<ul>
+<li><code>značka.razred#oznaka</code>: element <code>&lt;značka class=&quot;razred&quot; id=&quot;oznaka&quot;&gt;</code></li>
+</ul>
+</li>
+<li data-marpit-fragment="5">Če selektorje ločimo s presledki, se to razume kot gnezdene elemente:
+<ul>
+<li><code>značka .razred</code>: element z atributom <code>class=&quot;razred&quot;</code> znotraj elementa <code>&lt;značka&gt;</code></li>
 </ul>
 </li>
 </ul>

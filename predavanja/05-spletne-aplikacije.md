@@ -127,10 +127,10 @@ style: "@import url('style.css')"
 * `<html>` - vrhnja značka, ki vsebuje celotno spletno stran
 * `<head>` - glava dokumenta
   - `<title>` - naslov dokumenta
-  - `<meta>` - metapodatki (kodiranje znakov, način prikaza, ...)
+  - `<meta />` - metapodatki (kodiranje znakov, način prikaza, ...)
   - `<script>` - skripta v jeziku JavaScript
   - `<style>` - deklaracija stilov v obliki CSS
-  - `<link>` - zunanja datoteka (stili v CSS, ikone, ...)
+  - `<link />` - zunanja datoteka (stili v CSS, ikone, ...)
 * `<body>` - telo dokumenta
 
 ---
@@ -163,3 +163,32 @@ style: "@import url('style.css')"
     + `date` - polje za datum
     + `file` - nalaganje datoteke
     + `submit` - gumb za pošiljanje obrazca
+
+---
+
+# Oblikovanje spletnih strani
+
+* Izgled posameznih elementov določamo s stili, opisanimi v jeziku CSS (*Cascading Style Sheets*).
+* Stile navajamo z značko `<style>` ali v posebni datoteki s končnico `.css`, ki jo vključimo z `<link rel="stylesheet" href="stil.css" type="text/css">`.
+* Osnovna sintaksa:
+  ```css
+  selektor {
+    lastnost1: vrednost1;
+    lastnost2: vrednost2;
+    ...
+  }
+  ```
+  - Lastnosti (kar je znotraj `{}`) lahko navedemo tudi v atributu `style` pri posamezni znački.
+
+---
+
+# Selektorji v CSS
+
+* `značka`: element tipa `<značka>`
+* `.razred`: element z atributom `class="razred"`
+  - Element ima lahko tudi več razredov (ločeni s presledki).
+* `#oznaka`: element z atributom `id="oznaka"`
+* Selektorje lahko tudi kombiniramo:
+  - `značka.razred#oznaka`: element `<značka class="razred" id="oznaka">`
+* Če selektorje ločimo s presledki, se to razume kot gnezdene elemente:
+  - `značka .razred`: element z atributom `class="razred"` znotraj elementa `<značka>`
