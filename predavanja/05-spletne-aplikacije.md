@@ -192,3 +192,229 @@ style: "@import url('style.css')"
   - `značka.razred#oznaka`: element `<značka class="razred" id="oznaka">`
 * Če selektorje ločimo s presledki, se to razume kot gnezdene elemente:
   - `značka .razred`: element z atributom `class="razred"` znotraj elementa `<značka>`
+
+---
+
+# Knjižnica `bottle`
+
+* Za Python je na voljo knjižnica `bottle`, ki ponuja funkcionalnost spletnega strežnika, do katerega lahko dostopamo lokalno.
+* Knjižnico lahko namestimo v sistem, npr.
+  ```bash
+  pip install bottle
+  ```
+* Lahko pa si naložimo datoteko [`bottle.py`](https://github.com/bottlepy/bottle/raw/master/bottle.py) v mapo, kjer imamo svojo aplikacijo.
+
+---
+
+# Enostavna spletna aplikacija
+
+Spletni vmesnik gradimo s funkcijami.
+
+```python
+import bottle
+
+@bottle.get('/')
+def pozdravi_svet():
+    return 'Pozdravljen, svet!'
+
+bottle.run()
+```
+
+* Funkcijama `bottle.get` in `bottle.post` podamo pot, vračata pa dekorator, ki registrira funkcijo za zahtevke `GET` oziroma `POST` na podani poti.
+  - Ko strežnik dobi zahtevek za podano pot, se izvede ustrezna 
+
+---
+
+# Možnosti zaganjanja
+
+```python
+bottle.run(host='127.0.0.1', port=8080, reloader=False, debug=False)
+```
+* `host`: naslov, na katerem teče aplikacija
+  - Privzeto je aplikacija dostopna samo lokalno.
+  - Če navedemo `host='0.0.0.0'`, bo do aplikacije mogoče dostopati tudi z drugih računalnikov.
+* `port`: številka vrat, na katerih teče aplikacija
+  - Za vrata 80 običajno potrebujemo administratorske pravice.
+* `reloader`: ali naj se aplikacija samodejno znova zažene ob spremembah kode.
+* `debug`: ali naj se izpisujejo napake.
+  - Med razvojem običajno nastavimo `reloader=True, debug=True`.
+
+---
+
+# Parametrizirane poti
+
+* Poti lahko tudi parametriziramo.
+* Imena parametrov morajo ustrezati imenom parametrov funkcije.
+  ```python
+  @bottle.get('/pozdravi/<ime>/')
+  def pozdravi(ime):
+      return f'Živjo, {ime}!'
+  ```
+* Privzeto funkcija dobi vrednost parametra kot niz. Lahko pa zahtevamo vnos celega števila.
+  ```python
+  @bottle.get('/kvadriraj/<n:int>')
+  def kvadriraj(n):
+      return f'{n}^2 = {n**2}'
+  ```
+  - Druge možnosti: `<x:float>` (decimalna števila), `<x:path>` (pot do datoteke - lahko vsebuje `/`), `<x:re:exp>` (niz, ki ustreza regularnemu izrazu `exp`).
+
+---
+
+# Predloge
+
+* Funkcije vračajo vsebino strani v obliki HTML.
+* Za vračanje vsebine predloge uporabljamo funkcijo `template`, ki ji kot poimenovane parametre podamo vrednosti spremenljivk.
+  ```python
+  @bottle.get('/pozdravi/<ime>/')
+  def pozdravi(ime):
+      return bottle.template('pozdravi.html', ime=ime)
+  ```
+* Predloge postavimo v mapo `views` (z malimi črkami).
+  ```html
+  <html>
+    <head>
+      <title>Pozdravna stran za {{ime}}</title>
+    </head>
+    <body>
+      Živjo, <b>{{ime}}</b>!
+    </body>
+  </html>
+  ```
+
+---
+
+# Predloge (2)
+
+* V predlogah lahko med dvojnimi zavitimi oklepaji navajamo Pythonove izraze (običajno spremenljivke).
+* Vrstice, ki se začnejo s `%`, se razumejo kot Pythonova koda.
+  - Zamaknjene bloke (`if`, `for`, `with`, ...) moramo končati z `end`.
+* Ostale vrstice gradijo izpis.
+  ```html
+  vrstica besedila
+  %        if 3 < 7:
+  %   a = 42
+  % else:
+  %        a = 100
+  % end
+  odgovor je {{a}}
+  ```
+  ```
+  vrstica besedila
+  odgovor je 42
+  ```
+
+---
+
+# Primer
+
+```html
+<ul>
+% for i in range(5):
+    <li>{{i ** 2}}</li>
+% end
+</ul>
+```
+
+```html
+<ul>
+   <li>0</li>
+   <li>1</li>
+   <li>4</li>
+   <li>9</li>
+   <li>16</li>
+</ul>
+```
+
+---
+
+# Funkcija `rebase`
+
+* Za skupne dele predlog lahko uporabljamo funkcijo `rebase`, ki ji podamo ime datoteke z osnovno predlogo.
+* Tako kot funkciji `template` lahko tudi funkciji `rebase` kot poimenovane parametre podamo vrednosti spremenljivk.
+* V osnovno predlogo vsebino strani podamo z `{{!base}}`.
+  ```html
+  <html>
+    <head>
+      <title>{{naslov}}</title>
+    </head>
+    <body>
+      {{!base}}
+    </body>
+  </html>
+  ```
+  ```html
+  % rebase('osnova.html', naslov=f'Pozdravna stran za {ime}')
+  <h1>Živjo, <b>{{ime}}</b>!</h1>
+  ```
+
+---
+
+# Statične datoteke
+
+* S funkcijo `static_file` lahko ponujamo tudi statične datoteke (slike, stili CSS, skripte, ...)
+* Statične datoteke običajno hranimo znotraj zanje predvidene mape (npr. `static`).
+  ```python
+  @bottle.get('/static/<datoteka:path>')
+  def static(datoteka):
+      return bottle.static_file(datoteka, root='static')
+  ```
+
+---
+
+# Obrazci
+
+* Podatke iz obrazcev, poslanih z metodo `GET`, preberemo iz objekta `request.query`.
+  ```html
+  <form action="/sestej/">
+    a: <input type="text" name="a">
+    b: <input type="text" name="b">
+    <input type="submit" value="a + b">
+  </form>
+  ```
+  ```python
+  @bottle.get('/sestej/')
+  def sestej():
+      a = bottle.request.query.a
+      b = bottle.request.query.b
+      return f'{a} + {b} = {a + b}'
+  ```
+* Podatki so predstavljeni kot nizi!
+
+---
+
+# Metoda `POST` in preusmeritve
+
+* Podatke iz obrazcev, poslanih z metodo `POST`, preberemo iz objekta `request.forms`.
+* Preusmeritev izvedemo s funkcijo `redirect`.
+  ```html
+  <form action="/obrazec" method="POST">
+      Uporabnik: <input type="text" name="uporabnik" />
+      <input type="submit" value="Prijava" />
+  </form>
+  ```
+  ```python
+  @bottle.post('/obrazec')
+  def obrazec_post():
+      uporabnik = bottle.request.forms.uporabnik
+      # zabeležimo prijavo
+      bottle.redirect('/obrazec')
+  ```
+
+---
+
+# Piškotki
+
+* Piškotek nastavimo z metodo `response.set_cookie`.
+  ```python
+  bottle.response.set_cookie('uporabnik', uporabnik, secret=SKRIVNOST, path='/')
+  ```
+  - `SKRIVNOST` je vrednost, s katero podpisujemo piškotke in tako zagotovimo njihovo celovitost.
+  - `path='/'` nam zagotavlja, da bomo lahko do piškotka dostopali iz celotne aplikacije.
+* Piškotek preberemo z metodo `request.get_cookie`.
+  ```python
+  uporabnik = bottle.request.get_cookie('uporabnik', secret=SKRIVNOST)
+  ```
+* Piškotek pobrišemo z metodo `response.delete_cookie`.
+  ```python
+  bottle.response.delete_cookie('uporabnik', path='/')
+  ```

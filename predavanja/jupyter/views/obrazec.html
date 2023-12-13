@@ -1,0 +1,24 @@
+% rebase('osnova.html', naslov='Obrazci')
+
+% if uporabnik:
+Pozdravljen, {{uporabnik}}!
+% end
+
+<h1>Obrazec z metodo <code>GET</code></h1>
+
+<form action="/sestej/" method="GET">
+    a: <input type="text" name="a" />
+    b: <input type="text" name="b" />
+    <input type="submit" value="a + b" />
+</form>
+
+<h1>Obrazec z metodo <code>POST</code></h1>
+
+<form action="/obrazec" method="POST">
+    Uporabnik: <input type="text" name="uporabnik" />
+    <input type="submit" value="Prijava" />
+</form>
+
+<form action="/odjava" method="POST">
+    <input type="submit" value="Odjava" />
+</form>
