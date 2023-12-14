@@ -1,70 +1,137 @@
 <!DOCTYPE html>
 <html lang="sl">
     <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>Poskusna spletna stran</title>
-
-        <link rel="stylesheet" href="stili.css" type="text/css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+        <link rel="stylesheet" href="stili.css" type="text/css" />
     </head>
     <body>
-        <h1>Dobrodošli na <a href="index.html">naši</a> spletni strani!</h1>
-        <p>
-            Tukaj je <em>vsebina</em> strani. <br />
-            <strong><a href="druga_stran.html">Gremo</a></strong> v <span>novo</span> vrstico.
-        </p>
+        <section class="section">
+            <div class="container">
+                <div class="block">
+                    <h1 class="title">Dobrodošli na <a href="index.html">naši</a> spletni strani!</h1>
+                    <p>
+                        Tukaj je <em>vsebina</em> strani. <br />
+                        <strong><a href="druga_stran.html">Gremo</a></strong> v <span>novo</span> vrstico.
+                    </p>
+                </div>
 
-        <h2>Podnaslov</h2>
+                <div class="block">
+                    <h2 class="subtitle is-4">Podnaslov</h2>
 
-        <div>Prvi <div>blok</div></div>
-        <div>Drugi blok</div>
+                    <div class="columns">
+                        <div class="column">Prvi <div>blok</div></div>
+                        <div class="column">Drugi blok</div>
+                    </div>
+                </div>                
 
-        <h3>Tabela</h3>
+                <div class="block">
+                    <h3 class="subtitle">Tabela</h3>
 
-        <table>
-            <tr>
-                <th>Prvi stolpec</th>
-                <th>Drugi stolpec</th>
-            </tr>
-            <tr>
-                <td></td>
-                <td>Vsebina</td>
-            </tr>
-            <tr>
-                <td>Druga vrstica</td>
-            </tr>
-        </table>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Prvi stolpec</th>
+                                <th class="moder">Drugi stolpec</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td>Vsebina</td>
+                            </tr>
+                            <tr>
+                                <td>Druga vrstica</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-        <h3>Seznami</h3>
+                <div class="block">
+                    <h3 class="subtitle">Seznami</h3>
 
-        <ul>
-            <li>Prva točka</li>
-            <li>Druga točka</li>
-        </ul>
+                    <ul>
+                        <li>Prva točka</li>
+                        <li class="moder">Druga točka</li>
+                    </ul>
+    
+                    <ol>
+                        <li><a href="../05-spletne-aplikacije.marp.html">Prosojnice</a></li>
+                        <li><a href="https://www.google.com">Google</a></li>
+                        <li><a href="/" id="vrh">Vrh</a></li>
+                    </ol>
+                </div>
 
-        <ol>
-            <li><a href="../05-spletne-aplikacije.marp.html">Prosojnice</a></li>
-            <li><a href="https://www.google.com">Google</a></li>
-            <li><a href="/">Vrh</a></li>
-        </ol>
+                <div class="block">
+                    <h3 class="subtitle">Slika</h3>
 
-        <h3>Slika</h3>
+                    <img src="../slike/sqlitestudio1.png" />
+                </div>
 
-        <img src="../slike/sqlitestudio1.png" />
+                <div class="block">
+                    <h2 class="subtitle is-4">Obrazec</h2>
 
-        <h2>Obrazec</h2>
+                    <form action="druga_stran.html" method="POST">
+                        <div class="field">
+                            <label class="label">Ime</label>
+                            <div class="control">
+                                <input class="input" type="text" name="ime" placeholder="Ime in priimek" />
+                            </div>
+                            <p class="help">Vpiši ime</p>
+                        </div>
+                        <div class="field">
+                            <label class="label">Geslo</label>
+                            <div class="control">
+                                <input class="input" type="password" name="geslo" />
+                            </div>
+                            <p class="help">Vpiši geslo</p>
+                        </div>
+                        <div class="field">
+                            <label class="label">Starost</label>
+                            <div class="control">
+                                <input class="input" type="number" name="starost" />
+                            </div>
+                            <p class="help">Vpiši starost</p>
+                        </div>
+                        <div class="field">
+                            <label class="label">Datum</label>
+                            <div class="control">
+                                <input class="input" type="date" name="datum" />
+                            </div>
+                            <p class="help">Vpiši datum</p>
+                        </div>
+                        <div class="field is-grouped">
+                            <div class="control">
+                                <button class="button is-link">Pošlji</button>
+                            </div>
+                            <div class="control">
+                                <button class="button is-link is-light">Prekliči</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
 
-        <form action="druga_stran.html" method="POST">
-            <p>Ime: <input type="text" name="ime" placeholder="Ime in priimek" /></p>
-            <p>Geslo: <input type="password" name="geslo" /></p>
-            <p>Starost: <input type="number" name="starost" /></p>
-            <p>Datum: <input type="date" name="datum" /></p>
-            <p><input type="submit" value="Pošlji" /></p>
-        </form>
+                <div class="block">
+                    <h3 class="subtitle">Google</h3>
 
-        <h3>Google</h3>
-
-        <form action="https:/www.google.com/search" method="GET">
-            <input type="text" name="q" />
-            <input type="submit" value="Išči!" />
-        </form>
+                    <form action="https:/www.google.com/search" method="GET">
+                        <div class="field">
+                            <label class="label">Iskalni niz</label>
+                            <div class="control">
+                                <input class="input" type="text" name="q" />
+                            </div>
+                            <p class="help">Vpiši iskalni niz</p>
+                        </div>
+                        <div class="field">
+                            <div class="control">
+                                <button class="button is-link">Išči!</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
     </body>
 </html>

@@ -6,3 +6,23 @@ h1 {
     color: white;
     text-align: center;
 }
+
+h3 {
+    color: red;
+}
+
+.moder {
+    color: blue;
+}
+
+#vrh {
+    font-size: large;
+}
+
+li.moder {
+    text-decoration: underline;
+}
+
+p a {
+   color: darkgreen;
+}
