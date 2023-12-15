@@ -1,0 +1,8 @@
+% rebase('osnova.html', naslov='Pozdravljen, svet!')
+
+<ul>
+    <li><a href="pozdravi/{{uporabnik or 'svet'}}/">Pozdrav</a> (s <a href="pozdravi_predloga/{{uporabnik or 'svet'}}/">predlogo</a>)</li>
+    <li><a href="kvadriraj/{{len(uporabnik) if uporabnik else 42}}">Kvadriraj</a></li>
+    <li><a href="primer">Primer</a></li>
+    <li><a href="obrazec">Obrazci</a></li>
+</ul>
