@@ -221,7 +221,7 @@ bottle.run()
 ```
 
 * Funkcijama `bottle.get` in `bottle.post` podamo pot, vračata pa dekorator, ki registrira funkcijo za zahtevke `GET` oziroma `POST` na podani poti.
-  - Ko strežnik dobi zahtevek za podano pot, se izvede ustrezna 
+  - Ko strežnik dobi zahtevek za podano pot, se izvede ustrezna funkcija.
 
 ---
 
