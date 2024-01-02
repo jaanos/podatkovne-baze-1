@@ -1,0 +1,97 @@
+% setdefault('naslov', 'Filmi')
+% if not defined('uporabnik'):
+%     uporabnik = prijavljeni_uporabnik()
+% end
+% sporocilo = preberi_sporocilo()
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>{{naslov}}</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.1/css/all.min.css" />
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+                    const $notification = $delete.parentNode;
+
+                    $delete.addEventListener('click', () => {
+                        $notification.parentNode.removeChild($notification);
+                    });
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <nav class="navbar" role="navigation" aria-label="main navigation">
+            <div id="navbar" class="navbar-menu">
+                <div class="navbar-start">
+                    <a href="/" class="navbar-item">
+                        Domov
+                    </a>
+
+                    <div class="navbar-item has-dropdown is-hoverable">
+                        <a class="navbar-link">
+                            Filmi
+                        </a>
+                
+                        <div class="navbar-dropdown">
+                            <a href="/filmi/najbolje-ocenjeni/" class="navbar-item">
+                                Poišči dobre filme
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="navbar-item has-dropdown is-hoverable">
+                        <a class="navbar-link">
+                            Osebe
+                        </a>
+                
+                        <div class="navbar-dropdown">
+                            <a href="/osebe/poisci/" class="navbar-item">
+                                Poišči osebo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            
+                <div class="navbar-end">
+                    <div class="navbar-item">
+                        <div class="buttons">
+                            % if uporabnik:
+                            <a class="button is-static is-ghost">
+                                <strong>{{uporabnik}}</strong>
+                            </a>
+                            <form action="/odjava/" method="POST">
+                                <button class="button is-primary">
+                                    Odjava
+                                </button>
+                            </form>
+                            % else:
+                            <a href="/registracija/" class="button is-primary">
+                                <strong>Registracija</strong>
+                            </a>
+                            <a href="/prijava/" class="button is-light">
+                                Prijava
+                            </a>
+                            % end
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        % if sporocilo:
+        <div class="notification is-danger is-light">
+            <button class="delete"></button>
+            {{sporocilo}}
+        </div>
+        % end
+        <section class="section">
+            <div class="container">
+                {{!base}}
+            </div>
+        </section>
+    </body>
+</html>

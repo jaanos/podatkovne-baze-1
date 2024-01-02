@@ -7,6 +7,7 @@
 #   J. Vidali, dec. 2023
 #   Prirejeno po M. Pretnar, 2019, M. Lokar, dec. 2020
 #
+import bcrypt
 import sqlite3 as dbapi
 
 conn = dbapi.connect('filmi.sqlite')
@@ -139,3 +140,109 @@ class Oseba:
             return [Oseba(*vrstica) for vrstica in cur]
         finally:
             cur.close()
+
+
+class Uporabnik:
+    def __init__(self, idu=None, uporabnisko_ime=None, admin=False):
+        self.id = idu
+        self.uporabnisko_ime = uporabnisko_ime
+        self.admin = admin
+
+    def __str__(self):
+        return self.uporabnisko_ime or '(gost)'
+
+    def __bool__(self):
+        return self.id is not None
+
+    @staticmethod
+    def prijavi(uporabnisko_ime, geslo):
+        """
+        Vrni uporabnika z navedenim uporabniškim imenom in geslom.
+        Če takega uporabnika ni, vrni neprijavljenega uporabnika.
+        """
+        sql = """
+          SELECT id, uporabnisko_ime, admin, geslo
+            FROM uporabnik WHERE uporabnisko_ime = ?
+        """
+        cur = conn.cursor()
+        try:
+            cur.execute(sql, [uporabnisko_ime])
+            vrstica = cur.fetchone()
+            if vrstica is None:
+                return GUEST
+            *data, zgostitev = vrstica
+            if bcrypt.checkpw(geslo.encode("utf-8"), zgostitev):
+                return Uporabnik(*data)
+            else:
+                return GUEST
+        finally:
+            cur.close()
+
+    @staticmethod
+    def z_id(idu):
+        """
+        Vrni uporabnika z navedenim ID-jem.
+        Če takega uporabnika ni, vrni neprijavljenega uporabnika.
+        """
+        sql = """
+          SELECT id, uporabnisko_ime, admin
+            FROM uporabnik WHERE id = ?
+        """
+        cur = conn.cursor()
+        try:
+            cur.execute(sql, [idu])
+            vrstica = cur.fetchone()
+            if vrstica is None:
+                return GUEST
+            return Uporabnik(*vrstica)
+        finally:
+            cur.close()
+
+    @staticmethod
+    def zgostitev(geslo):
+        """
+        Vrni zgostitev podanega gesla.
+        """
+        sol = bcrypt.gensalt()
+        return bcrypt.hashpw(geslo.encode("utf-8"), sol)
+
+    def dodaj(self, geslo):
+        """
+        Dodaj uporabnika v bazo z navedenim geslom.
+        """
+        assert not self, "Uporabnik je že vpisan v bazo!"
+        assert self.uporabnisko_ime, "Uporabniško ime ni določeno!"
+        sql = """
+          INSERT INTO uporabnik (uporabnisko_ime, geslo, admin)
+          VALUES (?, ?, ?)
+        """
+        cur = conn.cursor()
+        try:
+            zgostitev = self.zgostitev(geslo)
+            with conn:
+                cur.execute(sql, [self.uporabnisko_ime, zgostitev, self.admin])
+            self.id = cur.lastrowid
+        except dbapi.IntegrityError:
+            raise ValueError("Uporabniško ime že obstaja!")
+        finally:
+            cur.close()
+
+    def spremeni_geslo(self, geslo):
+        """
+        Spremeni uporabnikovo geslo.
+        """
+        assert self, "Uporabnik še ni vpisan v bazo!"
+        sql = """
+          UPDATE uporabnik SET geslo = ?
+          WHERE id = ?
+        """
+        cur = conn.cursor()
+        try:
+            zgostitev = self.zgostitev(geslo)
+            with conn:
+                cur.execute(sql, [zgostitev, self.id])
+        finally:
+            cur.close()
+
+
+GUEST = Uporabnik()

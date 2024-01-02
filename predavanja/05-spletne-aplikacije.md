@@ -327,6 +327,21 @@ bottle.run(host='127.0.0.1', port=8080, reloader=False, debug=False)
 
 ---
 
+# Dekorator `view`
+
+* Namesto uporabe funkcije `template` lahko uporabimo dekorator `view`, ki mu podamo ime predloge in privzete vrednosti spremenljivk.
+  ```python
+  @bottle.get('/pozdravi/<ime>/')
+  @bottle.view('pozdravi.html')
+  def pozdravi(ime):
+      return dict(ime=ime)
+  ```
+* Dekorirana funkcija vrača slovar z vrednostmi spremenljivk.
+  - Če funkcija ne vrne slovarja, se parametri dekoratorja `view` ignorirajo.
+* Tak način je uporaben v kombinaciji z drugimi dekoratorji (npr. za preverjanje prijave).
+
+---
+
 # Funkcija `rebase`
 
 * Za skupne dele predlog lahko uporabljamo funkcijo `rebase`, ki ji podamo ime datoteke z osnovno predlogo.
@@ -418,3 +433,32 @@ bottle.run(host='127.0.0.1', port=8080, reloader=False, debug=False)
   ```python
   bottle.response.delete_cookie('uporabnik', path='/')
   ```
+
+---
+
+# Funkcije v predlogah
+
+* Poleg funkcije `rebase` so v predlogah na voljo še sledeče funkcije:
+  - `include(predloga, ...)` - vključi navedeno predlogo
+  - `defined(spremenljivka)` - pove, ali je spremenljivka (podana kot niz) definirana
+  - `get(spremenljivka, privzeto=None)` - vrne vrednost spremenljivke oziroma privzeto vrednost
+  - `setdefault(spremenljivka, privzeto)` - če spremenljivka ni definirana, jo nastavi na podano privzeto vrednost
+* Lastne funkcije lahko dodajamo v slovar `BaseTemplate.defaults`.
+  ```python
+  bottle.BaseTemplate.defaults['povecaj'] = lambda x: x+1
+  ```
+  ```html
+  {{povecaj(42)}}
+  ```
+
+---
+
+# Prijava
+
+* V bazi lahko hranimo podatke o uporabnikih aplikacije.
+  - Uporabniška imena, gesla, ...
+* Kako varno hraniti gesla?
+  - Čistopis? Upravnik baze lahko vidi gesla uporabnikov - težave z zaupanjem!
+  - Zgoščevalne funkcije? Gesla so zakrita, a lahko vsaj pogostejša gesla razkrijemo s pomočjo [mavričnih tabel](https://en.wikipedia.org/wiki/Rainbow_table).
+* Rešitev: hranimo še naključno vrednost (*sol*), ki jo zgostimo skupaj z geslom.
+  - Za delo z gesli so na voljo knjižnice, kot npr. `bcrypt`.

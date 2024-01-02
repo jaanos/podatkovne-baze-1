@@ -417,6 +417,23 @@ odgovor je 42
 </code></pre>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="22" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+<h1 id="dekorator-view">Dekorator <code>view</code></h1>
+<ul>
+<li data-marpit-fragment="1">Namesto uporabe funkcije <code>template</code> lahko uporabimo dekorator <code>view</code>, ki mu podamo ime predloge in privzete vrednosti spremenljivk.<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python"><span class="hljs-meta">@bottle.get(<span class="hljs-params"><span class="hljs-string">&#x27;/pozdravi/&lt;ime&gt;/&#x27;</span></span>)</span>
+<span class="hljs-meta">@bottle.view(<span class="hljs-params"><span class="hljs-string">&#x27;pozdravi.html&#x27;</span></span>)</span>
+<span class="hljs-keyword">def</span> <span class="hljs-title function_">pozdravi</span>(<span class="hljs-params">ime</span>):
+    <span class="hljs-keyword">return</span> <span class="hljs-built_in">dict</span>(ime=ime)
+</code></pre>
+</li>
+<li data-marpit-fragment="2">Dekorirana funkcija vrača slovar z vrednostmi spremenljivk.
+<ul>
+<li>Če funkcija ne vrne slovarja, se parametri dekoratorja <code>view</code> ignorirajo.</li>
+</ul>
+</li>
+<li data-marpit-fragment="3">Tak način je uporaben v kombinaciji z drugimi dekoratorji (npr. za preverjanje prijave).</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="23" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="funkcija-rebase">Funkcija <code>rebase</code></h1>
 <ul>
 <li data-marpit-fragment="1">Za skupne dele predlog lahko uporabljamo funkcijo <code>rebase</code>, ki ji podamo ime datoteke z osnovno predlogo.</li>
@@ -436,7 +453,7 @@ odgovor je 42
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="23" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="24" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="stati%C4%8Dne-datoteke">Statične datoteke</h1>
 <ul>
 <li data-marpit-fragment="1">S funkcijo <code>static_file</code> lahko ponujamo tudi statične datoteke (slike, stili CSS, skripte, ...)</li>
@@ -447,7 +464,7 @@ odgovor je 42
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="24" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="25" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="obrazci">Obrazci</h1>
 <ul>
 <li data-marpit-fragment="1">Podatke iz obrazcev, poslanih z metodo <code>GET</code>, preberemo iz objekta <code>request.query</code>.<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-html"><span class="hljs-tag">&lt;<span class="hljs-name">form</span> <span class="hljs-attr">action</span>=<span class="hljs-string">&quot;/sestej/&quot;</span>&gt;</span>
@@ -466,7 +483,7 @@ odgovor je 42
 <li data-marpit-fragment="2">Podatki so predstavljeni kot nizi!</li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="25" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="26" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="metoda-post-in-preusmeritve">Metoda <code>POST</code> in preusmeritve</h1>
 <ul>
 <li data-marpit-fragment="1">Podatke iz obrazcev, poslanih z metodo <code>POST</code>, preberemo iz objekta <code>request.forms</code>.</li>
@@ -484,7 +501,7 @@ odgovor je 42
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="26" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="27" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="pi%C5%A1kotki-1">Piškotki</h1>
 <ul>
 <li data-marpit-fragment="1">Piškotek nastavimo z metodo <code>response.set_cookie</code>.<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python">bottle.response.set_cookie(<span class="hljs-string">&#x27;uporabnik&#x27;</span>, uporabnik, secret=SKRIVNOST, path=<span class="hljs-string">&#x27;/&#x27;</span>)
@@ -499,6 +516,45 @@ odgovor je 42
 </li>
 <li data-marpit-fragment="3">Piškotek pobrišemo z metodo <code>response.delete_cookie</code>.<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python">bottle.response.delete_cookie(<span class="hljs-string">&#x27;uporabnik&#x27;</span>, path=<span class="hljs-string">&#x27;/&#x27;</span>)
 </code></pre>
+</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="28" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+<h1 id="funkcije-v-predlogah">Funkcije v predlogah</h1>
+<ul>
+<li data-marpit-fragment="1">Poleg funkcije <code>rebase</code> so v predlogah na voljo še sledeče funkcije:
+<ul>
+<li><code>include(predloga, ...)</code> - vključi navedeno predlogo</li>
+<li><code>defined(spremenljivka)</code> - pove, ali je spremenljivka (podana kot niz) definirana</li>
+<li><code>get(spremenljivka, privzeto=None)</code> - vrne vrednost spremenljivke oziroma privzeto vrednost</li>
+<li><code>setdefault(spremenljivka, privzeto)</code> - če spremenljivka ni definirana, jo nastavi na podano privzeto vrednost</li>
+</ul>
+</li>
+<li data-marpit-fragment="2">Lastne funkcije lahko dodajamo v slovar <code>BaseTemplate.defaults</code>.<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-python">bottle.BaseTemplate.defaults[<span class="hljs-string">&#x27;povecaj&#x27;</span>] = <span class="hljs-keyword">lambda</span> x: x+<span class="hljs-number">1</span>
+</code></pre>
+<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-html">{{povecaj(42)}}
+</code></pre>
+</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="29" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+<h1 id="prijava">Prijava</h1>
+<ul>
+<li data-marpit-fragment="1">V bazi lahko hranimo podatke o uporabnikih aplikacije.
+<ul>
+<li>Uporabniška imena, gesla, ...</li>
+</ul>
+</li>
+<li data-marpit-fragment="2">Kako varno hraniti gesla?
+<ul>
+<li>Čistopis? Upravnik baze lahko vidi gesla uporabnikov - težave z zaupanjem!</li>
+<li>Zgoščevalne funkcije? Gesla so zakrita, a lahko vsaj pogostejša gesla razkrijemo s pomočjo <a href="https://en.wikipedia.org/wiki/Rainbow_table">mavričnih tabel</a>.</li>
+</ul>
+</li>
+<li data-marpit-fragment="3">Rešitev: hranimo še naključno vrednost (<em>sol</em>), ki jo zgostimo skupaj z geslom.
+<ul>
+<li>Za delo z gesli so na voljo knjižnice, kot npr. <code>bcrypt</code>.</li>
+</ul>
 </li>
 </ul>
 </section>
