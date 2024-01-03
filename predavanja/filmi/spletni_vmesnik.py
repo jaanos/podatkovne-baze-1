@@ -79,15 +79,14 @@ def odjavi_uporabnika():
 def status(preveri):
     """
     Vrni dekorator, ki preveri prijavljenega uporabnika v skladu s podano funkcijo
-    in dekorirani funkciji kot prvi argument poda prijavljenega uporabnika.
+    in elemente vrnjenega zaporedja preda kot začetne argumente dekorirani funkciji.
     """
     @wraps(preveri)
     def decorator(fun):
         @wraps(fun)
         def decorated(*largs, **kwargs):
             uporabnik = prijavljeni_uporabnik()
-            preveri(uporabnik)
-            out = fun(uporabnik, *largs, **kwargs)
+            out = fun(*preveri(uporabnik), *largs, **kwargs)
             if isinstance(out, dict):
                 out['uporabnik'] = uporabnik
             return out
@@ -99,18 +98,24 @@ def status(preveri):
 def admin(uporabnik):
     """
     Preveri, ali ima uporabnik administratorske pravice.
+
+    Dekorirana funkcija kot prvi argument sprejme prijavljenega uporabnika.
     """
     if not uporabnik.admin:
         bottle.abort(401, "Dostop prepovedan!")
+    return (uporabnik, )
 
 
 @status
 def prijavljen(uporabnik):
     """
     Preveri, ali je uporabnik prijavljen.
+
+    Dekorirana funkcija kot prvi argument sprejme prijavljenega uporabnika.
     """
     if not uporabnik:
         bottle.redirect('/prijava/')
+    return (uporabnik, )
 
 
 @status
@@ -120,6 +125,7 @@ def odjavljen(uporabnik):
     """
     if uporabnik:
         bottle.redirect('/')
+    return ()
 
 
 @bottle.get('/static/<datoteka:path>')
@@ -136,13 +142,13 @@ def index():
 @bottle.get('/prijava/')
 @bottle.view('prijava.html')
 @odjavljen
-def prijava(uporabnik):
+def prijava():
     return {}
 
 
 @bottle.post('/prijava/')
 @odjavljen
-def prijava_post(uporabnik):
+def prijava_post():
     uporabnisko_ime = bottle.request.forms.uporabnisko_ime
     geslo = bottle.request.forms.geslo
     nastavi_obrazec('prijava', {'uporabnisko_ime': uporabnisko_ime})
@@ -152,13 +158,13 @@ def prijava_post(uporabnik):
 @bottle.get('/registracija/')
 @bottle.view('registracija.html')
 @odjavljen
-def registracija(uporabnik):
+def registracija():
     return {}
 
 
 @bottle.post('/registracija/')
 @odjavljen
-def registracija_post(uporabnik):
+def registracija_post():
     uporabnisko_ime = bottle.request.forms.uporabnisko_ime
     geslo = bottle.request.forms.geslo
     geslo2 = bottle.request.forms.geslo2
