@@ -29,6 +29,25 @@ class Film:
     def __str__(self):
         return self.naslov
 
+    @staticmethod
+    def z_id(ido):
+        """
+        Vrni film z navedenim ID-jem.
+        """
+        sql = """
+          SELECT id, naslov, leto, ocena
+            FROM film WHERE id = ?
+        """
+        cur = conn.cursor()
+        try:
+            cur.execute(sql, [ido])
+            vrstica = cur.fetchone()
+            if vrstica is None:
+                raise ValueError(f"Film z ID-jem {ido} ne obstaja!")
+            return Film(*vrstica)
+        finally:
+            cur.close()
+
     def zasedba(self):
         sql = """
           SELECT oseba.id, oseba.ime, vloga.tip
@@ -92,6 +111,32 @@ class Film:
             cur.close()
         self._dolzina = value
 
+    def komentarji(self):
+        sql = """
+          SELECT komentar, cas, uporabnik, uporabnisko_ime
+            FROM komentar JOIN uporabnik
+              ON komentar.uporabnik = uporabnik.id
+           WHERE film = ?
+        """
+        cur = conn.cursor()
+        try:
+            cur.execute(sql, [self.id])
+            return [(komentar, cas, Uporabnik(*uporabnik)) for komentar, cas, *uporabnik in cur]
+        finally:
+            cur.close()
+
+    def vpisi_komentar(self, uporabnik, komentar):
+        assert uporabnik, "Uporabnik ni prijavljen!"
+        sql = """
+          INSERT INTO komentar (film, uporabnik, komentar)
+          VALUES (?, ?, ?)
+        """
+        cur = conn.cursor()
+        try:
+            with conn:
+                cur.execute(sql, [self.id, uporabnik.id, komentar])
+        finally:
+            cur.close()
 
 class Oseba:
     """
@@ -105,6 +150,24 @@ class Oseba:
     
     def __str__(self):
         return self.ime
+
+    @staticmethod
+    def z_id(ido):
+        """
+        Vrni osebo z navedenim ID-jem.
+        """
+        sql = """
+          SELECT id, ime FROM oseba WHERE id = ?
+        """
+        cur = conn.cursor()
+        try:
+            cur.execute(sql, [ido])
+            vrstica = cur.fetchone()
+            if vrstica is None:
+                raise ValueError(f"Oseba z ID-jem {ido} ne obstaja!")
+            return Oseba(*vrstica)
+        finally:
+            cur.close()
 
     def poisci_vloge(self):
         """

@@ -1,0 +1,32 @@
+% rebase('osnova.html', naslov='Najbolje ocenjeni filmi')
+
+<h1 class="title">Najbolje ocenjeni filmi</h1>
+
+<form action="/filmi/najbolje-ocenjeni/" method="GET">
+    <div class="field has-addons">
+        <div class="control">
+            <input class="input" type="text" name="leto" placeholder="Vpiši leto" value="{{leto}}">
+        </div>
+        <div class="control">
+            <button class="button is-info">
+                Poišči
+            </button>
+        </div>
+      </div>
+</form>
+
+% if leto:
+    <div class="content">
+        <p>
+        % if filmi:
+            <ol>
+            % for film in filmi:
+                <li><a href="/filmi/{{film.id}}/">{{film.naslov}}</a> ({{film.ocena}}/10)</li>
+            % end
+            </ol>
+        % else:
+            Za leto {{leto}} ni podatkov o filmih.
+        % end
+        </p>
+    </div>
+% end

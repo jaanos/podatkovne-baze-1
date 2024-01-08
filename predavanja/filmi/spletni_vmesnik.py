@@ -70,7 +70,7 @@ def prijavi_uporabnika(uporabnik, piskotek=None):
 
 def odjavi_uporabnika():
     """
-    Pobriši piškotek z ID-jem prijavljenaga uporabnika.
+    Pobriši piškotek z ID-jem prijavljenega uporabnika.
     """
     bottle.response.delete_cookie('uporabnik', path='/')
     bottle.redirect('/')
@@ -84,13 +84,15 @@ def status(preveri):
     @wraps(preveri)
     def decorator(fun):
         @wraps(fun)
-        def decorated(*largs, **kwargs):
+        def wrapper(*largs, **kwargs):
             uporabnik = prijavljeni_uporabnik()
             out = fun(*preveri(uporabnik), *largs, **kwargs)
+            if out is None:
+                out = {}
             if isinstance(out, dict):
                 out['uporabnik'] = uporabnik
             return out
-        return decorated
+        return wrapper
     return decorator
 
 
@@ -136,14 +138,69 @@ def static(datoteka):
 @bottle.get('/')
 @bottle.view('index.html')
 def index():
-    return {}
+    pass
+
+
+@bottle.get('/filmi/najbolje-ocenjeni/')
+@bottle.view('filmi.najbolje-ocenjeni.html')
+def najbolje_ocenjeni():
+    leto = bottle.request.query.leto
+    filmi = Film.najboljsi_v_letu(leto)
+    return dict(leto=leto, filmi=filmi)
+
+
+@bottle.get('/filmi/<idf:int>/')
+@bottle.view('filmi.podatki.html')
+def podatki_filma(idf):
+    try:
+        film = Film.z_id(idf)
+    except ValueError:
+        bottle.abort(404, f'Film z ID-jem {idf} ne obstaja!')
+    vloge = film.zasedba()
+    igralci = [oseba for oseba, tip in vloge if tip == 'I']
+    reziserji = [oseba for oseba, tip in vloge if tip == 'R']
+    komentarji = film.komentarji()
+    return dict(film=film, igralci=igralci, reziserji=reziserji,
+                komentarji=komentarji)
+
+
+@bottle.post('/filmi/<idf:int>/')
+@prijavljen
+def podatki_filma_post(uporabnik, idf):
+    komentar = bottle.request.forms.komentar
+    Film.z_id(idf).vpisi_komentar(uporabnik, komentar)
+    bottle.redirect(f'/filmi/{idf}/')
+
+
+@bottle.get('/osebe/poisci/')
+@bottle.view('osebe.poisci.html')
+def poisci_osebo():
+    ime = bottle.request.query.ime
+    osebe = Oseba.poisci(ime)
+    if len(osebe) == 1:
+        oseba, = osebe
+        bottle.redirect(f'/osebe/{oseba.id}/')
+    return dict(ime=ime, osebe=osebe)
+
+
+@bottle.get('/osebe/<ido:int>/')
+@bottle.view('osebe.podatki.html')
+def podatki_osebe(ido):
+    try:
+        oseba = Oseba.z_id(ido)
+    except ValueError:
+        bottle.abort(404, f'Oseba z ID-jem {ido} ne obstaja!')
+    vloge = oseba.poisci_vloge()
+    igralec = [film for film, tip in vloge if tip == 'I']
+    reziser = [film for film, tip in vloge if tip == 'R']
+    return dict(oseba=oseba, igralec=igralec, reziser=reziser)
 
 
 @bottle.get('/prijava/')
 @bottle.view('prijava.html')
 @odjavljen
 def prijava():
-    return {}
+    pass
 
 
 @bottle.post('/prijava/')
@@ -159,7 +216,7 @@ def prijava_post():
 @bottle.view('registracija.html')
 @odjavljen
 def registracija():
-    return {}
+    pass
 
 
 @bottle.post('/registracija/')

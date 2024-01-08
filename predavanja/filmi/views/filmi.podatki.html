@@ -1,0 +1,67 @@
+% if not defined('uporabnik'):
+%     uporabnik = prijavljeni_uporabnik()
+% end
+% rebase('osnova.html', naslov=film.naslov)
+
+<h1 class="title">{{film.naslov}}</h1>
+
+<div class="columns">
+    % if igralci:
+    <div class="column">
+        <h2 class="subtitle">Igralci</h2>
+        <ol>
+        % for oseba in igralci:
+            <li><a href="/osebe/{{oseba.id}}/">{{oseba.ime}}</a></li>
+        % end
+        </ol>
+    </div>
+    % end
+    % if reziserji:
+    <div class="column">
+        <h2 class="subtitle">Režiserji</h2>
+        <ol>
+        % for oseba in reziserji:
+            <li><a href="/osebe/{{oseba.id}}/">{{oseba.ime}}</a></li>
+        % end
+        </ol>
+    </div>
+    % end
+</div>
+
+% if komentarji:
+<div class="content">
+    % for komentar, cas, up in komentarji:
+    <div class="block">
+        <article class="message">
+            <div class="message-header">
+              <p>{{up}} ({{cas}})</p>
+            </div>
+            <div class="message-body">
+              {{komentar}}
+            </div>
+          </article>
+    </div>
+    % end
+</div>
+% end
+
+% if uporabnik:
+<div class="block">
+    <h2 class="subtitle">Dodaj komentar</h2>
+    <form action="/filmi/{{film.id}}/" method="POST">
+        <div class="field">
+            <label class="label">Komentiraj:</label>
+            <p class="control has-icons-left">
+                <textarea class="textarea" placeholder="Vpiši svoj komentar" name="komentar"></textarea>
+            </p>
+        </div>
+        <div class="field">
+            <p class="control">
+                <button class="button is-success">
+                    Dodaj komentar
+                </button>
+            </p>
+        </div>
+    </form>
+</div>
+% end
