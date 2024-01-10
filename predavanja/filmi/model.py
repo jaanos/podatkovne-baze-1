@@ -13,13 +13,26 @@ import sqlite3 as dbapi
 conn = dbapi.connect('filmi.sqlite')
 
 
-class Film:
+class Entiteta:
+    """
+    Nadrazred za posamezne entitetne tipe.
+    """
+
+    def __bool__(self):
+        return self.id is not None
+    
+    def __init_subclass__(cls, /, **kwargs):
+        super().__init_subclass__(**kwargs)
+        cls.NULL = cls()
+
+
+class Film(Entiteta):
     """
     Opomba: lastnosti niso izvedene preko
     metod s @property - TODO!
     """
         
-    def __init__(self, idf, naslov, leto, ocena):
+    def __init__(self, idf=None, naslov=None, leto=None, ocena=None):
         self.id = idf
         self.naslov = naslov
         self.leto = leto
@@ -138,13 +151,14 @@ class Film:
         finally:
             cur.close()
 
-class Oseba:
+
+class Oseba(Entiteta):
     """
     Opomba: lastnosti niso izvedene preko
     metod s @property - TODO!
     """
 
-    def __init__(self, ido, ime):
+    def __init__(self, ido=None, ime=None):
         self.id = ido
         self.ime = ime
     
@@ -176,11 +190,11 @@ class Oseba:
         urejeno po letih
         """
         sql = """
-        SELECT film.id, film.naslov, film.leto, film.ocena, vloga.tip
-          FROM film
-          JOIN vloga ON film.id = vloga.film
-         WHERE vloga.oseba = ?
-         ORDER BY leto
+          SELECT film.id, film.naslov, film.leto, film.ocena, vloga.tip
+            FROM film
+            JOIN vloga ON film.id = vloga.film
+           WHERE vloga.oseba = ?
+           ORDER BY leto
         """
         cur = conn.cursor()
         try:
@@ -205,7 +219,7 @@ class Oseba:
             cur.close()
 
 
-class Uporabnik:
+class Uporabnik(Entiteta):
     def __init__(self, idu=None, uporabnisko_ime=None, admin=False):
         self.id = idu
         self.uporabnisko_ime = uporabnisko_ime
@@ -213,9 +227,6 @@ class Uporabnik:
 
     def __str__(self):
         return self.uporabnisko_ime or '(gost)'
-
-    def __bool__(self):
-        return self.id is not None
 
     @staticmethod
     def prijavi(uporabnisko_ime, geslo):
@@ -232,12 +243,12 @@ class Uporabnik:
             cur.execute(sql, [uporabnisko_ime])
             vrstica = cur.fetchone()
             if vrstica is None:
-                return GUEST
+                return Uporabnik.NULL
             *data, zgostitev = vrstica
             if bcrypt.checkpw(geslo.encode("utf-8"), zgostitev):
                 return Uporabnik(*data)
             else:
-                return GUEST
+                return Uporabnik.NULL
         finally:
             cur.close()
 
@@ -256,7 +267,7 @@ class Uporabnik:
             cur.execute(sql, [idu])
             vrstica = cur.fetchone()
             if vrstica is None:
-                return GUEST
+                return Uporabnik.NULL
             return Uporabnik(*vrstica)
         finally:
             cur.close()
@@ -297,7 +308,7 @@ class Uporabnik:
         assert self, "Uporabnik še ni vpisan v bazo!"
         sql = """
           UPDATE uporabnik SET geslo = ?
-          WHERE id = ?
+           WHERE id = ?
         """
         cur = conn.cursor()
         try:
@@ -306,6 +317,3 @@ class Uporabnik:
                 cur.execute(sql, [zgostitev, self.id])
         finally:
             cur.close()
-
-
-GUEST = Uporabnik()
