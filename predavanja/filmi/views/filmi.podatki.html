@@ -5,6 +5,31 @@
 
 <h1 class="title">{{film.naslov}}</h1>
 
+<div class="block">
+    <ul>
+        <li>Leto: {{film.leto}}</li>
+        <li>Ocena: {{film.ocena}}/10</li>
+        <li>Dolžina: {{film.dolzina}}</li>
+        % if film.zasluzek is not None:
+        <li>Zaslužek: {{film.zasluzek}}</li>
+        % end
+        <li>Glasovi: {{film.glasovi}}</li>
+        % if film.metascore is not None:
+        <li>Metascore: {{film.metascore}}</li>
+        % end
+        % if film.oznaka:
+        <li>Oznaka: {{film.oznaka}}</li>
+        % end
+    </ul>
+</div>
+
+% if film.opis:
+<div class="block">
+    <h2 class="subtitle">Opis</h2>
+    <p>{{film.opis}}</p>
+</div>
+% end
+
 <div class="columns">
     % if igralci:
     <div class="column">
@@ -51,8 +76,8 @@
     <form action="/filmi/{{film.id}}/" method="POST">
         <div class="field">
             <label class="label">Komentiraj:</label>
-            <p class="control has-icons-left">
-                <textarea class="textarea" placeholder="Vpiši svoj komentar" name="komentar"></textarea>
+            <p class="control">
+                <textarea class="textarea" placeholder="Vpiši svoj komentar" name="komentar" required></textarea>
             </p>
         </div>
         <div class="field">

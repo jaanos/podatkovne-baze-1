@@ -8,7 +8,7 @@
 import bottle
 import json
 from functools import wraps
-from model import Film, Oseba, Uporabnik
+from model import Film, Oseba, Oznaka, Uporabnik
 
 
 SKRIVNOST = 'nekaj, kar bo zelo težko uganiti!!!! djnskfndkjfnsd'
@@ -172,6 +172,40 @@ def podatki_filma_post(uporabnik, idf):
     bottle.redirect(f'/filmi/{idf}/')
 
 
+@bottle.get('/filmi/dodaj/')
+@bottle.view('filmi.dodaj.html')
+@admin
+def dodaj_film(uporabnik):
+    pass
+
+
+@bottle.post('/filmi/dodaj/')
+@admin
+def dodaj_film_post(uporabnik):
+    naslov = bottle.request.forms.naslov or None
+    leto = bottle.request.forms.leto or None
+    ocena = bottle.request.forms.ocena or None
+    dolzina = bottle.request.forms.dolzina or None
+    zasluzek = bottle.request.forms.zasluzek or None
+    glasovi = bottle.request.forms.glasovi or None
+    metascore = bottle.request.forms.metascore or None
+    oznaka = bottle.request.forms.oznaka or None
+    opis = bottle.request.forms.opis or ''
+    data = dict(naslov=naslov, leto=leto, ocena=ocena,
+                dolzina=dolzina, metascore=metascore,
+                glasovi=glasovi, zasluzek=zasluzek, oznaka=oznaka,
+                opis=opis)
+    nastavi_obrazec('filmi-dodaj', data)
+    film = Film(**data)
+    try:
+        film.dodaj()
+    except ValueError:
+        nastavi_sporocilo("Navedi vse potrebne podatke!")
+        bottle.redirect('/filmi/dodaj/')
+    preberi_obrazec('filmi-dodaj')
+    bottle.redirect(f'/filmi/{film.id}/')
+
+
 @bottle.get('/osebe/poisci/')
 @bottle.view('osebe.poisci.html')
 def poisci_osebo():
@@ -247,6 +281,7 @@ def odjava(uporabnik):
 bottle.BaseTemplate.defaults['prijavljeni_uporabnik'] = prijavljeni_uporabnik
 bottle.BaseTemplate.defaults['preberi_sporocilo'] = preberi_sporocilo
 bottle.BaseTemplate.defaults['preberi_obrazec'] = preberi_obrazec
+bottle.BaseTemplate.defaults['oznake'] = Oznaka.seznam
 
 if __name__ == '__main__':
     bottle.run(debug=True, reloader=True)

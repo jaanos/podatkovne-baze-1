@@ -32,12 +32,19 @@ class Film(Entiteta):
     metod s @property - TODO!
     """
         
-    def __init__(self, idf=None, naslov=None, leto=None, ocena=None):
+    def __init__(self, idf=None, naslov=None, leto=None, ocena=None,
+                 dolzina=None, metascore=None, glasovi=0,
+                 zasluzek=None, oznaka=None, opis=None):
         self.id = idf
         self.naslov = naslov
         self.leto = leto
         self.ocena = ocena
-        self._dolzina = None
+        self._dolzina = dolzina
+        self.metascore = metascore
+        self.glasovi = glasovi
+        self.zasluzek = zasluzek
+        self.oznaka = oznaka
+        self.opis = opis
     
     def __str__(self):
         return self.naslov
@@ -48,7 +55,8 @@ class Film(Entiteta):
         Vrni film z navedenim ID-jem.
         """
         sql = """
-          SELECT id, naslov, leto, ocena
+          SELECT id, naslov, leto, ocena, dolzina, metascore,
+                 glasovi, zasluzek, oznaka, opis
             FROM film WHERE id = ?
         """
         cur = conn.cursor()
@@ -97,7 +105,7 @@ class Film(Entiteta):
 
     @property
     def dolzina(self):
-        if self._dolzina is None:
+        if self._dolzina is None and self:
             sql = """
               SELECT dolzina FROM film
                WHERE id = ?
@@ -148,6 +156,29 @@ class Film(Entiteta):
         try:
             with conn:
                 cur.execute(sql, [self.id, uporabnik.id, komentar])
+        finally:
+            cur.close()
+
+    def dodaj(self):
+        """
+        Dodaj film v bazo.
+        """
+        assert not self, "Film je že vpisan v bazo!"
+        sql = """
+          INSERT INTO film (naslov, leto, ocena, dolzina, metascore,
+                            glasovi, zasluzek, oznaka, opis)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        """
+        cur = conn.cursor()
+        try:
+            with conn:
+                cur.execute(sql, [self.naslov, self.leto, self.ocena,
+                                  self.dolzina, self.metascore,
+                                  self.glasovi, self.zasluzek,
+                                  self.oznaka, self.opis])
+            self.id = cur.lastrowid
+        except dbapi.IntegrityError:
+            raise ValueError("Obvezni podatki niso navedeni!")
         finally:
             cur.close()
 
@@ -218,6 +249,19 @@ class Oseba(Entiteta):
         finally:
             cur.close()
 
+
+class Oznaka(Entiteta):
+    @staticmethod
+    def seznam():
+        sql = """
+          SELECT kratica FROM oznaka
+        """
+        cur = conn.cursor()
+        try:
+            cur.execute(sql)
+            return [kratica for kratica, in cur]
+        finally:
+            cur.close()
 
 class Uporabnik(Entiteta):
     def __init__(self, idu=None, uporabnisko_ime=None, admin=False):

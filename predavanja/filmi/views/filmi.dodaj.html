@@ -1,0 +1,73 @@
+% rebase('osnova.html', naslov='Dodaj film')
+% obrazec = preberi_obrazec('filmi-dodaj')
+
+<form action="/filmi/dodaj/" method="POST">
+    <div class="field">
+        <label class="label">Naslov</label>
+        <p class="control">
+            <input class="input" type="text" name="naslov" placeholder="Naslov filma" value="{{obrazec.get('naslov', '')}}" required />
+        </p>
+    </div>
+    <div class="field">
+        <label class="label">Leto</label>
+        <p class="control">
+            <input class="input" type="number" name="leto" placeholder="Leto" min="1900" value="{{obrazec.get('leto', '')}}" required />
+        </p>
+    </div>
+    <div class="field">
+        <label class="label">Ocena</label>
+        <p class="control">
+            <input class="input" type="number" name="ocena" placeholder="Ocena filma" min="0" max="10" step="0.1" value="{{obrazec.get('ocena', '')}}" required />
+        </p>
+    </div>
+    <div class="field">
+        <label class="label">Dolžina</label>
+        <p class="control">
+            <input class="input" type="number" name="dolzina" placeholder="Dolžina filma" min="0" value="{{obrazec.get('dolzina', '')}}" required />
+        </p>
+    </div>
+    <div class="field">
+        <label class="label">Zaslužek</label>
+        <p class="control">
+            <input class="input" type="number" name="zasluzek" placeholder="Zaslužek filma" min="0" value="{{obrazec.get('zasluzek', '')}}" />
+        </p>
+    </div>
+    <div class="field">
+        <label class="label">Glasovi</label>
+        <p class="control">
+            <input class="input" type="number" name="glasovi" placeholder="Glasovi filma" min="0" value="{{obrazec.get('glasovi', '')}}" required />
+        </p>
+    </div>
+    <div class="field">
+        <label class="label">Metascore</label>
+        <p class="control">
+            <input class="input" type="number" name="metascore" placeholder="Metascore filma" min="0" value="{{obrazec.get('metascore', '')}}" required />
+        </p>
+    </div>
+    <div class="field">
+        <label class="label">Oznaka</label>
+        <p class="control">
+            <div class="select">
+                <select name="oznaka">
+                    <option value="">---</option>
+                    % for oznaka in oznake():
+                    <option value="{{oznaka}}" {{'selected' if obrazec.get('oznaka') == oznaka else ''}}>{{oznaka}}</option>
+                    % end
+                </select>
+            </div>
+        </p>
+    </div>
+    <div class="field">
+        <label class="label">Opis</label>
+        <p class="control">
+            <textarea class="textarea" placeholder="Opis filma" name="opis">{{obrazec.get('opis', '')}}</textarea>
+        </p>
+    </div>
+    <div class="field">
+        <p class="control">
+            <button class="button is-success">
+                Dodaj film
+            </button>
+        </p>
+    </div>
+</form>

@@ -41,6 +41,12 @@
                             <a href="/filmi/najbolje-ocenjeni/" class="navbar-item">
                                 Poišči dobre filme
                             </a>
+
+                            % if uporabnik.admin:
+                            <a href="/filmi/dodaj/" class="navbar-item">
+                                Dodaj film
+                            </a>
+                            % end
                         </div>
                     </div>
 
