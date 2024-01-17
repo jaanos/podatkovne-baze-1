@@ -14,6 +14,10 @@ from model import Film, Oseba, Oznaka, Uporabnik
 SKRIVNOST = 'nekaj, kar bo zelo težko uganiti!!!! djnskfndkjfnsd'
 
 
+def izbrisi_piskotek(piskotek):
+    bottle.response.delete_cookie(piskotek, path='/')
+
+
 def nastavi_sporocilo(sporocilo, piskotek='sporocilo'):
     """
     Nastavi piškotek s sporočilom.
@@ -21,12 +25,13 @@ def nastavi_sporocilo(sporocilo, piskotek='sporocilo'):
     bottle.response.set_cookie(piskotek, sporocilo, secret=SKRIVNOST, path='/')
 
 
-def preberi_sporocilo(piskotek='sporocilo'):
+def preberi_sporocilo(piskotek='sporocilo', izbrisi=True):
     """
     Preberi sporočilo in pobriši pripadajoči piškotek.
     """
     sporocilo = bottle.request.get_cookie(piskotek, secret=SKRIVNOST)
-    bottle.response.delete_cookie(piskotek, path='/')
+    if izbrisi:
+        izbrisi_piskotek(piskotek)
     return sporocilo
 
 
@@ -37,14 +42,14 @@ def nastavi_obrazec(piskotek, obrazec):
     nastavi_sporocilo(json.dumps(obrazec), piskotek)
 
 
-def preberi_obrazec(piskotek):
+def preberi_obrazec(piskotek, privzeto={}, izbrisi=True):
     """
     Preberi vrednosti obrazca in pobriši pripadajoči piškotek.
     """
     try:
-        return json.loads(preberi_sporocilo(piskotek))
+        return json.loads(preberi_sporocilo(piskotek, izbrisi))
     except (TypeError, json.JSONDecodeError):
-        return {}
+        return privzeto
 
 
 def prijavljeni_uporabnik():
@@ -64,7 +69,7 @@ def prijavi_uporabnika(uporabnik, piskotek=None):
         bottle.redirect('/prijava/')
     bottle.response.set_cookie('uporabnik', str(uporabnik.id), secret=SKRIVNOST, path='/')
     if piskotek:
-        bottle.response.delete_cookie(piskotek, path='/')
+        izbrisi_piskotek(piskotek)
     bottle.redirect('/')
 
 
@@ -72,7 +77,7 @@ def odjavi_uporabnika():
     """
     Pobriši piškotek z ID-jem prijavljenega uporabnika.
     """
-    bottle.response.delete_cookie('uporabnik', path='/')
+    izbrisi_piskotek('uporabnik')
     bottle.redirect('/')
 
 
@@ -156,12 +161,29 @@ def podatki_filma(idf):
         film = Film.z_id(idf)
     except ValueError:
         bottle.abort(404, f'Film z ID-jem {idf} ne obstaja!')
-    vloge = film.zasedba()
-    igralci = [oseba for oseba, tip in vloge if tip == 'I']
-    reziserji = [oseba for oseba, tip in vloge if tip == 'R']
+    uporabnik = prijavljeni_uporabnik()
+    spremenjeno = False
+    if uporabnik.admin:
+        igralci = preberi_obrazec(f'film{idf}I', None, izbrisi=False)
+        reziserji = preberi_obrazec(f'film{idf}R', None, izbrisi=False)
+        if igralci is None:
+            igralci = [oseba for oseba, _ in Film.z_id(idf).zasedba('I')]
+        else:
+            igralci = Oseba.seznam(igralci)
+            spremenjeno = True
+        if reziserji is None:
+            reziserji = [oseba for oseba, _ in Film.z_id(idf).zasedba('R')]
+        else:
+            reziserji = Oseba.seznam(reziserji)
+            spremenjeno = True
+    else:
+        vloge = film.zasedba()
+        igralci = [oseba for oseba, tip in vloge if tip == 'I']
+        reziserji = [oseba for oseba, tip in vloge if tip == 'R']
     komentarji = film.komentarji()
     return dict(film=film, igralci=igralci, reziserji=reziserji,
-                komentarji=komentarji)
+                komentarji=komentarji, uporabnik=prijavljeni_uporabnik(),
+                spremenjeno=spremenjeno)
 
 
 @bottle.post('/filmi/<idf:int>/')
@@ -173,7 +195,7 @@ def podatki_filma_post(uporabnik, idf):
 
 
 @bottle.get('/filmi/dodaj/')
-@bottle.view('filmi.dodaj.html')
+@bottle.view('filmi.dodaj.html', film=Film.NULL)
 @admin
 def dodaj_film(uporabnik):
     pass
@@ -202,8 +224,114 @@ def dodaj_film_post(uporabnik):
     except ValueError:
         nastavi_sporocilo("Navedi vse potrebne podatke!")
         bottle.redirect('/filmi/dodaj/')
-    preberi_obrazec('filmi-dodaj')
+    izbrisi_piskotek('filmi-dodaj')
     bottle.redirect(f'/filmi/{film.id}/')
+
+
+@bottle.get('/filmi/<idf:int>/uredi/')
+@bottle.view('filmi.uredi.html')
+@admin
+def uredi_film(uporabnik, idf):
+    try:
+        film = Film.z_id(idf)
+    except ValueError:
+        bottle.abort(404, f'Film z ID-jem {idf} ne obstaja!')
+    return dict(film=film)
+
+
+@bottle.post('/filmi/<idf:int>/uredi/')
+@admin
+def uredi_film_post(uporabnik, idf):
+    naslov = bottle.request.forms.naslov or None
+    leto = bottle.request.forms.leto or None
+    ocena = bottle.request.forms.ocena or None
+    dolzina = bottle.request.forms.dolzina or None
+    zasluzek = bottle.request.forms.zasluzek or None
+    glasovi = bottle.request.forms.glasovi or None
+    metascore = bottle.request.forms.metascore or None
+    oznaka = bottle.request.forms.oznaka or None
+    opis = bottle.request.forms.opis or ''
+    data = dict(naslov=naslov, leto=leto, ocena=ocena,
+                dolzina=dolzina, metascore=metascore,
+                glasovi=glasovi, zasluzek=zasluzek, oznaka=oznaka,
+                opis=opis, idf=idf)
+    nastavi_obrazec(f'filmi{idf}', data)
+    film = Film(**data)
+    try:
+        film.dodaj()
+    except ValueError:
+        nastavi_sporocilo("Navedi vse potrebne podatke!")
+        bottle.redirect(f'/filmi/{idf}/uredi/')
+    izbrisi_piskotek(f'filmi{idf}')
+    bottle.redirect(f'/filmi/{idf}/')
+
+
+@bottle.post('/filmi/<idf:int>/izbrisi/')
+@admin
+def izbrisi_film_post(uporabnik, idf):
+    try:
+        Film.z_id(idf).izbrisi()
+    except ValueError:
+        nastavi_sporocilo("Napaka pri brisanju filma!")
+        bottle.redirect(f'/filmi/{idf}/')
+    bottle.redirect('/')
+
+
+@bottle.post('/filmi/<idf:int>/<tip:re:[IR]>/izbrisi/<ord:int>/')
+@admin
+def izbrisi_vlogo_post(uporabnik, idf, tip, ord):
+    osebe = preberi_obrazec(f'film{idf}{tip}', None, izbrisi=False)
+    if osebe is None:
+        osebe = [oseba.id for oseba, _ in Film.z_id(idf).zasedba(tip)]
+    try:
+        if ord < 0:
+            raise IndexError
+        del osebe[ord]
+        nastavi_obrazec(f'film{idf}{tip}', osebe)
+    except IndexError:
+        nastavi_sporocilo("Brisanje iz zasedbe ni uspelo!")
+    bottle.redirect(f'/filmi/{idf}/')
+
+
+@bottle.post('/filmi/<idf:int>/<tip:re:[IR]>/premakni/<ord:int>/')
+@admin
+def premakni_vlogo_post(uporabnik, idf, tip, ord):
+    osebe = preberi_obrazec(f'film{idf}{tip}', None, izbrisi=False)
+    if osebe is None:
+        osebe = [oseba.id for oseba, _ in Film.z_id(idf).zasedba(tip)]
+    try:
+        if ord < 0:
+            raise IndexError
+        osebe[ord], osebe[ord+1] = osebe[ord+1], osebe[ord]
+        nastavi_obrazec(f'film{idf}{tip}', osebe)
+    except IndexError:
+        nastavi_sporocilo("Preurejanje zasedbe ni uspelo!")
+    bottle.redirect(f'/filmi/{idf}/')
+
+
+@bottle.post('/filmi/<idf:int>/shrani/')
+@admin
+def shrani_zasedbo_post(uporabnik, idf):
+    igralci = preberi_obrazec(f'film{idf}I', None, izbrisi=False)
+    reziserji = preberi_obrazec(f'film{idf}R', None, izbrisi=False)
+    if igralci is not None:
+        igralci = [Oseba(ido) for ido in igralci]
+    if reziserji is not None:
+        reziserji = [Oseba(ido) for ido in reziserji]
+    try:
+        Film.z_id(idf).nastavi_zasedbo(igralci, reziserji)
+    except ValueError:
+        nastavi_sporocilo("Napaka pri shranjevanju zasedbe!")
+        bottle.redirect(f'/filmi/{idf}/')
+    ponastavi_zasedbo_post.__wrapped__(uporabnik, idf)
+
+
+@bottle.post('/filmi/<idf:int>/ponastavi/')
+@admin
+def ponastavi_zasedbo_post(uporabnik, idf):
+    izbrisi_piskotek(f'film{idf}I')
+    izbrisi_piskotek(f'film{idf}R')
+    bottle.redirect(f'/filmi/{idf}/')
 
 
 @bottle.get('/osebe/poisci/')

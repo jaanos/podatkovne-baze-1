@@ -1,9 +1,24 @@
-% if not defined('uporabnik'):
-%     uporabnik = prijavljeni_uporabnik()
-% end
 % rebase('osnova.html', naslov=film.naslov)
 
-<h1 class="title">{{film.naslov}}</h1>
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <h1 class="title">{{film.naslov}}</h1>
+        </div>
+    </div>
+    % if uporabnik.admin:
+    <div class="level-right">
+        <div class="level-item">
+            <a href="/filmi/{{film.id}}/uredi/" class="button is-primary">Uredi</a>
+        </div>
+        <div class="level-item">
+            <form action="/filmi/{{film.id}}/izbrisi/" method="POST">
+                <button class="button is-danger" onclick="return confirm('Ali želiš res izbrisati film z ID-jem {{film.id}}?')">Izbriši</button>
+            </form>
+        </div>
+    </div>
+    % end
+</div>
 
 <div class="block">
     <ul>
@@ -30,28 +45,114 @@
 </div>
 % end
 
+% if spremenjeno:
+<div class="notification is-warning is-light">
+    <button class="delete"></button>
+    Spremembe zasedbe še niso bile shranjene!
+</div>
+% end
+
 <div class="columns">
-    % if igralci:
+    % if igralci or uporabnik.admin:
     <div class="column">
         <h2 class="subtitle">Igralci</h2>
         <ol>
-        % for oseba in igralci:
-            <li><a href="/osebe/{{oseba.id}}/">{{oseba.ime}}</a></li>
+        % for i, oseba in enumerate(igralci):
+            <li>
+                <div class="level">
+                    <div class="level-left">
+                        % if uporabnik.admin:
+                        <div class="level-item">
+                            <form action="/filmi/{{film.id}}/I/izbrisi/{{i}}/" method="POST">
+                                <button class="button is-danger is-small">
+                                    <i class="fas fa-xmark"></i>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="level-item">
+                            <form action="/filmi/{{film.id}}/I/premakni/{{i-1}}/" method="POST">
+                                <button class="button is-primary is-small" {{'disabled' if i == 0 else ''}}>
+                                    <i class="fas fa-arrow-up"></i>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="level-item">
+                            <form action="/filmi/{{film.id}}/I/premakni/{{i}}/" method="POST">
+                                <button class="button is-primary is-small" {{'disabled' if i == len(igralci)-1 else ''}}>
+                                    <i class="fas fa-arrow-down"></i>
+                                </button>
+                            </form>
+                        </div>
+                        % end
+                        <div class="level-item">
+                            <a href="/osebe/{{oseba.id}}/">{{oseba.ime}}</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
         % end
         </ol>
     </div>
     % end
-    % if reziserji:
+    % if reziserji or uporabnik.admin:
     <div class="column">
         <h2 class="subtitle">Režiserji</h2>
         <ol>
-        % for oseba in reziserji:
-            <li><a href="/osebe/{{oseba.id}}/">{{oseba.ime}}</a></li>
+        % for i, oseba in enumerate(reziserji):
+        <li>
+            <div class="level">
+                <div class="level-left">
+                    % if uporabnik.admin:
+                    <div class="level-item">
+                        <form action="/filmi/{{film.id}}/R/izbrisi/{{i}}/" method="POST">
+                            <button class="button is-danger is-small">
+                                <i class="fas fa-xmark"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="level-item">
+                        <form action="/filmi/{{film.id}}/R/gor/{{i}}/" method="POST">
+                            <button class="button is-primary is-small" {{'disabled' if i == 0 else ''}}>
+                                <i class="fas fa-arrow-up"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="level-item">
+                        <form action="/filmi/{{film.id}}/R/dol/{{i}}/" method="POST">
+                            <button class="button is-primary is-small" {{'disabled' if i == len(reziserji)-1 else ''}}>
+                                <i class="fas fa-arrow-down"></i>
+                            </button>
+                        </form>
+                    </div>
+                    % end
+                    <div class="level-item">
+                        <a href="/osebe/{{oseba.id}}/">{{oseba.ime}}</a>
+                    </div>
+                </div>
+            </div>
+        </li>
         % end
         </ol>
     </div>
     % end
 </div>
+
+% if spremenjeno:
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <form action="/filmi/{{film.id}}/shrani/" method="POST">
+                <button class="button is-primary" onclick="return confirm('Ali želiš res shraniti spremembe zasedbe pri filmu z ID-jem {{film.id}}?')">Shrani</button>
+            </form>
+        </div>
+        <div class="level-item">
+            <form action="/filmi/{{film.id}}/ponastavi/" method="POST">
+                <button class="button is-danger" onclick="return confirm('Ali želiš res ponastaviti spremembe zasedbe pri filmu z ID-jem {{film.id}}?')">Ponastavi</button>
+            </form>
+        </div>
+    </div>
+</div>
+% end
 
 % if komentarji:
 <div class="content">

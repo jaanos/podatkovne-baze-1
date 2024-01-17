@@ -11,6 +11,7 @@ import bcrypt
 import sqlite3 as dbapi
 
 conn = dbapi.connect('filmi.sqlite')
+conn.execute("PRAGMA foreign_keys = ON;")
 
 
 class Entiteta:
@@ -69,21 +70,64 @@ class Film(Entiteta):
         finally:
             cur.close()
 
-    def zasedba(self):
-        sql = """
+    def zasedba(self, tip=None):
+        data = [self.id]
+        if tip is None:
+            sql_tip = ""
+        else:
+            sql_tip = "AND tip = ?"
+            data.append(tip)
+        sql = f"""
           SELECT oseba.id, oseba.ime, vloga.tip
             FROM oseba JOIN vloga
               ON vloga.oseba = oseba.id
            WHERE vloga.film = ?
+           {sql_tip}
            ORDER BY vloga.tip, vloga.mesto
         """
         cur = conn.cursor()
         try:
-            cur.execute(sql, [self.id])
+            cur.execute(sql, data)
             return [(Oseba(*oseba), tip) for *oseba, tip in cur]
         finally:
             cur.close()
-    
+
+    def nastavi_zasedbo(self, igralci=None, reziserji=None):
+        seznam = []
+        data = [self.id]
+        for tip, osebe in (('I', igralci), ('R', reziserji)):
+            if osebe is not None:
+                seznam.append((tip, osebe))
+        if not seznam:
+            return
+        if len(seznam) == 1:
+            (tip, _), = seznam
+            sql_tip = """
+              AND tip = ?
+            """
+            data.append(tip)
+        else:
+            sql_tip = ""
+        sql_izbrisi = f"""
+          DELETE FROM vloga WHERE film = ?
+          {sql_tip}
+        """
+        sql_vstavi = """
+          INSERT INTO vloga (film, oseba, tip, mesto)
+          VALUES (?, ?, ?, ?)
+        """
+        cur = conn.cursor()
+        try:
+            with conn:
+                cur.execute(sql_izbrisi, data)
+                for tip, osebe in seznam:
+                    for i, oseba in enumerate(osebe, 1):
+                        cur.execute(sql_vstavi, [self.id, oseba.id, tip, i])
+        except dbapi.IntegrityError:
+            raise ValueError(f"Prišlo je do napake pri nastavljanju zasedbe filma z ID-jem {self.id}!")
+        finally:
+            cur.close()
+
     @staticmethod
     def najboljsi_v_letu(leto, n=10):
         """
@@ -163,22 +207,51 @@ class Film(Entiteta):
         """
         Dodaj film v bazo.
         """
-        assert not self, "Film je že vpisan v bazo!"
-        sql = """
-          INSERT INTO film (naslov, leto, ocena, dolzina, metascore,
-                            glasovi, zasluzek, oznaka, opis)
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        data = [self.naslov, self.leto, self.ocena, self.dolzina,
+                self.metascore, self.glasovi, self.zasluzek,
+                self.oznaka, self.opis]
+        if self:
+            sql = """
+              UPDATE film SET naslov = ?, leto = ?, ocena = ?, dolzina = ?,
+                metascore = ?, glasovi = ?, zasluzek = ?, oznaka = ?, opis = ?
+                WHERE id = ?
+            """
+            data.append(self.id)
+        else:
+            sql = """
+              INSERT INTO film (naslov, leto, ocena, dolzina, metascore,
+                                glasovi, zasluzek, oznaka, opis)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """
+        cur = conn.cursor()
+        try:
+            with conn:
+                cur.execute(sql, data)
+            self.id = cur.lastrowid
+        except dbapi.IntegrityError:
+            raise ValueError("Obvezni podatki niso navedeni!")
+        finally:
+            cur.close()
+
+    def izbrisi(self):
+        assert self, "Film še ni vpisan v bazo!"
+        sql_vloga = """
+          DELETE FROM vloga WHERE film = ?
+        """
+        sql_komentar = """
+          DELETE FROM komentar WHERE film = ?
+        """
+        sql_film = """
+          DELETE FROM film WHERE id = ?
         """
         cur = conn.cursor()
         try:
             with conn:
-                cur.execute(sql, [self.naslov, self.leto, self.ocena,
-                                  self.dolzina, self.metascore,
-                                  self.glasovi, self.zasluzek,
-                                  self.oznaka, self.opis])
-            self.id = cur.lastrowid
+                cur.execute(sql_vloga, [self.id])
+                cur.execute(sql_komentar, [self.id])
+                cur.execute(sql_film, [self.id])
         except dbapi.IntegrityError:
-            raise ValueError("Obvezni podatki niso navedeni!")
+            raise ValueError(f"Prišlo je do napake pri brisanju filma z ID-jem {self.id}!")
         finally:
             cur.close()
 
@@ -211,6 +284,25 @@ class Oseba(Entiteta):
             if vrstica is None:
                 raise ValueError(f"Oseba z ID-jem {ido} ne obstaja!")
             return Oseba(*vrstica)
+        finally:
+            cur.close()
+
+    @staticmethod
+    def seznam(seznam_idjev):
+        if not seznam_idjev:
+            return []
+        elif len(seznam_idjev) == 1:
+            ido, = seznam_idjev
+            return [Oseba.z_id(ido)]
+        sql = f"""
+          SELECT id, ime FROM oseba
+           WHERE id IN ({', '.join(['?'] * len(seznam_idjev))})
+        """
+        cur = conn.cursor()
+        try:
+            cur.execute(sql, seznam_idjev)
+            slovar = {ido: Oseba(ido, ime) for ido, ime in cur}
+            return [slovar[ido] for ido in seznam_idjev]
         finally:
             cur.close()
 
