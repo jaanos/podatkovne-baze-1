@@ -167,12 +167,12 @@ def podatki_filma(idf):
         igralci = preberi_obrazec(f'film{idf}I', None, izbrisi=False)
         reziserji = preberi_obrazec(f'film{idf}R', None, izbrisi=False)
         if igralci is None:
-            igralci = [oseba for oseba, _ in Film.z_id(idf).zasedba('I')]
+            igralci = [oseba for oseba, _ in film.zasedba('I')]
         else:
             igralci = Oseba.seznam(igralci)
             spremenjeno = True
         if reziserji is None:
-            reziserji = [oseba for oseba, _ in Film.z_id(idf).zasedba('R')]
+            reziserji = [oseba for oseba, _ in film.zasedba('R')]
         else:
             reziserji = Oseba.seznam(reziserji)
             spremenjeno = True
@@ -190,7 +190,7 @@ def podatki_filma(idf):
 @prijavljen
 def podatki_filma_post(uporabnik, idf):
     komentar = bottle.request.forms.komentar
-    Film.z_id(idf).vpisi_komentar(uporabnik, komentar)
+    Film(idf).vpisi_komentar(uporabnik, komentar)
     bottle.redirect(f'/filmi/{idf}/')
 
 
@@ -270,7 +270,7 @@ def uredi_film_post(uporabnik, idf):
 @admin
 def izbrisi_film_post(uporabnik, idf):
     try:
-        Film.z_id(idf).izbrisi()
+        Film(idf).izbrisi()
     except ValueError:
         nastavi_sporocilo("Napaka pri brisanju filma!")
         bottle.redirect(f'/filmi/{idf}/')
@@ -282,7 +282,7 @@ def izbrisi_film_post(uporabnik, idf):
 def izbrisi_vlogo_post(uporabnik, idf, tip, ord):
     osebe = preberi_obrazec(f'film{idf}{tip}', None, izbrisi=False)
     if osebe is None:
-        osebe = [oseba.id for oseba, _ in Film.z_id(idf).zasedba(tip)]
+        osebe = [oseba.id for oseba, _ in Film(idf).zasedba(tip)]
     try:
         if ord < 0:
             raise IndexError
@@ -298,7 +298,7 @@ def izbrisi_vlogo_post(uporabnik, idf, tip, ord):
 def premakni_vlogo_post(uporabnik, idf, tip, ord):
     osebe = preberi_obrazec(f'film{idf}{tip}', None, izbrisi=False)
     if osebe is None:
-        osebe = [oseba.id for oseba, _ in Film.z_id(idf).zasedba(tip)]
+        osebe = [oseba.id for oseba, _ in Film(idf).zasedba(tip)]
     try:
         if ord < 0:
             raise IndexError
@@ -306,6 +306,30 @@ def premakni_vlogo_post(uporabnik, idf, tip, ord):
         nastavi_obrazec(f'film{idf}{tip}', osebe)
     except IndexError:
         nastavi_sporocilo("Preurejanje zasedbe ni uspelo!")
+    bottle.redirect(f'/filmi/{idf}/')
+
+
+@bottle.get('/filmi/<idf:int>/<tip:re:[IR]>/dodaj/')
+@bottle.view('filmi.dodaj_vlogo.html')
+@admin
+def dodaj_vlogo(uporabnik, idf, tip):
+    ime = bottle.request.query.ime
+    osebe = Oseba.poisci(ime)
+    if not osebe:
+        nastavi_sporocilo("Oseba z navedenim imenov ne obstaja!")
+        bottle.redirect(f'/filmi/{idf}/')
+    film = Film.z_id(idf)
+    return dict(ime=ime, osebe=osebe, film=film, tip=tip)
+
+
+@bottle.post('/filmi/<idf:int>/<tip:re:[IR]>/dodaj/<ido:int>/')
+@admin
+def dodaj_vlogo_post(uporabnik, idf, tip, ido):
+    osebe = preberi_obrazec(f'film{idf}{tip}', None, izbrisi=False)
+    if osebe is None:
+        osebe = [oseba.id for oseba, _ in Film(idf).zasedba(tip)]
+    osebe.append(ido)
+    nastavi_obrazec(f'film{idf}{tip}', osebe)
     bottle.redirect(f'/filmi/{idf}/')
 
 
@@ -319,7 +343,7 @@ def shrani_zasedbo_post(uporabnik, idf):
     if reziserji is not None:
         reziserji = [Oseba(ido) for ido in reziserji]
     try:
-        Film.z_id(idf).nastavi_zasedbo(igralci, reziserji)
+        Film(idf).nastavi_zasedbo(igralci, reziserji)
     except ValueError:
         nastavi_sporocilo("Napaka pri shranjevanju zasedbe!")
         bottle.redirect(f'/filmi/{idf}/')

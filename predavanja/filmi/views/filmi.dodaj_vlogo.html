@@ -1,0 +1,27 @@
+% rebase('osnova.html', naslov='Dodaj vlogo')
+
+<h1 class="title">{{film}} ({{film.leto}}</h1>
+
+<div class="content">
+    <p>
+    <ol>
+    % for oseba in osebe:
+        <li>
+            <div class="level">
+                <div class="level-left">
+                    <div class="level-item">
+                        <form action="/filmi/{{film.id}}/{{tip}}/dodaj/{{oseba.id}}/" method="POST">
+                            <button class="button is-primary is-small">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="level-item">
+                        <a href="/osebe/{{oseba.id}}/">{{oseba.ime}}</a>
+                    </div>
+                </div>
+            </div>
+        </li>
+    % end
+    </ol>
+</div>
