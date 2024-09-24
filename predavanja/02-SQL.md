@@ -270,10 +270,10 @@ SELECT name FROM world
     ```sql
     SELECT population FROM world WHERE name = 'Slovenia';
     ```
-    - Dobimo rezultat *2117674*
+    - Dobimo rezultat *2063151*
   * Uporabimo v ustrezni poizvedbi
     ```sql
-    SELECT name FROM world WHERE population <= 2117674;
+    SELECT name FROM world WHERE population <= 2063151;
     ```
 ---
 
@@ -316,15 +316,15 @@ SELECT name FROM world
     SELECT population FROM world
      WHERE name = 'Canada';
     ```
-    - Dobimo rezultat *40282200*.
+    - Dobimo rezultat *35427524*.
   * ```sql
     SELECT population FROM world
      WHERE name = 'Algeria';
     ```
-    - Dobimo rezultat *45400000*.
+    - Dobimo rezultat *38700000*.
   * ```sql
     SELECT name FROM world
-     WHERE population BETWEEN 40282200 AND 45400000;
+     WHERE population BETWEEN 35427524 AND 38700000;
     ```
 
 ---
@@ -403,21 +403,21 @@ SELECT name FROM world
 # `WITH` (2)
 
 * Navedemo lahko tudi več podpoizvedb in se nanje sklicujemo kot na tabele:
-```sql
-WITH gospodarji_prstanov AS (
+  ```sql
+  WITH gospodarji_prstanov AS (
+    SELECT * FROM film
+     WHERE naslov LIKE 'Gospodar prstanov%'
+  ),
+  leta_gospodarjev AS (
+    SELECT leto FROM gospodarji_prstanov
+  ),
+  ocene_gospodarjev AS (
+    SELECT ocena FROM gospodarji_prstanov
+  )
   SELECT * FROM film
-   WHERE naslov LIKE 'Gospodar prstanov%'
-),
-leta_gospodarjev AS (
-  SELECT leto FROM gospodarji_prstanov
-),
-ocene_gospodarjev AS (
-  SELECT ocena FROM gospodarji_prstanov
-)
-SELECT * FROM film
- WHERE leto IN leta_gospodarjev AND 
-       ocena IN ocene_gospodarjev;
-```
+   WHERE leto IN leta_gospodarjev AND 
+         ocena IN ocene_gospodarjev;
+  ```
 
 ---
 
@@ -632,24 +632,24 @@ SELECT * FROM film
          );
   ```
 * Dobimo prazno tabelo.
-  - Prav, saj ima največja evropska država 146M prebivalcev.
+  - Prav, saj ima največja evropska država 80M prebivalcev.
   - Za nobeno vrstico pogoj ni izpolnjen.
 
 ---
 
 # Ustrezna celina
 
-* "Ročno" preverimo, da je taka celina *Insular Oceania*.
+* "Ročno" preverimo, da je taka celina *Oceania*.
 * Torej bi moralo biti tole v redu za vse države v Oceaniji.
   ```sql
   SELECT continent FROM world
    WHERE 30000000 > (
            SELECT MAX(population) FROM world
-            WHERE continent = 'Insular Oceania'
+            WHERE continent = 'Oceania'
          );
   ```
 * Dobimo ogromno tabelo!
-  - Če uporabimo `COUNT`, vidimo, da dobimo VSE države (194).
+  - Če uporabimo `COUNT`, vidimo, da dobimo VSE države (195).
   - Za vsako vrstico je pogoj izpolnjen!
 * Hočemo, da sta celini "zunaj" in "znotraj" enaki.
 
@@ -865,8 +865,10 @@ SELECT name, continent, MAX(population) FROM world
 * Zakaj to ni OK?
 * SQLZoo vrne
   ```
-  Error:
-  'gisq.world.name' isn't in GROUP BY
+  Expression #1 of SELECT list is not in GROUP BY clause
+  and contains nonaggregated column 'gisq.world.name'
+  which is not functionally dependent on columns in GROUP BY clause;
+  this is incompatible with sql_mode=only_full_group_by
   ```
 
 ---
@@ -876,12 +878,12 @@ SELECT name, continent, MAX(population) FROM world
 <span class="columns" style="--cols: 2;">
 <span>
 
-* Zanima nas število držav z vsaj 200M prebivalci na vsaki celini.
+* Zanima nas število držav z vsaj 160M prebivalci na vsaki celini.
 * Takih držav je 7:
   
   ```sql
   SELECT name, population FROM world
-   WHERE population >= 200000000;
+   WHERE population >= 160000000;
   ```
 
 </span>
@@ -891,13 +893,13 @@ SELECT name, continent, MAX(population) FROM world
   
   `name`        | `population`
   ------------- | ------------
-  Brazil        | 203062512
-  China         | 1411750000
-  India         | 1392329000
-  Indonesia     | 277749853
-  Nigeria       | 216783400
-  Pakistan      | 241499431
-  United States | 335317000
+  Brazil        | 202794000
+  China         | 1365370000
+  India         | 1246160000
+  Indonesia     | 252164800
+  Nigeria       | 178517000
+  Pakistan      | 188020000
+  United States | 318320000
 
 </span>
 </span>
@@ -908,7 +910,7 @@ SELECT name, continent, MAX(population) FROM world
 
 ```sql
 SELECT continent, COUNT(*) AS stevilo FROM world 
- WHERE population >= 200000000
+ WHERE population >= 160000000
  GROUP BY continent;
 ```
 
@@ -1004,8 +1006,8 @@ South America | 1
   `winner`                                 | `COUNT(subject)`
   ---------------------------------------- | ----------------
   Frederick Sanger                         | 2
-  International Committee of the Red Cross | 3
   John Bardeen                             | 2
+  International Committee of the Red Cross | 3
   Linus Pauling                            | 2
   Marie Curie                              | 2
 
