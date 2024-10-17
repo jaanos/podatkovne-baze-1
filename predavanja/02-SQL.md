@@ -227,8 +227,8 @@ SELECT name, ROUND(population/1000000) AS prebMilijoni
 
 * Razčlenimo:
   * Izpiši ime in število prebivalcev v milijonih. 
-  * Drugi stolpec poimenuj `prebMilijoni`,
-  * Podatke pridobi iz tabele `world`,
+  * Drugi stolpec poimenuj `prebMilijoni`.
+  * Podatke pridobi iz tabele `world`.
   * Upoštevaj tiste vrstice, kjer je vrednost stolpca `continent` bodisi *Asia* bodisi *Europe* in kjer se vrednost v stolpcu `ime` začne s črko *C*.
 * Pomen:
   - Izpiši imena in število prebivalcev tistih evropskih in azijskih držav, katerih imena se začnejo s *C*.
@@ -1368,7 +1368,7 @@ SELECT title FROM movie
  WHERE actor.name = 'John Wayne';
 ```
 
-* Najprej sestavimo tabelo z stikanjem, nato jo filtriramo z `WHERE`.
+* Najprej sestavimo tabelo s stikanjem, nato jo filtriramo z `WHERE`.
   - Vzamemo vrstico tabele `movie`.
   - Staknemo jo s tistimi vrsticami tabele `casting`, ki imajo vrednost v stolpcu `movieid` enako vrednosti stolpca `id` tabele `movie`.
   - Dobljene vrstice staknemo s tistimi vrsticami tabele `actor`, ki imajo vrednost v stolpcu `id` enako vrednosti stolpca `actorid` tabele `casting`.
@@ -1874,7 +1874,7 @@ CREATE TABLE tabela (
   - Še en primer: ob dodajanju v tabelo naj se zapiše trenutni čas.
 * Če pri vstavljanju podatka ne navedemo, se uporabi privzeta vrednost.
 * Poseben primer: avtomatsko številčenje.
-  - V SQLite uporabimo določilo `AUTOINCREMENT` takoj za `PRIMARY KEY` pri stolpcu tipa `ìnteger`;
+  - V SQLite uporabimo določilo `AUTOINCREMENT` takoj za `PRIMARY KEY` pri stolpcu tipa `ìnteger`.
   - Nekateri RDBMS v ta namen uporabijo števce.
 
 ---
