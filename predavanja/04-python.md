@@ -83,7 +83,7 @@ Potrebovali bomo sledeče:
 
 # Primer s SQLite
 
-* Uporabimo bazo [`bbc.db`](bbc.db).
+* Uporabimo bazo [`bbc.db`](jupyter/bbc.db).
 * Izpišimo imena vseh evropskih držav.
 
   ```python
