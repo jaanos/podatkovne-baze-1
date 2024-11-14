@@ -54,16 +54,16 @@ def poisci_osebo():
     Zahtevaj vnos (dela) imena
     in vrni ustrezno osebo.
     """
-    ime_igralca = input('Kdo te zanima? ')
-    osebe = list(Oseba.poisci(ime_igralca))
-    if len(osebe) == 1:
-        return osebe[0]
-    elif len(osebe) == 0:
-        print('Te osebe ne najdem. Poskusi znova.')
-        return poisci_osebo()
-    else:
-        print('Našel sem več igralcev, kateri od teh te zanima?')
-        return vnesi_izbiro(osebe)
+    while True:
+        ime_igralca = input('Kdo te zanima? ')
+        osebe = list(Oseba.poisci(ime_igralca))
+        if len(osebe) == 1:
+            return osebe[0]
+        elif len(osebe) == 0:
+            print('Te osebe ne najdem. Poskusi znova.')
+        else:
+            print('Našel sem več igralcev, kateri od teh te zanima?')
+            return vnesi_izbiro(osebe)
 
 
 def najboljsi_filmi():
@@ -75,12 +75,14 @@ def najboljsi_filmi():
         : izpis seznama igralcev in režiserjev
     """
     leto = input('Katero leto te zanima? ')
-    filmi = Film.najboljsi_v_letu(leto)
+    filmi = list(Film.najboljsi_v_letu(leto))
     if filmi == []:
         print(f'Za leto {leto} ni podatkov o filmih')
         return
     film = vnesi_izbiro(filmi, lambda film: f'{film.naslov} ({film.ocena}/10)')
-    print(film)
+    print(f'{film} ({film.leto}, {film.dolzina} min, ocena {film.ocena}/10)')
+    for vloga in film.zasedba():
+        print(f'- {vloga.tip_vloge} {vloga.mesto}: {vloga.oseba}')
 
 
 def glavni_meni():
