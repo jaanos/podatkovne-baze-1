@@ -101,7 +101,7 @@ style: "@import url('style.css')"
 * Piškotki so informacije, ki jih spletni strežnik pošlje odjemalcu, ta si jih pa nato shrani in pošlje nazaj strežniku pri naslednjem zahtevku.
 * Uporabljajo se za hranjenje informacij o seji.
   - Podatki o prijavljenem uporabniku, vsebina košarice, obvestila, ...
-* Pogosto so podatki šifrirani, tako da uporabnik nima vpogleda v vsebino piškotka in ga ne more spreminjati.
+* Pogosto so podatki kriptografsko podpisani, tako da uporabnik ne more spreminjati piškotka.
   - Uporabnik lahko še vedno pobriše piškotke!
 * Strežnik naj bi spreminjal piškotke le ob uporabi metode `POST`.
 
