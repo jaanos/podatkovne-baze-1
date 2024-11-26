@@ -1,9 +1,9 @@
 body {
-    background-color: lightblue;
+    background-color: lightgray;
 }
 
 h1 {
-    color: white;
+    color: green;
     text-align: center;
 }
 
@@ -12,17 +12,28 @@ h3 {
 }
 
 .moder {
-    color: blue;
+    color: blue !important;
+}
+
+.poseven {
+    font-style: italic;
+    font-variant: small-caps;
 }
 
 #vrh {
     font-size: large;
+    text-shadow: 2px 2px;
 }
 
 li.moder {
     text-decoration: underline;
 }
 
+li .moder {
+    background-color: #ff7f00;
+}
+
 p a {
    color: darkgreen;
+   text-decoration: underline;
 }

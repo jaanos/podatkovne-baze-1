@@ -6,6 +6,12 @@
         <title>Poskusna spletna stran</title>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css" />
         <link rel="stylesheet" href="stili.css" type="text/css" />
+        
+        <style>
+            h1 {
+                text-transform: capitalize;
+            }
+        </style>
     </head>
     <body>
         <section class="section">
@@ -14,7 +20,7 @@
                     <h1 class="title">Dobrodošli na <a href="index.html">naši</a> spletni strani!</h1>
                     <p>
                         Tukaj je <em>vsebina</em> strani. <br />
-                        <strong><a href="druga_stran.html">Gremo</a></strong> v <span>novo</span> vrstico.
+                        <strong><a href="druga_stran.html">Gremo</a></strong> v <span style="text-transform: uppercase;">novo</span> vrstico.
                     </p>
                 </div>
 
@@ -22,7 +28,7 @@
                     <h2 class="subtitle is-4">Podnaslov</h2>
 
                     <div class="columns">
-                        <div class="column">Prvi <div>blok</div></div>
+                        <div class="column">Prvi <span class="poseven">blok</span></div>
                         <div class="column">Drugi blok</div>
                     </div>
                 </div>                
@@ -34,7 +40,7 @@
                         <thead>
                             <tr>
                                 <th>Prvi stolpec</th>
-                                <th class="moder">Drugi stolpec</th>
+                                <th class="moder poseven">Drugi stolpec</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -52,16 +58,18 @@
                 <div class="block">
                     <h3 class="subtitle">Seznami</h3>
 
-                    <ul>
-                        <li>Prva točka</li>
-                        <li class="moder">Druga točka</li>
-                    </ul>
-    
-                    <ol>
-                        <li><a href="../05-spletne-aplikacije.marp.html">Prosojnice</a></li>
-                        <li><a href="https://www.google.com">Google</a></li>
-                        <li><a href="/" id="vrh">Vrh</a></li>
-                    </ol>
+                    <div class="content">
+                        <ul>
+                            <li>Prva <span class="moder">točka</span></li>
+                            <li class="moder">Druga točka</li>
+                        </ul>
+
+                        <ol>
+                            <li><a href="../05-spletne-aplikacije.marp.html">Prosojnice</a></li>
+                            <li><a href="https://www.google.com">Google</a></li>
+                            <li><a href="/" id="vrh">Vrh</a></li>
+                        </ol>
+                     </div>
                 </div>
 
                 <div class="block">
@@ -116,7 +124,7 @@
                 <div class="block">
                     <h3 class="subtitle">Google</h3>
 
-                    <form action="https:/www.google.com/search" method="GET">
+                    <form action="https://www.google.com/search" method="GET">
                         <div class="field">
                             <label class="label">Iskalni niz</label>
                             <div class="control">
