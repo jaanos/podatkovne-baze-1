@@ -1,17 +1,15 @@
 % rebase('osnova.html')
 
-vrstica besedila
+vrstica besedila <br />
 %        if 3 < 7:
 %   a = 42
 % else:
 %        a = 100
 % end
+                  
 odgovor je {{povecaj(a)}}
+<p>nov odstavek</p>
 
-<ul>
-% for i in range(5):
-    <li>{{i ** 2}}</li>
-% end
-</ul>
+% include('seznam.html', stevilo=7)
 
 <img src="static/slike/sqlitestudio2.png" alt="Slika SQLiteStudio" />

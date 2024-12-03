@@ -1,0 +1,9 @@
+<ul>
+% for i in range(get('stevilo', 6)):
+    <li>{{i ** 2}}</li>
+% end
+</ul>
+
+% if defined('stevilo'):
+<p>Število korakov: {{stevilo}}</p>
+% end
