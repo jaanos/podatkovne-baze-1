@@ -1,0 +1,52 @@
+% rebase('osnova.html', naslov=film)
+
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <h1 class="title">{{film}} ({{film.leto}})</h1>
+        </div>
+    </div>
+</div>
+
+<div class="block">
+    <ul>
+        <li>Dolžina: {{film.dolzina}} minut</li>
+        <li>Ocena: {{film.ocena}}/10</li>
+        % if film.metascore:
+        <li>Metascore: {{film.metascore}}</li>
+        % end
+        <li>Glasovi: {{film.glasovi}}</li>
+        % if film.zasluzek:
+        <li>Zaslužek: {{film.zasluzek}}</li>
+        % end
+        % if film.oznaka:
+        <li>Oznaka: {{film.oznaka}}</li>
+        % end
+    </ul>
+</div>
+
+% if film.opis:
+<div class="block">
+    <h2 class="subtitle">Opis</h2>
+    <p>{{film.opis}}</p>
+</div>
+% end
+
+<div class="columns">
+    <div class="column">
+        <h2 class="subtitle">Igralci</h2>
+        <ol>
+            % for vloga in igralci:
+            <li><a href="/osebe/oseba/{{vloga.oseba.id}}/">{{vloga.oseba}}</a></li>
+            % end
+        </ol>
+    </div>
+    <div class="column">
+        <h2 class="subtitle">Režiserji</h2>
+        <ol>
+            % for vloga in reziserji:
+            <li><a href="/osebe/oseba/{{vloga.oseba.id}}/">{{vloga.oseba}}</a></li>
+            % end
+        </ol>
+    </div>
+</div>

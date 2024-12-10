@@ -377,6 +377,23 @@ class Film(Tabela, Entiteta):
             cur.execute(sql, [leto, n])
             yield from (Film(*vrstica) for vrstica in cur)
 
+    @staticmethod
+    def z_id(idf):
+        """
+        Vrni film z navedenim ID-jem.
+        """
+        sql = """
+          SELECT id, naslov, dolzina, leto, ocena,
+                 metascore, glasovi, zasluzek, oznaka, opis
+            FROM film WHERE id = ?;
+        """
+        with Kazalec() as cur:
+            cur.execute(sql, [idf])
+            vrstica = cur.fetchone()
+            if vrstica is None:
+                raise IndexError(f"Film z ID-jem {idf} ne obstaja.")
+            return Film(*vrstica)
+
     def zasedba(self):
         """
         Vrni zasedbo filma.
@@ -437,6 +454,22 @@ class Oseba(Tabela, Entiteta):
                 INSERT INTO oseba (id, ime)
                 VALUES (:id, :ime);
             """, cls.preberi_vir())
+
+    @staticmethod
+    def z_id(ido):
+        """
+        Vrni osebo z navedenim ID-jem.
+        """
+        sql = """
+          SELECT id, ime
+            FROM oseba WHERE id = ?;
+        """
+        with Kazalec() as cur:
+            cur.execute(sql, [ido])
+            vrstica = cur.fetchone()
+            if vrstica is None:
+                raise IndexError(f"Oseba z ID-jem {ido} ne obstaja.")
+            return Oseba(*vrstica)
 
     def poisci_vloge(self):
         """

@@ -146,6 +146,58 @@ def index():
     pass
 
 
+@bottle.get('/filmi/film/<idf:int>/')
+@bottle.view('filmi.film.html')
+def filmi_film(idf):
+    try:
+        film = Film.z_id(idf)
+    except IndexError as ex:
+        bottle.abort(404, *ex.args)
+    zasedba = list(film.zasedba())
+    igralci = [vloga for vloga in zasedba if vloga.tip == 'I']
+    reziserji = [vloga for vloga in zasedba if vloga.tip == 'R']
+    return dict(film=film, igralci=igralci, reziserji=reziserji)
+
+
+@bottle.get('/filmi/najbolje-ocenjeni/')
+@bottle.view('filmi.najbolje-ocenjeni.html')
+def filmi_najbolje_ocenjeni():
+    leto = bottle.request.query.leto
+    filmi = list(Film.najboljsi_v_letu(leto))
+    return dict(filmi=filmi, leto=leto)
+
+
+@bottle.get('/filmi/dodaj/')
+@bottle.view('filmi.dodaj.html')
+@admin
+def filmi_dodaj(uporabnik):
+    pass
+
+
+@bottle.get('/osebe/oseba/<ido:int>/')
+@bottle.view('osebe.oseba.html')
+def osebe_oseba(ido):
+    try:
+        oseba = Oseba.z_id(ido)
+    except IndexError as ex:
+        bottle.abort(404, *ex.args)
+    vloge = list(oseba.poisci_vloge())
+    igralec = [vloga for vloga in vloge if vloga.tip == 'I']
+    reziser = [vloga for vloga in vloge if vloga.tip == 'R']
+    return dict(oseba=oseba, igralec=igralec, reziser=reziser)
+
+
+@bottle.get('/osebe/poisci/')
+@bottle.view('osebe.poisci.html')
+def osebe_poisci():
+    ime = bottle.request.query.ime
+    osebe = list(Oseba.poisci(ime))
+    if len(osebe) == 1:
+        oseba, = osebe
+        bottle.redirect(f'/osebe/oseba/{oseba.id}/')
+    return dict(osebe=osebe, ime=ime)
+
+
 @bottle.get('/prijava/')
 @bottle.view('prijava.html')
 @odjavljen
