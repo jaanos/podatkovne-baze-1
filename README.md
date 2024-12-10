@@ -13,7 +13,7 @@ Repozitorij z gradivi za predmet Podatkovne baze 1 (3. letnik Praktične matemat
   - [Primer modela in tekstovnega vmesnika](https://nbviewer.org/github/jaanos/podatkovne-baze-1/blob/main/predavanja/filmi/filmi.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jaanos/podatkovne-baze-1/HEAD?labpath=predavanja/filmi/filmi.ipynb)
 * [Spletne aplikacije](https://jaanos.github.io/podatkovne-baze-1/predavanja/05-spletne-aplikacije.marp.html) ([izročki](predavanja/05-spletne-aplikacije.md))
   - [Primer s knjižnico `bottle`](https://nbviewer.org/github/jaanos/podatkovne-baze-1/blob/main/predavanja/jupyter/bottle.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jaanos/podatkovne-baze-1/HEAD?labpath=predavanja/jupyter/bottle.ipynb)
-  - [Primer spletne aplikacije (2023)](https://github.com/jaanos/podatkovne-baze-1/tree/main/predavanja/filmi/2023)
+  - [Primer spletne aplikacije](https://github.com/jaanos/podatkovne-baze-1/tree/main/predavanja/filmi/)
 * [Indeksi](https://nbviewer.org/github/jaanos/podatkovne-baze-1/blob/main/predavanja/jupyter/indeksi.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jaanos/podatkovne-baze-1/HEAD?labpath=predavanja/jupyter/indeksi.ipynb)
 
 ## [Zapiski z vaj](zapiski)
