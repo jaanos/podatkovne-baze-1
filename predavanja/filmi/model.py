@@ -9,6 +9,7 @@ import bcrypt
 import csv
 import sqlite3 as dbapi
 from dataclasses import dataclass, field
+from dataclasses_json import dataclass_json
 
 
 conn = dbapi.connect('filmi.sqlite')
@@ -115,6 +116,7 @@ class Entiteta:
         cls.NULL = cls()
 
 
+@dataclass_json
 @dataclass
 class Uporabnik(Tabela, Entiteta):
     """
@@ -127,6 +129,15 @@ class Uporabnik(Tabela, Entiteta):
 
     IME = 'uporabnisko_ime'
     VIR = 'uporabnik.csv'
+
+    def __post_init__(self):
+        """
+        Ustrezno inicializiraj atribute.
+        """
+        for k in ('id', 'uporabnisko_ime', 'geslo'):
+            if not getattr(self, k):
+                setattr(self, k, None)
+        self.admin = bool(self.admin)
 
     @classmethod
     def ustvari_tabelo(cls, cur=None):
@@ -249,6 +260,7 @@ class Uporabnik(Tabela, Entiteta):
                 cur.execute(sql, [zgostitev, self.id])
 
 
+@dataclass_json
 @dataclass
 class Oznaka(Tabela, Entiteta):
     """
@@ -258,6 +270,13 @@ class Oznaka(Tabela, Entiteta):
     kratica: str = field(default=None)
 
     IME = 'kratica'
+
+    def __post_init__(self):
+        """
+        Ustrezno inicializiraj atribute.
+        """
+        if not self.kratica:
+            self.kratica = None
 
     @classmethod
     def ustvari_tabelo(cls, cur=None):
@@ -281,7 +300,21 @@ class Oznaka(Tabela, Entiteta):
                 DROP TABLE IF EXISTS oznaka;
             """)
 
+    @staticmethod
+    def seznam():
+        """
+        Vrni oznake iz baze.
+        """
+        sql = """
+            SELECT kratica FROM oznaka
+            ORDER BY kratica;
+        """
+        with Kazalec() as cur:
+            cur.execute(sql)
+            yield from (Oznaka(kratica) for kratica, in cur)
 
+
+@dataclass_json
 @dataclass
 class Film(Tabela, Entiteta):
     """
@@ -301,6 +334,16 @@ class Film(Tabela, Entiteta):
 
     VIR = "film.csv"
     IME = 'naslov'
+
+    def __post_init__(self):
+        """
+        Ustrezno inicializiraj atribute.
+        """
+        for k in ('id', 'metascore', 'zasluzek', 'oznaka'):
+            if not getattr(self, k):
+                setattr(self, k, None)
+        if isinstance(self.oznaka, str):
+            self.oznaka = Oznaka(self.oznaka)
 
     @classmethod
     def ustvari_tabelo(cls, cur=None):
@@ -394,6 +437,39 @@ class Film(Tabela, Entiteta):
                 raise IndexError(f"Film z ID-jem {idf} ne obstaja.")
             return Film(*vrstica)
 
+    def shrani(self):
+        """
+        Shrani film v bazo.
+        """
+        podatki = self.to_dict()
+        if isinstance(podatki['oznaka'], dict):
+            podatki['oznaka'] = podatki['oznaka']['kratica']
+        try:
+            with conn:
+                if self.id:
+                    sql = """
+                        UPDATE film SET naslov = :naslov, dolzina = :dolzina,
+                                        leto = :leto, ocena = :ocena,
+                                        metascore = :metascore, glasovi = :glasovi,
+                                        zasluzek = :zasluzek, oznaka = :oznaka,
+                                        opis = :opis
+                        WHERE id = :id;
+                    """
+                    with Kazalec() as cur:
+                        cur.execute(sql, podatki)
+                else:
+                    sql = """
+                        INSERT INTO film (naslov, dolzina, leto, ocena,
+                                        metascore, glasovi, zasluzek, oznaka, opis)
+                        VALUES (:naslov, :dolzina, :leto, :ocena,
+                                :metascore, :glasovi, :zasluzek, :oznaka, :opis);
+                    """
+                    with Kazalec() as cur:
+                        cur.execute(sql, podatki)
+                        self.id = cur.lastrowid
+        except dbapi.IntegrityError:
+            raise ValueError("Napaka pri shranjevanju fima!")
+
     def zasedba(self):
         """
         Vrni zasedbo filma.
@@ -410,6 +486,7 @@ class Film(Tabela, Entiteta):
             yield from (Vloga(self, Oseba(id, ime), tip, mesto) for id, ime, tip, mesto in cur)
             
 
+@dataclass_json
 @dataclass
 class Oseba(Tabela, Entiteta):
     """
@@ -420,6 +497,14 @@ class Oseba(Tabela, Entiteta):
 
     VIR = "oseba.csv"
     IME = 'ime'
+
+    def __post_init__(self):
+        """
+        Ustrezno inicializiraj atribute.
+        """
+        for k in ('id', 'ime'):
+            if not getattr(self, k):
+                setattr(self, k, None)
 
     @classmethod
     def ustvari_tabelo(cls, cur=None):
@@ -502,6 +587,7 @@ class Oseba(Tabela, Entiteta):
             yield from (Oseba(*vrstica) for vrstica in cur)
 
 
+@dataclass_json
 @dataclass
 class Zanr(Tabela, Entiteta):
     """
@@ -512,6 +598,14 @@ class Zanr(Tabela, Entiteta):
     naziv: str = field(default=None)
 
     IME = 'naziv'
+
+    def __post_init__(self):
+        """
+        Ustrezno inicializiraj atribute.
+        """
+        for k in ('id', 'naziv'):
+            if not getattr(self, k):
+                setattr(self, k, None)
 
     @classmethod
     def ustvari_tabelo(cls, cur=None):
@@ -537,6 +631,7 @@ class Zanr(Tabela, Entiteta):
             """)
 
 
+@dataclass_json
 @dataclass
 class Vloga(Tabela):
     """
@@ -601,6 +696,7 @@ class Vloga(Tabela):
         return self.VLOGE[self.tip]
 
 
+@dataclass_json
 @dataclass
 class Pripada(Tabela):
     """

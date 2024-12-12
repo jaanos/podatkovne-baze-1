@@ -52,6 +52,17 @@ def preberi_obrazec(piskotek, privzeto={}, izbrisi=True):
         return privzeto
 
 
+def iz_obrazca(cls, obrazec=None, /, **kwargs):
+    """
+    Vrni objekt s podatki iz obrazca.
+    """
+    if obrazec is None:
+        obrazec = bottle.request.forms
+    podatki = {k: getattr(obrazec, k) for k in cls.NULL.to_dict()}
+    podatki.update(kwargs)
+    return cls(**podatki)
+
+
 def prijavljeni_uporabnik():
     """
     Vrni prijavljenega uporabnika z ID-jem iz piškotka.
@@ -174,6 +185,19 @@ def filmi_dodaj(uporabnik):
     pass
 
 
+@bottle.post('/filmi/dodaj/')
+@admin
+def filmi_dodaj_post(uporabnik):
+    film = iz_obrazca(Film)
+    try:
+        film.shrani()
+    except ValueError:
+        nastavi_obrazec('filmi-dodaj', film.to_dict())
+        nastavi_sporocilo("Dodajanje filma neuspešno!")
+        bottle.redirect("/filmi/dodaj/")
+    bottle.redirect(f"/filmi/film/{film.id}/")
+
+
 @bottle.get('/osebe/oseba/<ido:int>/')
 @bottle.view('osebe.oseba.html')
 def osebe_oseba(ido):
@@ -249,6 +273,9 @@ def odjava(uporabnik):
 bottle.BaseTemplate.defaults['prijavljeni_uporabnik'] = prijavljeni_uporabnik
 bottle.BaseTemplate.defaults['preberi_sporocilo'] = preberi_sporocilo
 bottle.BaseTemplate.defaults['preberi_obrazec'] = preberi_obrazec
+bottle.BaseTemplate.defaults['Film'] = Film
+bottle.BaseTemplate.defaults['Oseba'] = Oseba
+bottle.BaseTemplate.defaults['Oznaka'] = Oznaka
 
 if __name__ == '__main__':
     bottle.run(debug=True, reloader=True)
