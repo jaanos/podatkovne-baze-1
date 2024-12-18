@@ -10,6 +10,7 @@ import csv
 import sqlite3 as dbapi
 from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json
+from datetime import datetime
 
 
 conn = dbapi.connect('filmi.sqlite')
@@ -331,6 +332,8 @@ class Film(Tabela, Entiteta):
     zasluzek: int = field(default=None)
     oznaka: Oznaka = field(default=None)
     opis: str = field(default=None)
+    ocena_uporabnikov: int = field(default=None)
+    stevilo_komentarjev: int = field(default=None)
 
     VIR = "film.csv"
     IME = 'naslov'
@@ -342,6 +345,8 @@ class Film(Tabela, Entiteta):
         for k in ('id', 'metascore', 'zasluzek', 'oznaka'):
             if not getattr(self, k):
                 setattr(self, k, None)
+        if not self.glasovi:
+            self.glasovi = 0
         if isinstance(self.oznaka, str):
             self.oznaka = Oznaka(self.oznaka)
 
@@ -426,9 +431,11 @@ class Film(Tabela, Entiteta):
         Vrni film z navedenim ID-jem.
         """
         sql = """
-          SELECT id, naslov, dolzina, leto, ocena,
-                 metascore, glasovi, zasluzek, oznaka, opis
-            FROM film WHERE id = ?;
+          SELECT film.id, naslov, dolzina, leto, film.ocena,
+                 metascore, glasovi, zasluzek, oznaka, opis,
+                 AVG(komentar.ocena), COUNT(komentar.id)
+            FROM film LEFT JOIN komentar ON film.id = komentar.film
+            WHERE film.id = ?;
         """
         with Kazalec() as cur:
             cur.execute(sql, [idf])
@@ -442,6 +449,9 @@ class Film(Tabela, Entiteta):
         Shrani film v bazo.
         """
         podatki = self.to_dict()
+        for k in ('naslov', 'dolzina', 'leto', 'ocena'):
+            if not podatki[k]:
+                raise ValueError("Nepopolni podatki!")
         if isinstance(podatki['oznaka'], dict):
             podatki['oznaka'] = podatki['oznaka']['kratica']
         try:
@@ -468,7 +478,24 @@ class Film(Tabela, Entiteta):
                         cur.execute(sql, podatki)
                         self.id = cur.lastrowid
         except dbapi.IntegrityError:
-            raise ValueError("Napaka pri shranjevanju fima!")
+            raise ValueError("Napaka pri shranjevanju filma!")
+
+    def izbrisi(self):
+        """
+        Izbriši film iz baze.
+        """
+        assert self.id
+        sql = """
+            DELETE FROM film WHERE id = ?;
+        """
+        try:
+            with conn:
+                with Kazalec() as cur:
+                    cur.execute(sql, [self.id])
+                    if cur.rowcount == 0:
+                        raise IndexError(f"Film z ID {self.id} ne obstaja!")
+        except dbapi.IntegrityError:
+            raise ValueError(f"Napaka pri brisanju filma z ID {self.id}!")
 
     def zasedba(self):
         """
@@ -484,7 +511,121 @@ class Film(Tabela, Entiteta):
         with Kazalec() as cur:
             cur.execute(sql, [self.id])
             yield from (Vloga(self, Oseba(id, ime), tip, mesto) for id, ime, tip, mesto in cur)
-            
+
+    def komentarji(self):
+        """
+        Vrni komentarje filma.
+        """
+        sql = """
+            SELECT komentar.id, uporabnik, uporabnisko_ime, vsebina, ocena, cas
+              FROM komentar JOIN uporabnik ON uporabnik = uporabnik.id
+             WHERE film = ?
+             ORDER BY cas;
+        """
+        with Kazalec() as cur:
+            cur.execute(sql, [self.id])
+            yield from (Komentar(idk, self, Oseba(idu, ime), vsebina, ocena, cas)
+                        for idk, idu, ime, vsebina, ocena, cas in cur)
+
+
+@dataclass_json
+@dataclass
+class Komentar(Tabela, Entiteta):
+    """
+    Razred za komentar na film.
+    """
+    id: int = field(default=None)
+    film: Film = field(default=None)
+    uporabnik: Uporabnik = field(default=None)
+    vsebina: str = field(default=None)
+    ocena: int = field(default=None)
+    cas: datetime = field(default=None)
+
+    IME = 'id'
+
+    def __post_init__(self):
+        if not isinstance(self.film, Film):
+            self.film = Film(id=self.film)
+        if not isinstance(self.uporabnik, Uporabnik):
+            self.uporanik = Uporabnik(self.uporabnik)
+
+    @classmethod
+    def ustvari_tabelo(cls, cur=None):
+        """
+        Ustvari tabelo "komentar".
+        """
+        with Kazalec(cur) as cur:
+            cur.execute("""
+                CREATE TABLE komentar (
+                    id        INTEGER  PRIMARY KEY,
+                    film      INTEGER  NOT NULL REFERENCES film(id),
+                    uporabnik INTEGER  NOT NULL REFERENCES uporabnik(id),
+                    vsebina   TEXT     NOT NULL,
+                    ocena     INTEGER  NOT NULL,
+                    cas       DATETIME NOT NULL DEFAULT (datetime('now'))
+                );
+            """)
+
+    @classmethod
+    def pobrisi_tabelo(cls, cur=None):
+        """
+        Pobriši tabelo "komentar".
+        """
+        with Kazalec(cur) as cur:
+            cur.execute("""
+                DROP TABLE IF EXISTS komentar;
+            """)
+
+    def shrani(self):
+        """
+        Shrani komentar v bazo.
+        """
+        podatki = self.to_dict()
+        for k in ('film', 'uporabnik', 'vsebina', 'ocena'):
+            if not podatki[k]:
+                raise ValueError("Nepopolni podatki!")
+        if isinstance(podatki['film'], dict):
+            podatki['film'] = podatki['film']['id']
+        if isinstance(podatki['uporabnik'], dict):
+            podatki['uporabnik'] = podatki['uporabnik']['id']
+        try:
+            with conn:
+                if self.id:
+                    sql = """
+                        UPDATE komentar SET film = :film, uporabnik = :uporabnik,
+                                            vsebina = :vsebina, ocena = :ocena, cas = :cas
+                        WHERE id = :id;
+                    """
+                    with Kazalec() as cur:
+                        cur.execute(sql, podatki)
+                else:
+                    sql = """
+                        INSERT INTO komentar (film, uporabnik, vsebina, ocena)
+                        VALUES (:film, :uporabnik, :vsebina, :ocena);
+                    """
+                    with Kazalec() as cur:
+                        cur.execute(sql, podatki)
+                        self.id = cur.lastrowid
+        except dbapi.IntegrityError:
+            raise ValueError("Napaka pri shranjevanju komentarja!")
+
+    def izbrisi(self):
+        """
+        Izbriši komentar iz baze.
+        """
+        assert self.id and self.film.id
+        sql = """
+            DELETE FROM komentar WHERE id = ? AND film = ?;
+        """
+        try:
+            with conn:
+                with Kazalec() as cur:
+                    cur.execute(sql, [self.id, self.film.id])
+                    if cur.rowcount == 0:
+                        raise IndexError(f"Komentar z ID {self.id} za film {self.film.id} ne obstaja!")
+        except dbapi.IntegrityError:
+            raise ValueError(f"Napaka pri brisanju komentarja z ID {self.id}!")
+
 
 @dataclass_json
 @dataclass

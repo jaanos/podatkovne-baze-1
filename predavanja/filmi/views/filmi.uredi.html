@@ -1,0 +1,17 @@
+% rebase('osnova.html', naslov='Uredi film')
+% obrazec = preberi_obrazec(f"filmi-uredi-{film.id}")
+% if obrazec:
+%     film = Film(id=film.id, **obrazec)
+% end
+
+<form action="/filmi/uredi/{{film.id}}/" method="POST">
+    % include('filmi.obrazec.html')
+    <div class="field">
+        <p class="control">
+            <button class="button is-success">
+                Uredi film
+            </button>
+            <a href="/filmi/film/{{film.id}}/" class="button is-danger">Prekliči</a>
+        </p>
+    </div>
+</form>

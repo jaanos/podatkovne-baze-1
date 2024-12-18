@@ -8,7 +8,7 @@
 import bottle
 import json
 from functools import wraps
-from model import Film, Oseba, Oznaka, Uporabnik
+from model import Film, Oseba, Oznaka, Uporabnik, Komentar
 
 
 SKRIVNOST = 'nekaj, kar bo zelo težko uganiti!!!! djnskfndkjfnsd'
@@ -167,7 +167,20 @@ def filmi_film(idf):
     zasedba = list(film.zasedba())
     igralci = [vloga for vloga in zasedba if vloga.tip == 'I']
     reziserji = [vloga for vloga in zasedba if vloga.tip == 'R']
-    return dict(film=film, igralci=igralci, reziserji=reziserji)
+    return dict(film=film, igralci=igralci, reziserji=reziserji, uporabnik=prijavljeni_uporabnik())
+
+
+@bottle.post('/filmi/film/<idf:int>/')
+@bottle.view('filmi.film.html')
+@prijavljen
+def filmi_film_post(uporabnik, idf):
+    komentar = iz_obrazca(Komentar, film=idf, uporabnik=uporabnik)
+    try:
+        komentar.shrani()
+    except ValueError:
+        nastavi_obrazec(f'filmi-film-{idf}', komentar.to_dict())
+        nastavi_sporocilo("Dodajanje komentarja neuspešno!")
+    bottle.redirect(f"/filmi/film/{idf}/")
 
 
 @bottle.get('/filmi/najbolje-ocenjeni/')
@@ -197,6 +210,47 @@ def filmi_dodaj_post(uporabnik):
         bottle.redirect("/filmi/dodaj/")
     bottle.redirect(f"/filmi/film/{film.id}/")
 
+
+@bottle.get('/filmi/uredi/<idf:int>/')
+@bottle.view('filmi.uredi.html')
+@admin
+def filmi_uredi(uporabnik, idf):
+    return dict(film=Film.z_id(idf))
+
+
+@bottle.post('/filmi/uredi/<idf:int>/')
+@admin
+def filmi_uredi_post(uporabnik, idf):
+    film = iz_obrazca(Film, id=idf)
+    try:
+        film.shrani()
+    except ValueError:
+        nastavi_obrazec(f'filmi-uredi-{idf}', film.to_dict())
+        nastavi_sporocilo("Urejanje filma neuspešno!")
+        bottle.redirect(f"/filmi/uredi/{idf}")
+    bottle.redirect(f"/filmi/film/{film.id}/")
+
+
+@bottle.post('/filmi/izbrisi/<idf:int>/')
+@admin
+def filmi_izbrisi_post(uporabnik, idf):
+    try:
+        Film(id=idf).izbrisi()
+    except (ValueError, IndexError):
+        nastavi_sporocilo("Brisanje filma neuspešno!")
+        bottle.redirect(f"/filmi/film/{idf}/")
+    bottle.redirect("/")
+
+
+@bottle.post('/filmi/izbrisi_komentar/<idf:int>/<idk:int>/')
+@admin
+def komentarji_izbrisi_post(uporabnik, idf, idk):
+    try:
+        Komentar(id=idk, film=idf).izbrisi()
+    except (ValueError, IndexError):
+        nastavi_sporocilo("Brisanje komentarja neuspešno!")
+    bottle.redirect(f"/filmi/film/{idf}/")
+    
 
 @bottle.get('/osebe/oseba/<ido:int>/')
 @bottle.view('osebe.oseba.html')
@@ -276,6 +330,7 @@ bottle.BaseTemplate.defaults['preberi_obrazec'] = preberi_obrazec
 bottle.BaseTemplate.defaults['Film'] = Film
 bottle.BaseTemplate.defaults['Oseba'] = Oseba
 bottle.BaseTemplate.defaults['Oznaka'] = Oznaka
+bottle.BaseTemplate.defaults['Komentar'] = Komentar
 
 if __name__ == '__main__':
     bottle.run(debug=True, reloader=True)

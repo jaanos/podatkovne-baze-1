@@ -6,6 +6,16 @@
             <h1 class="title">{{film}} ({{film.leto}})</h1>
         </div>
     </div>
+    <div class="level-right">
+        <div class="level-item">
+            <a href="/filmi/uredi/{{film.id}}/" class="button is-primary">Uredi</a>
+        </div>
+        <div class="level-item">
+            <form action="/filmi/izbrisi/{{film.id}}/" method="POST">
+                <button class="button is-danger" onclick="return confirm('Ali želiš res izbrisati film z ID-jem {{film.id}}?')">Izbriši</button>
+            </form>
+        </div>
+    </div>
 </div>
 
 <div class="block">
@@ -21,6 +31,9 @@
         % end
         % if film.oznaka:
         <li>Oznaka: {{film.oznaka}}</li>
+        % end
+        % if film.stevilo_komentarjev:
+        <li>Ocena uporabnikov: {{film.ocena_uporabnikov}} (število ocen: {{film.stevilo_komentarjev}})</li>
         % end
     </ul>
 </div>
@@ -50,3 +63,56 @@
         </ol>
     </div>
 </div>
+
+% if film.stevilo_komentarjev:
+    % for komentar in film.komentarji():
+    <div class="block">
+        <div class="card">
+            <header class="card-header">
+                <p class="card-header-title">{{komentar.uporabnik}}, ocena {{komentar.ocena}}</p>
+                % if uporabnik.admin:
+                <form action="/filmi/izbrisi_komentar/{{film.id}}/{{komentar.id}}/" method="POST">
+                    <button class="card-header-icon" aria-label="Izbriši" onclick="return confirm('Ali želiš izbirsati komentar z ID {{komentar.id}}?')">
+                        <span class="icon has-text-danger">
+                            <i class="fas fa-trash" aria-hidden="true"></i>
+                        </span>
+                    </button>
+                </form>
+                % end
+            </header>
+            <div class="card-content">
+                {{komentar.vsebina}}<br />
+                <time datetime="{{komentar.cas}}">{{komentar.cas}}</time>
+            </div>
+        </div>
+    </div>
+    % end
+% end
+
+% komentar = Komentar(**preberi_obrazec(f"filmi-film-{film.id}"))
+% if uporabnik:
+<div class="block">
+    <h2 class="subtitle">Dodaj komentar</h2>
+    <form action="/filmi/film/{{film.id}}/" method="POST">
+        <div class="field">
+            <label class="label">Ocena</label>
+            <p class="control">
+                <input type="range" name="ocena" min="0" max="10" value="{{komentar.ocena}}" />
+            </p>
+        </div>
+        <div class="field">
+            <label class="label">Komentar</label>
+            <p class="control">
+                <textarea class="textarea" name="vsebina" placeholder="Vnesi svoj komentar">{{komentar.vsebina}}</textarea>
+            </p>
+        </div>
+        <div class="field">
+            <p class="control">
+                <button class="button is-success">
+                    Dodaj komentar
+                </button>
+            </p>
+        </div>
+    </form>
+</div>
+% end
