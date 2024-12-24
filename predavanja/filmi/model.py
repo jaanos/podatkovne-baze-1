@@ -697,6 +697,22 @@ class Oseba(Tabela, Entiteta):
                 raise IndexError(f"Oseba z ID-jem {ido} ne obstaja.")
             return Oseba(*vrstica)
 
+    @staticmethod
+    def iz_seznama(seznam):
+        """
+        Vrni seznam oseb z navedenimi ID-ji.
+        """
+        sql = f"""
+          SELECT id, ime
+            FROM oseba WHERE id IN ({', '.join(['?'] * len(seznam))})
+        """
+        if not seznam:
+            return []
+        with Kazalec() as cur:
+            cur.execute(sql, seznam)
+            slovar = {ido: Oseba(ido, ime) for ido, ime in cur}
+            return [slovar.get(ido, Oseba.NULL) for ido in seznam]
+
     def poisci_vloge(self):
         """
         Vrni seznam vseh filmov, kjer

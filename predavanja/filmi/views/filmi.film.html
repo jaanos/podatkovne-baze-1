@@ -6,6 +6,7 @@
             <h1 class="title">{{film}} ({{film.leto}})</h1>
         </div>
     </div>
+    % if uporabnik.admin:
     <div class="level-right">
         <div class="level-item">
             <a href="/filmi/uredi/{{film.id}}/" class="button is-primary">Uredi</a>
@@ -16,6 +17,7 @@
             </form>
         </div>
     </div>
+    % end
 </div>
 
 <div class="block">
@@ -45,24 +47,130 @@
 </div>
 % end
 
+% if uporabnik.admin and sprememba:
+<div class="notification is-warning is-light">
+    <button class="delete"></button>
+    Spremembe zasedbe še niso shranjene!
+</div>
+% end
+
 <div class="columns">
     <div class="column">
         <h2 class="subtitle">Igralci</h2>
         <ol>
-            % for vloga in igralci:
-            <li><a href="/osebe/oseba/{{vloga.oseba.id}}/">{{vloga.oseba}}</a></li>
+            % for i, vloga in enumerate(zasedba['I'], 1):
+            <li>
+                <div class="level">
+                    <div class="level-left">
+                        % if uporabnik.admin:
+                        <div class="level-item">
+                            <form action="/zasedba/izbrisi/{{film.id}}/I/{{i}}/" method="POST">
+                                <button class="button is-danger is-small"
+                                        onclick="return confirm('Ali želiš res izbrisati igralca z ID-jem {{vloga.oseba.id}} iz zasedbe filma z ID-jem {{film.id}}?')">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-times"></i>
+                                    </span>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="level-item">
+                            <form action="/zasedba/gor/{{film.id}}/I/{{i}}/" method="POST">
+                                <button class="button is-primary is-small" {{'disabled' if i == 1 else ''}}>
+                                    <span class="icon is-small">
+                                        <i class="fas fa-angle-up"></i>
+                                    </span>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="level-item">
+                            <form action="/zasedba/dol/{{film.id}}/I/{{i}}/" method="POST">
+                                <button class="button is-primary is-small" {{'disabled' if i == len(zasedba['I']) else ''}}>
+                                    <span class="icon is-small">
+                                        <i class="fas fa-angle-down"></i>
+                                    </span>
+                                </button>
+                            </form>
+                        </div>
+                        % end
+                        <div class="level-item">
+                            <a href="/osebe/oseba/{{vloga.oseba.id}}/">{{vloga.oseba}}</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
             % end
         </ol>
     </div>
     <div class="column">
         <h2 class="subtitle">Režiserji</h2>
         <ol>
-            % for vloga in reziserji:
-            <li><a href="/osebe/oseba/{{vloga.oseba.id}}/">{{vloga.oseba}}</a></li>
+            % for i, vloga in enumerate(zasedba['R'], 1):
+            <li>
+                <div class="level">
+                    <div class="level-left">
+                        % if uporabnik.admin:
+                        <div class="level-item">
+                            <form action="/zasedba/izbrisi/{{film.id}}/R/{{i}}/" method="POST">
+                                <button class="button is-danger is-small"
+                                        onclick="return confirm('Ali želiš res izbrisati režiserja z ID-jem {{vloga.oseba.id}} iz zasedbe filma z ID-jem {{film.id}}?')">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-times"></i>
+                                    </span>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="level-item">
+                            <form action="/zasedba/gor/{{film.id}}/R/{{i}}/" method="POST">
+                                <button class="button is-primary is-small" {{'disabled' if i == 1 else ''}}>
+                                    <span class="icon is-small">
+                                        <i class="fas fa-angle-up"></i>
+                                    </span>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="level-item">
+                            <form action="/zasedba/dol/{{film.id}}/R/{{i}}/" method="POST">
+                                <button class="button is-primary is-small" {{'disabled' if i == len(zasedba['R']) else ''}}>
+                                    <span class="icon is-small">
+                                        <i class="fas fa-angle-down"></i>
+                                    </span>
+                                </button>
+                            </form>
+                        </div>
+                        % end
+                        <div class="level-item">
+                            <a href="/osebe/oseba/{{vloga.oseba.id}}/">{{vloga.oseba}}</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
             % end
         </ol>
     </div>
 </div>
+
+% if uporabnik.admin and sprememba:
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <form action="/zasedba/shrani/{{film.id}}/" method="POST">
+                <button class="button is-primary"
+                        onclick="return confirm('Ali želiš res shraniti zasedbo filma z ID-jem {{film.id}}?')">
+                    Shrani
+                </button>
+            </form>
+        </div>
+        <div class="level-item">
+            <form action="/zasedba/preklici/{{film.id}}/" method="POST">
+                <button class="button is-danger"
+                        onclick="return confirm('Ali želiš res prekicati spremembe zasedbe filma z ID-jem {{film.id}}?')">
+                    Prekliči spremembe
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+% end
 
 % if film.stevilo_komentarjev:
     % for komentar in film.komentarji():

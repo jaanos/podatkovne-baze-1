@@ -8,7 +8,7 @@
 import bottle
 import json
 from functools import wraps
-from model import Film, Oseba, Oznaka, Uporabnik, Komentar
+from model import Film, Oseba, Oznaka, Vloga, Uporabnik, Komentar
 
 
 SKRIVNOST = 'nekaj, kar bo zelo težko uganiti!!!! djnskfndkjfnsd'
@@ -92,6 +92,36 @@ def odjavi_uporabnika():
     bottle.redirect('/')
 
 
+def pridobi_zasedbo(film, admin=True, preberi_podatke=False):
+    """
+    Pridobi zasedbo iz piškotka, če obstaja, sicer jo preberi iz baze.
+    """
+    zasedba = preberi_obrazec(f'zasedba-{film.id}', izbrisi=False)
+    if admin and zasedba:
+        sprememba = True
+        if preberi_podatke:
+            zasedba = {tip: [Vloga(film, oseba, tip, i) for i, oseba in enumerate(Oseba.iz_seznama(seznam), 1)]
+                       for tip, seznam in zasedba.items()}
+        else:
+            zasedba = {tip: [Vloga(film, Oseba(id=ido), tip, i) for i, ido in enumerate(seznam, 1)]
+                       for tip, seznam in zasedba.items()}
+    else:
+        sprememba = False
+        zasedba = list(film.zasedba())
+        igralci = [vloga for vloga in zasedba if vloga.tip == 'I']
+        reziserji = [vloga for vloga in zasedba if vloga.tip == 'R']
+        zasedba = {'I': igralci, 'R': reziserji}
+    return (zasedba, sprememba)
+
+
+def nastavi_zasedbo(idf, zasedba):
+    """
+    Nastavi piškotek z zasedbo.
+    """
+    zasedba = {tip: [vloga.oseba.id for vloga in seznam] for tip, seznam in zasedba.items()}
+    nastavi_obrazec(f'zasedba-{idf}', zasedba)
+
+
 def status(preveri):
     """
     Vrni dekorator, ki preveri prijavljenega uporabnika v skladu s podano funkcijo
@@ -164,10 +194,9 @@ def filmi_film(idf):
         film = Film.z_id(idf)
     except IndexError as ex:
         bottle.abort(404, *ex.args)
-    zasedba = list(film.zasedba())
-    igralci = [vloga for vloga in zasedba if vloga.tip == 'I']
-    reziserji = [vloga for vloga in zasedba if vloga.tip == 'R']
-    return dict(film=film, igralci=igralci, reziserji=reziserji, uporabnik=prijavljeni_uporabnik())
+    uporabnik = prijavljeni_uporabnik()
+    zasedba, sprememba = pridobi_zasedbo(film, admin=uporabnik.admin, preberi_podatke=True)
+    return dict(film=film, zasedba=zasedba, sprememba=sprememba, uporabnik=uporabnik)
 
 
 @bottle.post('/filmi/film/<idf:int>/')
@@ -250,7 +279,48 @@ def komentarji_izbrisi_post(uporabnik, idf, idk):
     except (ValueError, IndexError):
         nastavi_sporocilo("Brisanje komentarja neuspešno!")
     bottle.redirect(f"/filmi/film/{idf}/")
-    
+
+
+@bottle.post('/zasedba/izbrisi/<idf:int>/<tip:re:[IR]>/<ord:int>/')
+@admin
+def zasedba_izbrisi_post(uporabnik, idf, tip, ord):
+    zasedba, _ = pridobi_zasedbo(Film(id=idf))
+    del zasedba[tip][ord-1]
+    nastavi_zasedbo(idf, zasedba)
+    bottle.redirect(f'/filmi/film/{idf}/')
+
+
+@bottle.post('/zasedba/gor/<idf:int>/<tip:re:[IR]>/<ord:int>/')
+@admin
+def zasedba_izbrisi_post(uporabnik, idf, tip, ord):
+    zasedba, _ = pridobi_zasedbo(Film(id=idf))
+    zasedba[tip][ord-2], zasedba[tip][ord-1] = zasedba[tip][ord-1], zasedba[tip][ord-2]
+    nastavi_zasedbo(idf, zasedba)
+    bottle.redirect(f'/filmi/film/{idf}/')
+
+
+@bottle.post('/zasedba/dol/<idf:int>/<tip:re:[IR]>/<ord:int>/')
+@admin
+def zasedba_izbrisi_post(uporabnik, idf, tip, ord):
+    zasedba, _ = pridobi_zasedbo(Film(id=idf))
+    zasedba[tip][ord-1], zasedba[tip][ord] = zasedba[tip][ord], zasedba[tip][ord-1]
+    nastavi_zasedbo(idf, zasedba)
+    bottle.redirect(f'/filmi/film/{idf}/')
+
+
+@bottle.post('/zasedba/shrani/<idf:int>/')
+@admin
+def zasedba_preklici_post(uporabnik, idf):
+    # TODO: napiši ustrezno metodo v modelu
+    bottle.redirect(f'/filmi/film/{idf}/')
+
+
+@bottle.post('/zasedba/preklici/<idf:int>/')
+@admin
+def zasedba_preklici_post(uporabnik, idf):
+    izbrisi_piskotek(f'zasedba-{idf}')
+    bottle.redirect(f'/filmi/film/{idf}/')
+
 
 @bottle.get('/osebe/oseba/<ido:int>/')
 @bottle.view('osebe.oseba.html')
