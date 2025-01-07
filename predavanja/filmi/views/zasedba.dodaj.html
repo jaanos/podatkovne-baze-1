@@ -1,0 +1,50 @@
+% rebase('osnova.html', naslov='Dodaj vlogo')
+% TIP = {'I': 'igralca', 'R': 'režiserja'}
+
+<h1 class="title">Dodaj {{TIP[tip]}} k filmu {{film}}</h1>
+
+<form action="/zasedba/dodaj/{{film.id}}/{{tip}}/" method="GET">
+    <div class="field has-addons">
+        <div class="control">
+            <input class="input" name="ime" type="text" value="{{ime}}" placeholder="Vnesi ime osebe">
+        </div>
+        <div class="control">
+            <button class="button is-info">
+              Poišči
+            </button>
+        </div>
+    </div>
+</form>
+
+% if ime:
+<div class="content">
+    <p>
+        % if osebe:
+        <ol>
+            % for oseba in osebe:
+            <li>
+                <div class="level">
+                    <div class="level-left">
+                        <div class="level-item">
+                            <form action="/zasedba/dodaj/{{film.id}}/{{tip}}/{{oseba.id}}/?ime={{ime}}" method="POST">
+                                <button class="button is-primary is-small">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-plus"></i>
+                                    </span>
+                                </button>
+                            </form>
+                        </div>
+                        <div class="level-item">
+                            <a href="/osebe/oseba/{{oseba.id}}/">{{oseba}}</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            % end
+        </ol>
+        % else:
+        Ne najdem osebe z imenom <em>{{ime}}</em>.
+        % end
+    </p>
+</div>
+% end

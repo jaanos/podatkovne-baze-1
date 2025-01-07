@@ -1,0 +1,17 @@
+% rebase('osnova.html', naslov='Uredi osebo')
+% obrazec = preberi_obrazec(f"osebe-uredi-{oseba.id}")
+% if obrazec:
+%     oseba = Oseba(id=oseba.id, **obrazec)
+% end
+
+<form action="/osebe/uredi/{{oseba.id}}/" method="POST">
+    % include('osebe.obrazec.html')
+    <div class="field">
+        <p class="control">
+            <button class="button is-success">
+                Uredi osebo
+            </button>
+            <a href="/osebe/oseba/{{oseba.id}}/" class="button is-danger">Prekliči</a>
+        </p>
+    </div>
+</form>

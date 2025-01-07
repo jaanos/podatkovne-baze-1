@@ -6,6 +6,18 @@
             <h1 class="title">{{oseba}}</h1>
         </div>
     </div>
+    % if uporabnik.admin:
+    <div class="level-right">
+        <div class="level-item">
+            <a href="/osebe/uredi/{{oseba.id}}/" class="button is-primary">Uredi</a>
+        </div>
+        <div class="level-item">
+            <form action="/osebe/izbrisi/{{oseba.id}}/" method="POST">
+                <button class="button is-danger" onclick="return confirm('Ali želiš res izbrisati osebo z ID-jem {{oseba.id}}?')">Izbriši</button>
+            </form>
+        </div>
+    </div>
+    % end
 </div>
 
 <div class="columns">

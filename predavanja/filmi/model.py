@@ -512,6 +512,27 @@ class Film(Tabela, Entiteta):
             cur.execute(sql, [self.id])
             yield from (Vloga(self, Oseba(id, ime), tip, mesto) for id, ime, tip, mesto in cur)
 
+    def nastavi_zasedbo(self, zasedba):
+        """
+        Nastavi zasedbo filma.
+        """
+        sql_delete = """
+            DELETE FROM vloga
+            WHERE film = ?
+        """
+        sql_insert = """
+            INSERT INTO vloga (film, oseba, tip, mesto)
+            VALUES (?, ?, ?, ?)
+        """
+        try:
+            with conn:
+                with Kazalec() as cur:
+                    cur.execute(sql_delete, [self.id])
+                    cur.executemany(sql_insert, [(self.id, vloga.oseba.id, vloga.tip, vloga.mesto)
+                                                for seznam in zasedba.values() for vloga in seznam])
+        except dbapi.IntegrityError:
+            raise ValueError(f"Napaka pri nastaavljanju zasedbe filma z ID {self.id}!")
+
     def komentarji(self):
         """
         Vrni komentarje filma.
@@ -732,16 +753,74 @@ class Oseba(Tabela, Entiteta):
                         for fid, naslov, leto, tip, mesto in cur)
 
     @staticmethod
-    def poisci(niz):
+    def poisci(niz, izpusti=[], stevilo=None, stran=0):
         """
         Vrni vse osebe, ki v imenu vsebujejo dani niz.
         """
-        sql = """
-            SELECT id, ime FROM oseba WHERE ime LIKE ?;
+        podatki = ['%' + niz + '%', *izpusti]
+        if izpusti:
+            sql_izpusti = f"""
+                AND id NOT IN ({', '.join(['?'] * len(izpusti))})
+            """
+        else:
+            sql_izpusti = ""
+        if stevilo:
+            sql_limit = """
+                LIMIT ? OFFSET ?
+            """
+            podatki.extend([stevilo, stran * stevilo])
+        sql = f"""
+            SELECT id, ime FROM oseba WHERE ime LIKE ?
+            {sql_izpusti}
+            {sql_limit};
         """
         with Kazalec() as cur:
-            cur.execute(sql, ['%' + niz + '%'])
+            cur.execute(sql, podatki)
             yield from (Oseba(*vrstica) for vrstica in cur)
+
+    def shrani(self):
+        """
+        Shrani osebo v bazo.
+        """
+        podatki = self.to_dict()
+        if not podatki['ime']:
+            raise ValueError("Nepopolni podatki!")
+        try:
+            with conn:
+                if self.id:
+                    sql = """
+                        UPDATE oseba SET ime = :ime
+                        WHERE id = :id;
+                    """
+                    with Kazalec() as cur:
+                        cur.execute(sql, podatki)
+                else:
+                    sql = """
+                        INSERT INTO oseba (ime)
+                        VALUES (:ime);
+                    """
+                    with Kazalec() as cur:
+                        cur.execute(sql, podatki)
+                        self.id = cur.lastrowid
+        except dbapi.IntegrityError:
+            raise ValueError("Napaka pri shranjevanju osebe!")
+
+    def izbrisi(self):
+        """
+        Izbriši osebo iz baze.
+        """
+        assert self.id
+        sql = """
+            DELETE FROM oseba WHERE id = ?;
+        """
+        try:
+            with conn:
+                with Kazalec() as cur:
+                    cur.execute(sql, [self.id])
+                    if cur.rowcount == 0:
+                        raise IndexError(f"Oseba z ID {self.id} ne obstaja!")
+        except dbapi.IntegrityError:
+            raise ValueError(f"Napaka pri brisanju osebe z ID {self.id}!")
 
 
 @dataclass_json

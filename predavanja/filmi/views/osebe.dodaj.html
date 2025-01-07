@@ -1,0 +1,13 @@
+% rebase('osnova.html', naslov='Dodaj osebo')
+% oseba = Oseba(**preberi_obrazec("osebe-dodaj"))
+
+<form action="/osebe/dodaj/" method="POST">
+    % include('osebe.obrazec.html')
+    <div class="field">
+        <p class="control">
+            <button class="button is-success">
+                Dodaj osebo
+            </button>
+        </p>
+    </div>
+</form>

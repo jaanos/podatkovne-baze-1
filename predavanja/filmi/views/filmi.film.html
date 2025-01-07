@@ -57,6 +57,18 @@
 <div class="columns">
     <div class="column">
         <h2 class="subtitle">Igralci</h2>
+        <form action="/zasedba/dodaj/{{film.id}}/I/" method="GET">
+            <div class="field has-addons">
+                <div class="control">
+                    <input class="input" name="ime" type="text" placeholder="Vnesi ime osebe" required>
+                </div>
+                <div class="control">
+                    <button class="button is-primary">
+                      Dodaj igralca
+                    </button>
+                </div>
+            </div>
+        </form>
         <ol>
             % for i, vloga in enumerate(zasedba['I'], 1):
             <li>
@@ -103,6 +115,18 @@
     </div>
     <div class="column">
         <h2 class="subtitle">Režiserji</h2>
+        <form action="/zasedba/dodaj/{{film.id}}/R/" method="GET">
+            <div class="field has-addons">
+                <div class="control">
+                    <input class="input" name="ime" type="text" placeholder="Vnesi ime osebe" required>
+                </div>
+                <div class="control">
+                    <button class="button is-primary">
+                      Dodaj režiserja
+                    </button>
+                </div>
+            </div>
+        </form>
         <ol>
             % for i, vloga in enumerate(zasedba['R'], 1):
             <li>

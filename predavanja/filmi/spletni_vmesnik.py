@@ -281,6 +281,29 @@ def komentarji_izbrisi_post(uporabnik, idf, idk):
     bottle.redirect(f"/filmi/film/{idf}/")
 
 
+@bottle.get('/zasedba/dodaj/<idf:int>/<tip:re:[IR]>/')
+@bottle.view('zasedba.dodaj.html')
+@admin
+def zasedba_dodaj(uporabnik, idf, tip):
+    film = Film.z_id(idf)
+    zasedba, _ = pridobi_zasedbo(film)
+    ime = bottle.request.query.ime
+    osebe = list(Oseba.poisci(ime, izpusti=[vloga.oseba.id for vloga in zasedba[tip]]))
+    return dict(film=film, tip=tip, osebe=osebe, ime=ime)
+
+
+@bottle.post('/zasedba/dodaj/<idf:int>/<tip:re:[IR]>/<ido:int>/')
+@admin
+def zasedba_dodaj_post(uporabnik, idf, tip, ido):
+    zasedba, _ = pridobi_zasedbo(Film(id=idf))
+    if any(vloga.oseba.id == ido for vloga in zasedba[tip]):
+        nastavi_sporocilo(f"Oseba z ID-jem {ido} je že v zasedbi!")
+        bottle.redirect(f'/zasedba/dodaj/{idf}/{tip}/?ime={bottle.request.query.ime}')
+    zasedba[tip].append(Vloga(Film(id=idf), Oseba(id=ido), tip, len(zasedba[tip]) + 1))
+    nastavi_zasedbo(idf, zasedba)
+    bottle.redirect(f'/filmi/film/{idf}/')
+
+
 @bottle.post('/zasedba/izbrisi/<idf:int>/<tip:re:[IR]>/<ord:int>/')
 @admin
 def zasedba_izbrisi_post(uporabnik, idf, tip, ord):
@@ -310,8 +333,15 @@ def zasedba_izbrisi_post(uporabnik, idf, tip, ord):
 
 @bottle.post('/zasedba/shrani/<idf:int>/')
 @admin
-def zasedba_preklici_post(uporabnik, idf):
-    # TODO: napiši ustrezno metodo v modelu
+def zasedba_shrani_post(uporabnik, idf):
+    film = Film(id=idf)
+    zasedba, sprememba = pridobi_zasedbo(film)
+    if sprememba:
+        try:
+            film.nastavi_zasedbo(zasedba)
+            izbrisi_piskotek(f'zasedba-{film.id}')
+        except ValueError:
+            nastavi_sporocilo("Nastavljanje zasedbe ni uspelo!")
     bottle.redirect(f'/filmi/film/{idf}/')
 
 
@@ -332,18 +362,74 @@ def osebe_oseba(ido):
     vloge = list(oseba.poisci_vloge())
     igralec = [vloga for vloga in vloge if vloga.tip == 'I']
     reziser = [vloga for vloga in vloge if vloga.tip == 'R']
-    return dict(oseba=oseba, igralec=igralec, reziser=reziser)
+    return dict(oseba=oseba, igralec=igralec, reziser=reziser, uporabnik=prijavljeni_uporabnik())
 
 
 @bottle.get('/osebe/poisci/')
 @bottle.view('osebe.poisci.html')
 def osebe_poisci():
+    STEVILO = 20
     ime = bottle.request.query.ime
-    osebe = list(Oseba.poisci(ime))
+    try:
+        stran = int(bottle.request.query.stran)
+    except ValueError:
+        stran = 0
+    osebe = list(Oseba.poisci(ime, stevilo=STEVILO, stran=stran))
     if len(osebe) == 1:
         oseba, = osebe
         bottle.redirect(f'/osebe/oseba/{oseba.id}/')
-    return dict(osebe=osebe, ime=ime)
+    return dict(osebe=osebe, ime=ime, stran=stran, zacetek=stran*STEVILO+1)
+
+
+@bottle.get('/osebe/dodaj/')
+@bottle.view('osebe.dodaj.html')
+@admin
+def osebe_dodaj(uporabnik):
+    pass
+
+
+@bottle.post('/osebe/dodaj/')
+@admin
+def osebe_dodaj_post(uporabnik):
+    oseba = iz_obrazca(Oseba)
+    try:
+        oseba.shrani()
+    except ValueError:
+        nastavi_obrazec('osebe-dodaj', oseba.to_dict())
+        nastavi_sporocilo("Dodajanje osebe neuspešno!")
+        bottle.redirect("/osebe/dodaj/")
+    bottle.redirect(f"/osebe/oseba/{oseba.id}/")
+
+
+@bottle.get('/osebe/uredi/<ido:int>/')
+@bottle.view('osebe.uredi.html')
+@admin
+def osebe_uredi(uporabnik, ido):
+    return dict(oseba=Oseba.z_id(ido))
+
+
+@bottle.post('/osebe/uredi/<ido:int>/')
+@admin
+def osebe_uredi_post(uporabnik, ido):
+    oseba = iz_obrazca(Oseba, id=ido)
+    try:
+        oseba.shrani()
+    except ValueError:
+        nastavi_obrazec(f'osebe-uredi-{ido}', oseba.to_dict())
+        nastavi_sporocilo("Urejanje osebe neuspešno!")
+        bottle.redirect(f"/osebe/uredi/{ido}")
+    bottle.redirect(f"/osebe/oseba/{oseba.id}/")
+
+
+@bottle.post('/osebe/izbrisi/<ido:int>/')
+@admin
+def osebe_izbrisi_post(uporabnik, ido):
+    try:
+        Oseba(id=ido).izbrisi()
+    except (ValueError, IndexError):
+        nastavi_sporocilo("Brisanje osebe neuspešno!")
+        bottle.redirect(f"/osebe/oseba/{ido}/")
+    bottle.redirect("/")
 
 
 @bottle.get('/prijava/')

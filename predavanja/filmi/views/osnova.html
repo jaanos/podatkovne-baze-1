@@ -59,6 +59,11 @@
                             <a href="/osebe/poisci/" class="navbar-item">
                                 Poišči osebo
                             </a>
+                            % if uporabnik.admin:
+                            <a href="/osebe/dodaj/" class="navbar-item">
+                                Dodaj osebo
+                            </a>
+                            % end
                         </div>
                     </div>
                 </div>

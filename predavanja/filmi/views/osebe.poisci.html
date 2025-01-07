@@ -17,11 +17,19 @@
 <div class="content">
     <p>
         % if osebe:
-        <ol>
+        <ol start="{{zacetek}}">
             % for oseba in osebe:
             <li><a href="/osebe/oseba/{{oseba.id}}/">{{oseba}}</a></li>
             % end
         </ol>
+
+        <p>
+            % if stran > 0:
+            <a href="/osebe/poisci/?ime={{ime}}&stran={{stran-1}}">Nazaj</a>
+            |
+            % end
+            <a href="/osebe/poisci/?ime={{ime}}&stran={{stran+1}}">Naprej</a>
+        </p>
         % else:
         Ne najdem osebe z imenom <em>{{ime}}</em>.
         % end
