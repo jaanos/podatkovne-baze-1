@@ -11,6 +11,8 @@ import sqlite3 as dbapi
 from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json
 from datetime import datetime
+from functools import wraps
+from types import MethodType
 
 
 conn = dbapi.connect('filmi.sqlite')
@@ -115,6 +117,155 @@ class Entiteta:
         """
         super().__init_subclass__(**kwargs)
         cls.NULL = cls()
+
+
+class Rezultat:
+    """
+    Razred za rezultate poizvedb v seznamu.
+    """
+    def __init__(self, gen, stevilo, stran, skupaj):
+        """
+        Konstruktor rezultata.
+        """
+        self.gen = gen
+        self.stevilo = stevilo
+        self.stran = stran
+        self.skupaj = skupaj
+        if stevilo is None:
+            self.dolzina = skupaj
+        elif (stran + 1) * stevilo <= skupaj:
+            self.dolzina = stevilo
+        elif stran * stevilo >= skupaj:
+            self.dolzina = 0
+        else:
+            self.dolzina = skupaj % stevilo
+
+    def __iter__(self):
+        """
+        Iteriraj čez rezultat.
+        """
+        yield from self.gen
+
+    def __len__(self):
+        """
+        Število vnosov v rezultatu.
+        """
+        return self.dolzina
+
+
+class Seznam:
+    """
+    Razred za sezname z deljenjem na strani.
+    """
+    def __init__(self, fun=None, stevilo=None, stolpci=None, sql=None, podatki=()):
+        """
+        Konstruktor seznama.
+
+        Možno ga je uporabiti kot dekorator.
+        """
+        self.fun = None
+        self.stevilo = stevilo
+        self.stolpci = stolpci
+        self.sql = sql
+        self.podatki = podatki
+        if fun:
+            self(fun)
+
+    def __call__(self, *largs, **kwargs):
+        """
+        Klic seznama za uporabo kot dekorator.
+
+        Če je funkcija že nastavljena, jo kliče s podanimi parametri.
+        """
+        if self.fun:
+            return self.fun(*largs, **kwargs)
+        fun, = largs
+        self.tip = type(fun)
+        if isinstance(fun, (classmethod, staticmethod)):
+            fun = fun.__func__
+        @wraps(fun)
+        def wrapper(*largs, stevilo=self.stevilo, stran=0, **kwargs):
+            largs, kwargs = self.obdelaj_argumente(largs, kwargs)
+            stolpci, sql, podatki = self.vrni_poizvedbo(*largs, **kwargs)
+            def generator(podatki=podatki):
+                with conn:
+                    with Kazalec() as cur:
+                        cur.execute(f"""
+                            SELECT COUNT(*) {sql};
+                        """, podatki)
+                        skupaj, = cur.fetchone()
+                        yield skupaj
+                        if stevilo:
+                            odmik = stran * stevilo
+                            if isinstance(podatki, dict):
+                                sql_limit = "LIMIT :stevilo OFFSET :odmik"
+                                podatki = dict(**podatki, stevilo=stevilo, odmik=odmik)
+                            else:
+                                sql_limit = "LIMIT ? OFFSET ?"
+                                if podatki is None:
+                                    podatki = ()
+                                podatki = (*podatki, stevilo, odmik)
+                        else:
+                            sql_limit = ""
+                        cur.execute(f"""
+                            SELECT {stolpci} {sql} {sql_limit};
+                        """, podatki)
+                        yield from fun(*largs, cur=cur, **kwargs)
+            gen = generator()
+            skupaj = next(gen)
+            return Rezultat(gen, stevilo, stran, skupaj)
+        self.fun = wrapper
+        return self
+
+    def __get__(self, instance, owner=None):
+        """
+        Vrni ustrezno metodo glede na način klicanja.
+        """
+        if issubclass(self.tip, classmethod):
+            return MethodType(self.fun, owner)
+        elif issubclass(self.tip, staticmethod) or instance is None:
+            return self.fun
+        else:
+            return MethodType(self.fun, instance)
+
+    def obdelaj_argumente(self, largs, kwargs):
+        """
+        Obdelaj argumente za nadaljnje klice.
+
+        Privzeto ne spremeni argumentov, lahko se nadomesti z metodo argumenti.
+        """
+        return (largs, kwargs)
+
+    def sestavi_poizvedbo(self, *largs, **kwargs):
+        """
+        Vrni slovar s specifikacijo stolpcev, glavnega dela stavka SQL in podatkov.
+        Manjkajoči ključi se nadomestijo s privzetimi vrednostmi.
+
+        Privzeto vrača prazen slovar, lahko se nadomesti z metodo poizvedba.
+        """
+        return {}
+
+    def vrni_poizvedbo(self, *largs, **kwargs):
+        """
+        Vrni trojico s pecifikacijo stolpcev, glavnega dela stavka SQL in podatkov.
+        """
+        poizvedba = dict(stolpci=self.stolpci, sql=self.sql, podatki=self.podatki)
+        poizvedba.update(self.sestavi_poizvedbo(*largs, **kwargs))
+        return tuple(poizvedba[k] for k in ('stolpci', 'sql', 'podatki'))
+
+    def argumenti(self, fun):
+        """
+        Nastavi funkcijo za obdelavo argumentov.
+        """
+        self.obdelaj_argumente = fun
+        return self
+
+    def poizvedba(self, fun):
+        """
+        Nastavi funkcijo za sestavljanje poizvedbe.
+        """
+        self.sestavi_poizvedbo = fun
+        return self
 
 
 @dataclass_json
@@ -752,10 +903,18 @@ class Oseba(Tabela, Entiteta):
             yield from (Vloga(Film(fid, naslov, leto=leto), self, tip, mesto)
                         for fid, naslov, leto, tip, mesto in cur)
 
+    @Seznam(stolpci="id, ime")
     @staticmethod
-    def poisci(niz, izpusti=[], stevilo=None, stran=0):
+    def poisci(niz, izpusti=[], cur=None):
         """
         Vrni vse osebe, ki v imenu vsebujejo dani niz.
+        """
+        yield from (Oseba(*vrstica) for vrstica in cur)
+
+    @poisci.poizvedba
+    def poisci(niz, izpusti=[]):
+        """
+        Sestavi poizvedbo za iskanje oseb.
         """
         podatki = ['%' + niz + '%', *izpusti]
         if izpusti:
@@ -764,19 +923,11 @@ class Oseba(Tabela, Entiteta):
             """
         else:
             sql_izpusti = ""
-        if stevilo:
-            sql_limit = """
-                LIMIT ? OFFSET ?
-            """
-            podatki.extend([stevilo, stran * stevilo])
         sql = f"""
-            SELECT id, ime FROM oseba WHERE ime LIKE ?
+            FROM oseba WHERE ime LIKE ?
             {sql_izpusti}
-            {sql_limit};
         """
-        with Kazalec() as cur:
-            cur.execute(sql, podatki)
-            yield from (Oseba(*vrstica) for vrstica in cur)
+        return dict(sql=sql, podatki=podatki)
 
     def shrani(self):
         """
