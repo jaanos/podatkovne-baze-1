@@ -202,8 +202,6 @@ class Seznam:
                                 podatki = dict(**podatki, stevilo=stevilo, odmik=odmik)
                             else:
                                 sql_limit = "LIMIT ? OFFSET ?"
-                                if podatki is None:
-                                    podatki = ()
                                 podatki = (*podatki, stevilo, odmik)
                         else:
                             sql_limit = ""
@@ -397,19 +395,33 @@ class Uporabnik(Tabela, Entiteta):
             except dbapi.IntegrityError:
                 raise ValueError("Uporabniško ime že obstaja!")
 
-    def spremeni_geslo(self, geslo):
+    def spremeni_geslo(self, geslo, staro_geslo=None):
         """
         Spremeni uporabnikovo geslo.
         """
         assert self.id, "Uporabnik še ni vpisan v bazo!"
+        sql_preveri = """
+          SELECT geslo
+            FROM uporabnik WHERE id = ?;
+        """
         sql = """
           UPDATE uporabnik SET geslo = ?
            WHERE id = ?;
         """
         zgostitev = self.zgostitev(geslo)
-        with Kazalec() as cur:
-            with conn:
+        with conn:
+            with Kazalec() as cur:
+                if staro_geslo is not None:
+                    cur.execute(sql_preveri, [self.id])
+                    rez = cur.fetchone()
+                    if rez is None:
+                        raise IndexError(f"Uporabnik z ID-jem {self.id} ne obstaja!")
+                    stara_zgostitev, = rez
+                    if not stara_zgostitev or not bcrypt.checkpw(staro_geslo.encode("utf-8"), stara_zgostitev):
+                        raise ValueError("Vneseno geslo ni pravilno!")
                 cur.execute(sql, [zgostitev, self.id])
+                if cur.rowcount == 0:
+                    raise IndexError(f"Uporabnik z ID-jem {self.id} ne obstaja!")
 
 
 @dataclass_json
@@ -560,21 +572,23 @@ class Film(Tabela, Entiteta):
                             :metascore, :glasovi, :zasluzek, :oznaka, :opis);
                 """, vrstica)
 
+    @Seznam(stevilo=10, stolpci="id, naslov, dolzina, leto, ocena",
+        sql="""
+             FROM film
+            WHERE leto = ?
+            ORDER BY ocena DESC
+        """
+    )
     @staticmethod
-    def najboljsi_v_letu(leto, n=10):
+    def najboljsi_v_letu(leto, cur):
         """
         Vrni najboljših n filmov v danem letu.
         """
-        sql = """
-            SELECT id, naslov, dolzina, leto, ocena
-              FROM film
-             WHERE leto = ?
-             ORDER BY ocena DESC
-             LIMIT ?;
-        """
-        with Kazalec() as cur:
-            cur.execute(sql, [leto, n])
-            yield from (Film(*vrstica) for vrstica in cur)
+        yield from (Film(*vrstica) for vrstica in cur)
+
+    @najboljsi_v_letu.poizvedba
+    def najboljsi_v_letu(leto):
+        return dict(podatki=[leto])
 
     @staticmethod
     def z_id(idf):
@@ -591,7 +605,7 @@ class Film(Tabela, Entiteta):
         with Kazalec() as cur:
             cur.execute(sql, [idf])
             vrstica = cur.fetchone()
-            if vrstica is None:
+            if vrstica is None or vrstica[0] is None:
                 raise IndexError(f"Film z ID-jem {idf} ne obstaja.")
             return Film(*vrstica)
 

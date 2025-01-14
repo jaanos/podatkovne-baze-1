@@ -19,8 +19,8 @@
 % if ime:
 <div class="content">
     <p>
-        % if osebe:
-        <ol>
+        % if osebe.skupaj:
+        <ol start="{{osebe.stran * osebe.stevilo + 1}}">
             % for oseba in osebe:
             <li>
                 <div class="level">
@@ -42,6 +42,7 @@
             </li>
             % end
         </ol>
+        % include('strani.html', seznam=osebe, url=f'/zasedba/dodaj/{film.id}/{tip}/', parametri=dict(ime=ime))
         % else:
         Ne najdem osebe z imenom <em>{{ime}}</em>.
         % end

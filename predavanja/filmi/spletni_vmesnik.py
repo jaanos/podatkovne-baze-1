@@ -18,16 +18,16 @@ def izbrisi_piskotek(piskotek):
     bottle.response.delete_cookie(piskotek, path='/')
 
 
-def nastavi_sporocilo(sporocilo, piskotek='sporocilo'):
+def nastavi_piskotek(piskotek, sporocilo):
     """
-    Nastavi piškotek s sporočilom.
+    Nastavi piškotek.
     """
     bottle.response.set_cookie(piskotek, sporocilo, secret=SKRIVNOST, path='/')
 
 
-def preberi_sporocilo(piskotek='sporocilo', izbrisi=True):
+def preberi_piskotek(piskotek, izbrisi=True):
     """
-    Preberi sporočilo in pobriši pripadajoči piškotek.
+    Preberi in po potrebi pobriši pripadajoči piškotek.
     """
     sporocilo = bottle.request.get_cookie(piskotek, secret=SKRIVNOST)
     if izbrisi:
@@ -35,11 +35,32 @@ def preberi_sporocilo(piskotek='sporocilo', izbrisi=True):
     return sporocilo
 
 
+def nastavi_sporocilo(sporocilo, vrsta='danger'):
+    """
+    Nastavi piškotek s sporočilom.
+    """
+    nastavi_piskotek('sporocilo', sporocilo)
+    nastavi_piskotek('vrsta', vrsta)
+
+
+def preberi_sporocilo():
+    """
+    Preberi sporočilo in pobriši pripadajoči piškotek.
+    """
+    sporocilo = bottle.request.get_cookie('sporocilo', secret=SKRIVNOST)
+    vrsta = bottle.request.get_cookie('vrsta', secret=SKRIVNOST)
+    if not vrsta:
+        vrsta = 'danger'
+    izbrisi_piskotek('sporocilo')
+    izbrisi_piskotek('vrsta')
+    return (sporocilo, vrsta)
+
+
 def nastavi_obrazec(piskotek, obrazec):
     """
     Zapiši vrednosti obrazca v obliki slovarja v piškotek kot niz JSON.
     """
-    nastavi_sporocilo(json.dumps(obrazec), piskotek)
+    nastavi_piskotek(piskotek, json.dumps(obrazec))
 
 
 def preberi_obrazec(piskotek, privzeto={}, izbrisi=True):
@@ -47,7 +68,7 @@ def preberi_obrazec(piskotek, privzeto={}, izbrisi=True):
     Preberi vrednosti obrazca in pobriši pripadajoči piškotek.
     """
     try:
-        return json.loads(preberi_sporocilo(piskotek, izbrisi))
+        return json.loads(preberi_piskotek(piskotek, izbrisi))
     except (TypeError, json.JSONDecodeError):
         return privzeto
 
@@ -120,6 +141,19 @@ def nastavi_zasedbo(idf, zasedba):
     """
     zasedba = {tip: [vloga.oseba.id for vloga in seznam] for tip, seznam in zasedba.items()}
     nastavi_obrazec(f'zasedba-{idf}', zasedba)
+
+
+def vrni_stran():
+    """
+    Vrni številko strani za prikaz.
+    """
+    try:
+        stran = int(bottle.request.query.stran)
+        if stran < 0:
+            stran = 0
+    except ValueError:
+        stran = 0
+    return stran
 
 
 def status(preveri):
@@ -216,7 +250,8 @@ def filmi_film_post(uporabnik, idf):
 @bottle.view('filmi.najbolje-ocenjeni.html')
 def filmi_najbolje_ocenjeni():
     leto = bottle.request.query.leto
-    filmi = list(Film.najboljsi_v_letu(leto))
+    stran = vrni_stran()
+    filmi = Film.najboljsi_v_letu(leto, stran=stran)
     return dict(filmi=filmi, leto=leto)
 
 
@@ -268,6 +303,7 @@ def filmi_izbrisi_post(uporabnik, idf):
     except (ValueError, IndexError):
         nastavi_sporocilo("Brisanje filma neuspešno!")
         bottle.redirect(f"/filmi/film/{idf}/")
+    nastavi_sporocilo(f'Uspešno izbrisan film z ID-jem {idf}!', 'warning')
     bottle.redirect("/")
 
 
@@ -278,6 +314,7 @@ def komentarji_izbrisi_post(uporabnik, idf, idk):
         Komentar(id=idk, film=idf).izbrisi()
     except (ValueError, IndexError):
         nastavi_sporocilo("Brisanje komentarja neuspešno!")
+    nastavi_sporocilo(f'Uspešno izbrisan komentar z ID-jem {idk}!', 'warning')
     bottle.redirect(f"/filmi/film/{idf}/")
 
 
@@ -288,7 +325,8 @@ def zasedba_dodaj(uporabnik, idf, tip):
     film = Film.z_id(idf)
     zasedba, _ = pridobi_zasedbo(film)
     ime = bottle.request.query.ime
-    osebe = list(Oseba.poisci(ime, izpusti=[vloga.oseba.id for vloga in zasedba[tip]]))
+    stran = vrni_stran()
+    osebe = Oseba.poisci(ime, izpusti=[vloga.oseba.id for vloga in zasedba[tip]], stevilo=20, stran=stran)
     return dict(film=film, tip=tip, osebe=osebe, ime=ime)
 
 
@@ -340,6 +378,7 @@ def zasedba_shrani_post(uporabnik, idf):
         try:
             film.nastavi_zasedbo(zasedba)
             izbrisi_piskotek(f'zasedba-{film.id}')
+            nastavi_sporocilo(f'Uspešno shranjena zasedba filma z ID-jem {film.id}!', 'success')
         except ValueError:
             nastavi_sporocilo("Nastavljanje zasedbe ni uspelo!")
     bottle.redirect(f'/filmi/film/{idf}/')
@@ -368,17 +407,13 @@ def osebe_oseba(ido):
 @bottle.get('/osebe/poisci/')
 @bottle.view('osebe.poisci.html')
 def osebe_poisci():
-    STEVILO = 20
     ime = bottle.request.query.ime
-    try:
-        stran = int(bottle.request.query.stran)
-    except ValueError:
-        stran = 0
-    osebe = list(Oseba.poisci(ime, stevilo=STEVILO, stran=stran))
-    if len(osebe) == 1:
+    stran = vrni_stran()
+    osebe = Oseba.poisci(ime, stevilo=20, stran=stran)
+    if osebe.skupaj == 1 and len(osebe) == 1:
         oseba, = osebe
         bottle.redirect(f'/osebe/oseba/{oseba.id}/')
-    return dict(osebe=osebe, ime=ime, stran=stran, zacetek=stran*STEVILO+1)
+    return dict(osebe=osebe, ime=ime)
 
 
 @bottle.get('/osebe/dodaj/')
@@ -429,6 +464,7 @@ def osebe_izbrisi_post(uporabnik, ido):
     except (ValueError, IndexError):
         nastavi_sporocilo("Brisanje osebe neuspešno!")
         bottle.redirect(f"/osebe/oseba/{ido}/")
+    nastavi_sporocilo(f'Uspešno izbrisana oseba z ID-jem {ido}!', 'warning')
     bottle.redirect("/")
 
 
@@ -480,6 +516,34 @@ def odjava(uporabnik):
     odjavi_uporabnika()
 
 
+@bottle.get('/spremeni-geslo/')
+@bottle.view('spremeni-geslo.html')
+@prijavljen
+def spremeni_geslo(uporabnik):
+    pass
+
+
+@bottle.post('/spremeni-geslo/')
+@prijavljen
+def spremeni_geslo_post(uporabnik):
+    geslo0 = bottle.request.forms.geslo0
+    geslo1 = bottle.request.forms.geslo1
+    geslo2 = bottle.request.forms.geslo2
+    if geslo1 != geslo2:
+        nastavi_sporocilo("Gesli se ne ujemata!")
+    else:
+        try:
+            uporabnik.spremeni_geslo(geslo1, geslo0)
+            nastavi_sporocilo("Geslo uspešno zamenjano!", 'success')
+        except ValueError:
+            nastavi_sporocilo("Vneseno geslo ni pravilno!")
+        except IndexError as ex:
+            nastavi_sporocilo(*ex.args)
+            odjavi_uporabnika()
+    bottle.redirect('/spremeni-geslo/')
+
+
+bottle.BaseTemplate.defaults['urlencode'] = bottle.urlencode
 bottle.BaseTemplate.defaults['prijavljeni_uporabnik'] = prijavljeni_uporabnik
 bottle.BaseTemplate.defaults['preberi_sporocilo'] = preberi_sporocilo
 bottle.BaseTemplate.defaults['preberi_obrazec'] = preberi_obrazec

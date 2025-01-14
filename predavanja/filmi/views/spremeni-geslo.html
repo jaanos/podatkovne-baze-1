@@ -1,0 +1,47 @@
+% rebase('osnova.html', naslov='Spremeni geslo')
+
+<form action="/spremeni-geslo/" method="POST">
+    <div class="field">
+        <label class="label">Uporabniško ime</label>
+        <p class="control has-icons-left">
+            <input class="input" type="text" value="{{uporabnik.uporabnisko_ime}}" disabled />
+            <span class="icon is-small is-left">
+                <i class="fas fa-user"></i>
+            </span>
+        </p>
+    </div>
+    <div class="field">
+        <label class="label">Staro geslo</label>
+        <p class="control has-icons-left">
+            <input class="input" type="password" name="geslo0" placeholder="Staro geslo" />
+            <span class="icon is-small is-left">
+                <i class="fas fa-lock"></i>
+            </span>
+        </p>
+    </div>
+    <div class="field">
+        <label class="label">Novo geslo</label>
+        <p class="control has-icons-left">
+            <input class="input" type="password" name="geslo1" placeholder="Novo geslo" />
+            <span class="icon is-small is-left">
+                <i class="fas fa-lock"></i>
+            </span>
+        </p>
+    </div>
+    <div class="field">
+        <label class="label">Ponovi novo geslo</label>
+        <p class="control has-icons-left">
+            <input class="input" type="password" name="geslo2" placeholder="Ponovi novo geslo" />
+            <span class="icon is-small is-left">
+                <i class="fas fa-lock"></i>
+            </span>
+        </p>
+    </div>
+    <div class="field">
+        <p class="control">
+            <button class="button is-success">
+                Spremeni geslo
+            </button>
+        </p>
+    </div>
+</form>

@@ -16,12 +16,13 @@
 % if leto:
 <div class="content">
     <p>
-        % if filmi:
-        <ol>
+        % if filmi.skupaj:
+        <ol start="{{filmi.stran * filmi.stevilo + 1}}">
             % for film in filmi:
             <li><a href="/filmi/film/{{film.id}}/">{{film}}</a> (ocena {{film.ocena}}/10)</li>
             % end
         </ol>
+        % include('strani.html', seznam=filmi, url='/filmi/najbolje-ocenjeni/', parametri=dict(leto=leto))
         % else:
         Za leto {{leto}} v bazi ni filmov.
         % end
