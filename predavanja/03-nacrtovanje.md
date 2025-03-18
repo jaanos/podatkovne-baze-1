@@ -5,12 +5,16 @@ style: "@import url('style.css')"
 
 # Načrtovanje podatkovnih baz
 
+<span class="small">
+
 * Načrtovanje podatkovne baze je postopek opredelitve in razvoja strukture podatkovne baze.
   - Formalni model nekaterih vidikov realnega sveta (problemske domene)
 * Mera za pravilnost načrtovane sheme podatkovne baze je realni svet.
   - Od tod sledi, da mora vsebina podatkovne baze odražati podatke, pravila in izjeme iz realnega sveta.
 
   ![h:260px](slike/nacrtovanje.png)
+
+</span>
 
 ---
 
@@ -122,6 +126,8 @@ Izhodišče:
 
 # Predstavitev podatkov
 
+<span class="small">
+
 * Pregledamo vse omenjene samostalnike in fraze (npr. *profesor*, *predmet*, *izpit*, *rok*, *datum izpita*, ...).
 * Pozorni smo na pomembne objekte (npr. ljudje, lokacije, ...).
 * Skušamo ločiti objekte (npr. profesor, izpit, ...) od lastnosti objektov (ime, vpisna številka, ...).
@@ -130,6 +136,8 @@ Izhodišče:
 * V relacijskih podatkovnih bazah bo vsakemu entitetnemu tipu pripadala ustrezna tabela, vsaki entiteti pa vrstica v tej tabeli.
   - Za glavni ključ izberemo atribut, ki enolično določa entiteto.
   - Če ga ni, uporabimo zaporedni ali naključni ID.
+
+</span>
 
 ---
 
@@ -149,6 +157,8 @@ Izpitni rok | Datum, na katerega je za nek predmet in določeno ciljno skupino (
 
 # Odnosi med entitetami
 
+<span class="small">
+
 (angl. *relationship*, včasih rečemo tudi *relacija*)
 
 * Omogočajo povezovanje informacij, ki pripadajo različnim entitetnim tipom.
@@ -160,6 +170,8 @@ Izpitni rok | Datum, na katerega je za nek predmet in določeno ciljno skupino (
 * Uporabimo pregled uporabniških zahtev.
   - Iščemo glagole (npr. profesor *razpiše* rok, študent *polaga* izpit, študent *izbere* mentorja, študent *se vpiše* v letnik, ...)
   - Zanimajo nas samo tisti odnosi, ki so res potrebni za našo poslovno domeno (sposobnost abstrakcije).
+
+</span>
 
 ---
 
@@ -222,6 +234,8 @@ Postopek:
 
 # ER diagram
 
+<span class="small">
+
 (angl. *entity-relationship diagram*, tudi *entitetno-odnosni diagram*)
 
 ![h:350px](slike/er-ljudje.png)
@@ -229,6 +243,8 @@ Postopek:
 * **Entitetne tipe** predstavimo s **pravokotniki**.
 * **Atribute** predstavimo z **elipsami**.
 * **Odnose** predstavimo z **rombi**.
+
+</span>
 
 ---
 
@@ -316,20 +332,6 @@ Postopek:
 
 ---
 
-# Primer - šola
-
-![w:1000px](slike/er-sola.png)
-
----
-
-# Primer - knjižnica
-
-![w:1000px](slike/er-knjiznica.png)
-
-* Kakšne so težave s tem modelom?
-
----
-
 # Logični nivo načrtovanja
 
 * Izhajamo iz konceptualnega modela.
@@ -347,6 +349,8 @@ Postopek:
 
 # Identifikacija tabel
 
+<span class="small">
+
 * Za vsak entitetni tip naredimo tabelo.
   - Atribute predstavimo s stolpci tabele.
   - Če nimamo ustreznega glavnega ključa, ga dodamo (npr. zaporedni ID).
@@ -356,6 +360,8 @@ Postopek:
 * Odnos z najmanjšo števnostjo 0 pri vseh entitetnih tipih lahko predstavimo s povezovalno tabelo.
   - Glavni ključ sestoji iz tujih ključev na ustrezne tabele, atribute predstavimo s stolpci v tabeli.
   - Običajno uporabimo tak pristop tudi pri odnosih več na več z najmanjšo števnostjo 1.
+
+</span>
 
 ---
 
@@ -682,7 +688,7 @@ Fizika               | Teoretična
 
 # Konceptualni model
 
-<span class="columns small" style="grid-template-columns: 0.75fr 0.5fr">
+<span class="columns small" style="grid-template-columns: 0.58fr 0.5fr">
 <span>
 
 * ER diagram:
@@ -711,6 +717,8 @@ Fizika               | Teoretična
 
 # Logični model (SQLite)
 
+<span class="small">
+
 ```sql
 CREATE TABLE film (
   id         integer  PRIMARY KEY AUTOINCREMENT,
@@ -734,66 +742,4 @@ CREATE TABLE spored (
 );
 ```
 
----
-
-# Primer: banka
-
-* Hraniti želimo podatke o komitentih banke ter njihovih računih in transakcijah.
-  - Za komitenta hranimo EMŠO, ime, priimek in naslov.
-  - Vsak komitent ima lahko več računov.
-  - Za vsako transakcijo na nekem računu beležimo znesek, čas in neobvezen opis.
-
----
-
-# Konceptualni model
-
-![h:600px](slike/er-banka.png)
-
----
-
-# Logični model (SQLite)
-
-<span class="columns small" style="--cols: 2;">
-<span>
-
-```sql
-CREATE TABLE kraj (
-  posta    integer PRIMARY KEY,
-  kraj     text    NOT NULL
-);
-
-CREATE TABLE oseba (
-  emso     text    PRIMARY KEY,
-  ime      text    NOT NULL,
-  priimek  text    NOT NULL,
-  ulica    text    NOT NULL,
-  posta    integer NOT NULL
-             REFERENCES kraj(posta)
-);
-```
-
-</span>
-<span>
-
-```sql
-CREATE TABLE racun (
-  stevilka integer PRIMARY KEY
-                   AUTOINCREMENT,
-  lastnik  text    NOT NULL
-             REFERENCES oseba(emso)
-);
-
-CREATE TABLE transakcija (
-  id       integer   PRIMARY KEY
-                     AUTOINCREMENT,
-  racun    integer   NOT NULL
-             REFERENCES racun(stevilka),
-  znesek   integer   NOT NULL, 
-  cas      timestamp NOT NULL
-             DEFAULT CURRENT_TIMESTAMP,
-  opis     text
-);
-```
-
-</span>
 </span>

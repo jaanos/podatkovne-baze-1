@@ -7,3 +7,7 @@
 .small {
   font-size: x-large;
 }
+
+.small td, .smaller {
+  font-size: large;
+}

@@ -3,62 +3,6 @@ marp: true
 style: "@import url('style.css')"
 ---
 
-# Kako deluje internet
-
-* Internet je v osnovi ogromno omrežje, v katerega so povezani računalniki (in ostale naprave).
-* Lahko si ga predstavljamo kot graf.
-  - Posamezni računalniki so listi tega grafa.
-  - Vmesna vozlišča so usmerjevalniki.
-* Če se želita dva računalnika pogovarjati, je potrebno poiskati pot v tem grafu.
-  - Za iskanje učinkovitih poti skrbijo usmerjevalniki.
-* Vsaka naprava na internetu ima svoj naslov.
-  ```
-  $ host www.google.com
-  www.google.com has address 142.250.186.68
-  www.google.com has IPv6 address 2a00:1450:400d:80e::2004
-  ```
-  - Vsaka naprava lahko uporablja naslova 127.0.0.1 (IPv4) ali ::1 (IPv6) za sklicevanje nase.
-
----
-
-# DNS - *Domain Name System*
-
-* Za lažjo uporabo napravam v omrežju dodelimo hierarhično organizirana imena.
-* Primer: `www.google.com`
-  - Vrhnja domena: `com` (ali `net`, `org`, ..., ter državne domene, kot `si`, ...)
-  - Organizacija (znotraj `com`): `google`
-  - Naprava (znotraj `google.com`): `www`
-* Naslove, ki ustrezajo imenom, hranijo hierarhično organizirani imenski strežniki.
-* Ko se želimo povezavi na `www.google.com`, pošljemo poizvedbo imenskemu strežniku internetnega ponudnika.
-  - Če odgovora ne pozna, povpraša vrhnji strežnik, nato strežnik za `com`, nazadnje še strežnik za `google.com`.
-* Ime `localhost` ustreza naslovoma 127.0.0.1 in ::1.
-
----
-
-# Protokoli in vrata
-
-* Za pošiljanje podatkov med računalniki se uporabljata omrežna protokola IPv4 in IPv6 (*Internet Protocol*, različici 4 in 6).
-* Na posamezni napravi lahko teče več aplikacij, vsaka uporablja določena *vrata* pri enem od transportnih protokolov.
-  - UDP (*User Datagram Protocol*) - za DNS, IPTV, IP telefonijo, ...
-  - TCP (*Transmission Control Protocol*) - za večino storitev
-* Številke vrat so večinoma standardizirane:
-  - 53/UDP: DNS
-  - 80/TCP: HTTP (*Hypertext Transfer Protocol*)
-  - 443/TCP: HTTPS (HTTP preko SSL/TLS - šifrirana povezava)
-
----
-
-# Kaj se zgodi, ko v brskalnik vtipkamo `https://www.google.com/`
-
-* Operacijski sistem pošlje zahtevo imenskemu strežniku po protokolu DNS za IP naslov, ki ustreza imenu `www.google.com`.
-  - Odgovor si zapomni, da ni potrebno vsakič spraševati.
-* Z računalnikom na dobljenem naslovu poskusi vzpostaviti sejo TCP na vratih 443.
-  - Seja TCP skrbi za zanesljiv prenos podatkov.
-* Po vzpostavljeni seji se vzpostavi šifriran kanal po protokolu SSL/TLS.
-* Brskalnik ima sedaj na voljo povezavo s spletnim strežnikom, s katerim se pogovarja po protokolu HTTP.
-
----
-
 # Protokol HTTP
 
 * Odjemalec (brskalnik) pošlje zahtevek, ki sestoji iz:
@@ -243,6 +187,8 @@ bottle.run(host='127.0.0.1', port=8080, reloader=False, debug=False)
 
 # Parametrizirane poti
 
+<span class="small">
+
 * Poti lahko tudi parametriziramo.
 * Imena parametrov morajo ustrezati imenom parametrov funkcije.
   ```python
@@ -258,9 +204,13 @@ bottle.run(host='127.0.0.1', port=8080, reloader=False, debug=False)
   ```
   - Druge možnosti: `<x:float>` (decimalna števila), `<x:path>` (pot do datoteke - lahko vsebuje `/`), `<x:re:exp>` (niz, ki ustreza regularnemu izrazu `exp`).
 
+</span>
+
 ---
 
 # Predloge
+
+<span class="small">
 
 * Funkcije vračajo vsebino strani v obliki HTML.
 * Za vračanje vsebine predloge uporabljamo funkcijo `template`, ki ji kot poimenovane parametre podamo vrednosti spremenljivk.
@@ -281,9 +231,13 @@ bottle.run(host='127.0.0.1', port=8080, reloader=False, debug=False)
   </html>
   ```
 
+</span>
+
 ---
 
 # Predloge (2)
+
+<span class="small">
 
 * V predlogah lahko med dvojnimi zavitimi oklepaji navajamo Pythonove izraze (običajno spremenljivke).
 * Vrstice, ki se začnejo s `%`, se razumejo kot Pythonova koda.
@@ -302,6 +256,8 @@ bottle.run(host='127.0.0.1', port=8080, reloader=False, debug=False)
   vrstica besedila
   odgovor je 42
   ```
+
+</span>
 
 ---
 
@@ -344,6 +300,8 @@ bottle.run(host='127.0.0.1', port=8080, reloader=False, debug=False)
 
 # Funkcija `rebase`
 
+<span class="small">
+
 * Za skupne dele predlog lahko uporabljamo funkcijo `rebase`, ki ji podamo ime datoteke z osnovno predlogo.
 * Tako kot funkciji `template` lahko tudi funkciji `rebase` kot poimenovane parametre podamo vrednosti spremenljivk.
 * V osnovno predlogo vsebino strani podamo z `{{!base}}`.
@@ -361,6 +319,8 @@ bottle.run(host='127.0.0.1', port=8080, reloader=False, debug=False)
   % rebase('osnova.html', naslov=f'Pozdravna stran za {ime}')
   <h1>Živjo, <b>{{ime}}</b>!</h1>
   ```
+
+</span>
 
 ---
 
@@ -438,6 +398,8 @@ bottle.run(host='127.0.0.1', port=8080, reloader=False, debug=False)
 
 # Funkcije v predlogah
 
+<span class="small">
+
 * Poleg funkcije `rebase` so v predlogah na voljo še sledeče funkcije:
   - `include(predloga, ...)` - vključi navedeno predlogo
   - `defined(spremenljivka)` - pove, ali je spremenljivka (podana kot niz) definirana
@@ -450,6 +412,8 @@ bottle.run(host='127.0.0.1', port=8080, reloader=False, debug=False)
   ```html
   {{povecaj(42)}}
   ```
+
+</span>
 
 ---
 

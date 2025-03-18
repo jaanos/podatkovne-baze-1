@@ -5,6 +5,8 @@ style: "@import url('style.css')"
 
 # Delo s podatkovnimi bazami v Pythonu
 
+<span class="small">
+
 * Podatke hranimo v bazi.
 * S pomočjo jezika SQL lahko enostavno dobimo ustrezne podatke.
 * Sedaj pa bi s temi podatki radi še kaj naredili.
@@ -15,6 +17,8 @@ style: "@import url('style.css')"
   - SQL je za običajnega uporabnika "pretežek".
   - Potrebujemo gumbke, vnosna polja, ...
   - Podatki morajo biti prikazani "lepo".
+
+</span>
 
 ---
 
@@ -103,6 +107,8 @@ Potrebovali bomo sledeče:
 
 # Še en primer
 
+<span class="small">
+
 ```python
 import sqlite3 as dbapi
 # Povežemo se na novo bazo - s tem jo ustvarimo
@@ -128,6 +134,8 @@ cur.close()
 conn.close()
 ```
 
+</span>
+
 ---
 
 # Uporaba `with`
@@ -141,6 +149,7 @@ conn.close()
   ```
   - Po koncu izvajanja (tudi, če gre kaj narobe) se datoteka zapre.
 * Če bloku `with` podamo povezavo na bazo, bo ob uspešnem dokončanju potrdil transakcijo, sicer jo bo pa preklical:
+  <span class="smaller">
   ```python
   import sqlite3 as dbapi
   conn = dbapi.connect("testdb.sqlite")
@@ -155,6 +164,7 @@ conn.close()
       print(f"Napaka: {ex}")
   ```
   - Povezava in kazalec ostaneta odprta!
+  </span>
 
 </span>
 
@@ -206,11 +216,13 @@ conn.close()
   geslo = ""
   ```
 * Izvedla se bo taka poizvedba:
+  <span class="smaller">
   ```sql
   SELECT id, admin FROM uporabnik
    WHERE uporabnisko_ime = 'admin' OR 0 AND --' AND
          geslo = '';
   ```
+  </span>
 
 </span>
 
@@ -218,11 +230,15 @@ conn.close()
 
 # SQL injection (2)
 
+<span class="small">
+
 * Podatkov, nad katerimi nimamo popolnega nadzora (npr. jih lahko vnese uporabnik), nikoli ne vstavljamo neposredno v poizvedbo.
   - V Pythonu v ta namen **ne** uporabljamo `f`-nizov, metod `format` in `join`, operatorjev `%` in `+`, ...
 * Namesto tega naj za vstavljanje poskrbi podatkovni vmesnik.
 
   ![h:300px](https://imgs.xkcd.com/comics/exploits_of_a_mom.png)
+
+</span>
 
 ---
 
