@@ -4,10 +4,38 @@
   gap: 1rem;
 }
 
+.col2 {
+  --cols: 2;
+}
+
+.col2a {
+  grid-template-columns: 1.5fr 0.5fr;
+}
+
+.col2b {
+  grid-template-columns: 0.58fr 0.5fr;
+}
+
+.col3 {
+  --cols: 3;
+}
+
 .small {
   font-size: x-large;
 }
 
 .small td, .smaller {
   font-size: large;
+}
+
+.red {
+  color: red;
+}
+
+.green {
+  color: green;
+}
+
+.blue {
+  color: blue;
 }

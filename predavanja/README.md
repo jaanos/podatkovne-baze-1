@@ -15,3 +15,7 @@
   - [Primer s knjižnico `bottle`](https://nbviewer.org/github/jaanos/podatkovne-baze-1/blob/main/predavanja/jupyter/bottle.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jaanos/podatkovne-baze-1/HEAD?labpath=predavanja/jupyter/bottle.ipynb)
   - [Primer spletne aplikacije](https://github.com/jaanos/podatkovne-baze-1/tree/main/predavanja/filmi/) ([2023](https://github.com/jaanos/podatkovne-baze-1/tree/main/predavanja/filmi/2023/))
 * [Indeksi](https://nbviewer.org/github/jaanos/podatkovne-baze-1/blob/main/predavanja/jupyter/indeksi.ipynb) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jaanos/podatkovne-baze-1/HEAD?labpath=predavanja/jupyter/indeksi.ipynb)
+
+## [Seminar](https://jaanos.github.io/podatkovne-baze-1/predavanja/seminar.marp.html) ([izročki](seminar.md))
+
+Dodatna gradiva, ki jih obravnavamo na seminarju (za 3. letnike)

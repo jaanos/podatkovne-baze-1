@@ -265,7 +265,7 @@ Postopek:
 
 # Entitetni tip - primeri risanja
 
-<span class="columns small" style="--cols: 2;">
+<span class="columns small col2">
 <span>
 
 ![w:400px](slike/entiteta-chen.png)
@@ -290,7 +290,7 @@ Postopek:
   * Označujemo tudi z (*min*, *max*).
 * Primera:
 
-  <span class="columns small" style="--cols: 2;">
+  <span class="columns small col2">
   <span>
 
   ![](slike/odnos-11-0n.png)
@@ -312,7 +312,7 @@ Postopek:
 * Odnose predstavimo s povezavami med entitetnimi tipi.
 * S simboli pri entitetnem tipu povemo, koliko entitet povezanega entitetnega tipa je v odnosu z njim.
 
-  <span class="columns small" style="--cols: 2;">
+  <span class="columns small col2">
   <span>
 
   ![](slike/cfn-11-0n.png)
@@ -443,7 +443,7 @@ bivanje (#id_osebe->oseba(id_osebe), #id_kraja->kraj(id_kraja), leta)
 
 # Zgled
 
-<span class="columns" style="--cols: 2;">
+<span class="columns col2">
 <span>
 
 * Ustvarimo tabeli proizvajalcev in izdelkov.
@@ -542,7 +542,7 @@ bivanje (#id_osebe->oseba(id_osebe), #id_kraja->kraj(id_kraja), leta)
 
 # Dekompozicija
 
-<span class="columns small" style="--cols: 2;">
+<span class="columns small col2">
 <span>
 
 <u>Predmet</u>   | Profesor
@@ -596,7 +596,7 @@ Fizika               | Teoretična
 
 * Do težave pride, če npr. profesor zamenja kabinet - moramo popraviti povsod!
 
-  <span class="columns small" style="grid-template-columns: 1.5fr 0.5fr">
+  <span class="columns small col2a">
   <span>
 
   <u>Predmet</u>       | <u>Profesor</u> $\to$ | Dan        | Ura
@@ -650,7 +650,7 @@ Fizika               | Teoretična
 
 * Spet bodo težave, če profesor zamenja kabinet.
 
-  <span class="columns small" style="grid-template-columns: 1.5fr 0.5fr">
+  <span class="columns small col2a">
   <span>
 
   <u>Predmet</u>       | Profesor $\to$ | Dan        | Ura
@@ -688,7 +688,7 @@ Fizika               | Teoretična
 
 # Konceptualni model
 
-<span class="columns small" style="grid-template-columns: 0.58fr 0.5fr">
+<span class="columns small col2b">
 <span>
 
 * ER diagram:

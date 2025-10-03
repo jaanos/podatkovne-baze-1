@@ -226,7 +226,7 @@ SELECT name FROM world
   HAVING COUNT(DISTINCT subject) > 1;
   ```
 
-  <span class="columns" style="--cols: 2;">
+  <span class="columns col2">
   <span>
 
   `winner`      | `podrocja`
@@ -389,7 +389,7 @@ HAVING pogoji_skupin                    -- 6
 
 * Imamo tabeli `narocnik` in `narocilo`.
 
-  <span class="columns small" style="--cols: 2;">
+  <span class="columns small col2">
   <span>
 
   `narocnik_id` | `ime`  | `priimek`
@@ -735,7 +735,7 @@ SELECT film.*
 
 # Logični model (SQLite)
 
-<span class="columns small" style="--cols: 2;">
+<span class="columns small col2">
 <span>
 
 ```sql

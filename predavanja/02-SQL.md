@@ -643,7 +643,7 @@ GROUP BY stolpci;
 
 # `GROUP BY` - primer
 
-<span class="small columns" style="--cols: 3;">
+<span class="small columns col3">
 <span>
 
 ```sql
@@ -748,7 +748,7 @@ SELECT name, continent, MAX(population) FROM world
 
 # `GROUP BY` in `WHERE`
 
-<span class="columns" style="--cols: 2;">
+<span class="columns col2">
 <span>
 
 * Zanima nas število držav z vsaj 160M prebivalci na vsaki celini.
@@ -787,7 +787,7 @@ SELECT continent, COUNT(*) AS stevilo FROM world
  GROUP BY continent;
 ```
 
-<span class="columns" style="--cols: 2;">
+<span class="columns col2">
 <span>
 
 `continent`   | `stevilo`
@@ -899,7 +899,7 @@ South America | 1
 
 # Stikanje tabel
 
-<span class="columns small" style="--cols: 2;">
+<span class="columns small col2">
 <span>
 
 * Denimo, da imamo sledeči tabeli o olimpijskih igrah.
@@ -943,7 +943,7 @@ South America | 1
 
 - Seveda moramo računati na nepopolne podatke ...
 
-<span class="columns" style="--cols: 2;">
+<span class="columns col2">
 <span>
 
   <span class="small">
@@ -986,7 +986,7 @@ Leto   | Kraj    | Država
 * "Prave" baze torej običajno sestavlja več tabel.
 * Pogosto želimo kot rezultat dobiti podatke, ki se nahajajo v več tabelah.
 
-  <span class="columns small" style="--cols: 2;">
+  <span class="columns small col2">
   <span>
 
   `ID` | `ImePriimek` | `Posta`

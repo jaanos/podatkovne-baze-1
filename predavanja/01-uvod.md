@@ -1,16 +1,17 @@
 ---
 marp: true
+style: "@import url('style.css')"
 ---
 
 # Podatkovne baze 1
 
 * Predavanja:
   - Janoš Vidali ([janos.vidali@fmf.uni-lj.si](mailto:janos.vidali@fmf.uni-lj.si)), kabinet 1.14
-  - torek 8-10 v predavalnici 3.10
-  - sreda 11-12 v predavalnici 3.10
+  - ponedeljek 10-12 v predavalnici 3.04
+  - ponedeljek 12-13 v predavalnici 3.04 (seminar, za 3. letnike)
 * Vaje:
   - Ajda Lampe ([ajda.lampe@fmf.uni-lj.si](mailto:ajda.lampe@fmf.uni-lj.si)), kabinet 1.09
-  - ponedeljek 12-14 v predavalnici 3.12
+  - četrtek 9-11 v predavalnici 3.11
 
 ---
 
@@ -56,6 +57,8 @@ marp: true
 
 # Sočasen dostop
 
+<span class="small">
+
 * Program, ki omogoča vpis novih naslovov
   - Recimo, da ga sočasno uporablja več ljudi!
 * Dva hočeta sočasno vnesti nov e-naslov?
@@ -68,6 +71,8 @@ marp: true
 * Denimo, da bi na ta način poslovala banka!
   + Dva tipa računov: tekoči in varčevalni
   + Transakcije (dvige in pologe) za vsak račun hranimo v dveh datotekah, `tekoci.txt` in `varcevalni.txt`.
+
+</span>
 
 ---
 
@@ -168,6 +173,8 @@ ACID: **A**tomicity, **C**onsistency, **I**solation, **D**urability
 
 # Relacijske baze podatkov
 
+<span class="small">
+
 * Po domače: *Relacijska baza podatkov je skupek preglednic, ki jih lahko več ljudi sočasno popravlja.*
 * Podatke hranimo v *tabelah* (*relacijah*), ki imajo *vrstice* in *stolpce*.
 * Stolpci:
@@ -179,6 +186,8 @@ ACID: **A**tomicity, **C**onsistency, **I**solation, **D**urability
 * Podatkovna baza: skupek več tabel
   - Podatki so povezani preko referenc (tujih ključev)
 * Najprej se bomo naučili delati z najbolj enostavnimi bazami, ki bodo sestavljene le iz ene tabele.
+
+</span>
 
 ---
 
@@ -227,15 +236,15 @@ ACID: **A**tomicity, **C**onsistency, **I**solation, **D**urability
   - Navadno ustrezajo razredom v objektno usmerjenih programskih jezikih (npr. Java, Python)
   - Primer: zaposleni, oddelek, ...
   - Vsaki entiteti pripada ena tabela.
-* <span style="color: green">Vrstica</span>: primerek entitete
-* <span style="color: red">Stolpec</span>: lastnost (npr. ime in priimek, stopnja izobrazbe)
-* <span style="color: blue">Celica</span>: vrednost lastnosti določenega primerka
+* <span class="green">Vrstica</span>: primerek entitete
+* <span class="red">Stolpec</span>: lastnost (npr. ime in priimek, stopnja izobrazbe)
+* <span class="blue">Celica</span>: vrednost lastnosti določenega primerka
 
 ---
 
-`IDZaposlenega` | <span style="color: red">`ImePriimek`</span> | `IDOddelka` | `Stopnja`
+`IDZaposlenega` | <span class="red">`ImePriimek`</span> | `IDOddelka` | `Stopnja`
 --------------- | ------------ | ----------- | ---------
-MK1             | <span style="color: red">Miha Kranjc</span>  | PO          | IV
-<span style="color: green">MH1</span> | <span style="color: blue">Maja Hrust</span> | <span style="color: green">KO</span> | <span style="color: green">VII</span>
-LS1             | <span style="color: red">Lidija Svet</span>  | RO          | V
-MK2             | <span style="color: red">Mitja Kern</span>   | NO          | IV
+MK1             | <span class="red">Miha Kranjc</span>  | PO          | IV
+<span class="green">MH1</span> | <span class="blue">Maja Hrust</span> | <span class="green">KO</span> | <span class="green">VII</span>
+LS1             | <span class="red">Lidija Svet</span>  | RO          | V
+MK2             | <span class="red">Mitja Kern</span>   | NO          | IV
