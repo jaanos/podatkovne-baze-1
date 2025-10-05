@@ -49,7 +49,7 @@ SELECT * FROM knjige
 # `SELECT * FROM tabela`
 
 * `*`
-  - Izpiši vse stolpce
+  - Vrni vse stolpce
   - V izhodu naj bodo vsi stolpci izvorne tabele
 * `tabela`
   - Ime tabele, katere stolpce želimo dobiti

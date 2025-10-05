@@ -156,13 +156,13 @@ ACID: **A**tomicity, **C**onsistency, **I**solation, **D**urability
   - Relacijski (Codd, 1970)
 * Danes praktično večina baz:
   - **R**elacijske podatkovne baze
-  - **R**DMBS
+  - **R**DBMS
 
 ---
 
 # Sistemi za upravljanje z relacijskimi bazami podatkov
 
-* Primeri RDMBS:
+* Primeri RDBMS:
   - MS Access, MySQL, PostgreSQL, Oracle, MS SQL, DB2, SQLite, ...
 * Pogosto rečemo *baza MySQL*.
   - To je narobe!
