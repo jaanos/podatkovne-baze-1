@@ -847,7 +847,7 @@ South America | 1
   HAVING SUM(population) >= 500000000;
   ```
   - Najprej tabelo razdelimo na skupine po celinah.
-  - `SUM(population)` potem seštejo prebivalstvo na posamezni celini.
+  - `SUM(population)` potem sešteje prebivalstvo na posamezni celini.
   - Pogoj pri `HAVING` preverja vrstice, ki jo dobimo za vsako skupino.
 * Pri `HAVING` smemo uporabiti tiste stolpce/izraze, ki jih lahko ob uporabi `GROUP BY` izberemo za stolpce dobljene tabele.
 
@@ -1134,6 +1134,75 @@ Leto   | Kraj    | Država
   SELECT * FROM oi
   NATURAL LEFT OUTER JOIN kraj;
   ```
+
+---
+
+# Več tabel
+
+* Baza [filmov](https://sqlzoo.net/wiki/More_JOIN_operations) na SQLZoo
+  - `movie(id, title, yr, score, votes, director)`
+  - `actor(id, name)`
+  - `casting(movieid, actorid, ord)`
+* Izpiši naslove filmov, kjer je igral *John Wayne*.
+* Za naslove potrebujemo tabelo `movie`.
+* Imena igralcev so v tabeli `actor`.
+* Tabela `casting` povezuje igralce in filme.
+  - Odnos tipa več-na-več med tabelama `movie` in `actor` (igralec je igral v več filmih, filmi pa imajo več igralcev)
+
+---
+
+# Stikanje
+
+```sql
+SELECT title FROM movie
+  JOIN casting ON movie.id = movieid
+  JOIN actor   ON actorid = actor.id
+ WHERE actor.name = 'John Wayne';
+```
+
+* Najprej sestavimo tabelo s stikanjem, nato jo filtriramo z `WHERE`.
+  - Vzamemo vrstico tabele `movie`.
+  - Staknemo jo s tistimi vrsticami tabele `casting`, ki imajo vrednost v stolpcu `movieid` enako vrednosti stolpca `id` tabele `movie`.
+  - Dobljene vrstice staknemo s tistimi vrsticami tabele `actor`, ki imajo vrednost v stolpcu `id` enako vrednosti stolpca `actorid` tabele `casting`.
+  - Od dobljenih vrstic vzamemo le tiste, kjer je vrednost stolpca `name` v tabeli `actor` enaka *John Wayne*.
+
+---
+
+# Igralci v filmu Velikan
+
+* Zanima nas, kdo je poleg Jamesa Deana še igral v filmu Velikan (*Giant*).
+* Zasedbo dobimo iz tabele `casting`.
+  - Tu so le ID-ji filmov in igralcev!
+* Potrebujemo ID filma, poznamo pa le njegov naslov, ki se nahaja v tabeli `movie`.
+* Imena igralcev bomo dobili iz tabele `actor`.
+* Uredili bomo po vrstnem redu igralcev v filmu (`casting.ord`).
+  ```sql
+  SELECT name FROM movie
+    JOIN casting ON movie.id = movieid
+    JOIN actor   ON actor.id = actorid
+  WHERE title = 'Giant' AND
+        name <> 'James Dean'
+  ORDER BY ord;
+  ```
+
+---
+
+# Največje zvezde
+
+* Kateri igralci so bili glavni igralci v vsaj 10 filmih?
+* V tabeli `casting` se pojavijo vsaj desetkrat z `ord = 1`.
+  - `WHERE ord = 1`
+  - `HAVING COUNT(*) >= 10`
+* Imena igralcev bomo dobili iz tabele `actor`.
+* Podatkov o filmih ne bomo potrebovali!
+  ```sql
+  SELECT name FROM actor
+    JOIN casting ON actorid = id
+   WHERE ord = 1
+   GROUP BY id, name
+  HAVING COUNT(*) >= 10;
+  ```
+* Kaj pa, če nas zanima tudi, v koliko filmih so bili glavni igralci?
 
 ---
 

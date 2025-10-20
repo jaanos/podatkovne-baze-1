@@ -336,86 +336,6 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </ul>
 </section>
 </foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="14" data-marpit-fragments="5" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
-<h1 id="ve%C4%8D-tabel">Več tabel</h1>
-<ul>
-<li data-marpit-fragment="1">Baza <a href="https://sqlzoo.net/wiki/More_JOIN_operations">filmov</a> na SQLZoo
-<ul>
-<li><code>movie(id, title, yr, score, votes, director)</code></li>
-<li><code>actor(id, name)</code></li>
-<li><code>casting(movieid, actorid, ord)</code></li>
-</ul>
-</li>
-<li data-marpit-fragment="2">Izpiši naslove filmov, kjer je igral <em>John Wayne</em>.</li>
-<li data-marpit-fragment="3">Za naslove potrebujemo tabelo <code>movie</code>.</li>
-<li data-marpit-fragment="4">Imena igralcev so v tabeli <code>actor</code>.</li>
-<li data-marpit-fragment="5">Tabela <code>casting</code> povezuje igralce in filme.
-<ul>
-<li>Odnos tipa več-na-več med tabelama <code>movie</code> in <code>actor</code> (igralec je igral v več filmih, filmi pa imajo več igralcev)</li>
-</ul>
-</li>
-</ul>
-</section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="15" data-marpit-fragments="1" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
-<h1 id="stikanje">Stikanje</h1>
-<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> title <span class="hljs-keyword">FROM</span> movie
-  <span class="hljs-keyword">JOIN</span> casting <span class="hljs-keyword">ON</span> movie.id <span class="hljs-operator">=</span> movieid
-  <span class="hljs-keyword">JOIN</span> actor   <span class="hljs-keyword">ON</span> actorid <span class="hljs-operator">=</span> actor.id
- <span class="hljs-keyword">WHERE</span> actor.name <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;John Wayne&#x27;</span>;
-</code></pre>
-<ul>
-<li data-marpit-fragment="1">Najprej sestavimo tabelo s stikanjem, nato jo filtriramo z <code>WHERE</code>.
-<ul>
-<li>Vzamemo vrstico tabele <code>movie</code>.</li>
-<li>Staknemo jo s tistimi vrsticami tabele <code>casting</code>, ki imajo vrednost v stolpcu <code>movieid</code> enako vrednosti stolpca <code>id</code> tabele <code>movie</code>.</li>
-<li>Dobljene vrstice staknemo s tistimi vrsticami tabele <code>actor</code>, ki imajo vrednost v stolpcu <code>id</code> enako vrednosti stolpca <code>actorid</code> tabele <code>casting</code>.</li>
-<li>Od dobljenih vrstic vzamemo le tiste, kjer je vrednost stolpca <code>name</code> v tabeli <code>actor</code> enaka <em>John Wayne</em>.</li>
-</ul>
-</li>
-</ul>
-</section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="16" data-marpit-fragments="5" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
-<h1 id="igralci-v-filmu-velikan">Igralci v filmu Velikan</h1>
-<ul>
-<li data-marpit-fragment="1">Zanima nas, kdo je poleg Jamesa Deana še igral v filmu Velikan (<em>Giant</em>).</li>
-<li data-marpit-fragment="2">Zasedbo dobimo iz tabele <code>casting</code>.
-<ul>
-<li>Tu so le ID-ji filmov in igralcev!</li>
-</ul>
-</li>
-<li data-marpit-fragment="3">Potrebujemo ID filma, poznamo pa le njegov naslov, ki se nahaja v tabeli <code>movie</code>.</li>
-<li data-marpit-fragment="4">Imena igralcev bomo dobili iz tabele <code>actor</code>.</li>
-<li data-marpit-fragment="5">Uredili bomo po vrstnem redu igralcev v filmu (<code>casting.ord</code>).<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> name <span class="hljs-keyword">FROM</span> movie
-  <span class="hljs-keyword">JOIN</span> casting <span class="hljs-keyword">ON</span> movie.id <span class="hljs-operator">=</span> movieid
-  <span class="hljs-keyword">JOIN</span> actor   <span class="hljs-keyword">ON</span> actor.id <span class="hljs-operator">=</span> actorid
-<span class="hljs-keyword">WHERE</span> title <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Giant&#x27;</span> <span class="hljs-keyword">AND</span>
-      name <span class="hljs-operator">&lt;&gt;</span> <span class="hljs-string">&#x27;James Dean&#x27;</span>
-<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> ord;
-</code></pre>
-</li>
-</ul>
-</section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="17" data-marpit-fragments="5" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
-<h1 id="najve%C4%8Dje-zvezde">Največje zvezde</h1>
-<ul>
-<li data-marpit-fragment="1">Kateri igralci so bili glavni igralci v vsaj 10 filmih?</li>
-<li data-marpit-fragment="2">V tabeli <code>casting</code> se pojavijo vsaj desetkrat z <code>ord = 1</code>.
-<ul>
-<li><code>WHERE ord = 1</code></li>
-<li><code>HAVING COUNT(*) &gt;= 10</code></li>
-</ul>
-</li>
-<li data-marpit-fragment="3">Imena igralcev bomo dobili iz tabele <code>actor</code>.</li>
-<li data-marpit-fragment="4">Podatkov o filmih ne bomo potrebovali!<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> name <span class="hljs-keyword">FROM</span> actor
-  <span class="hljs-keyword">JOIN</span> casting <span class="hljs-keyword">ON</span> actorid <span class="hljs-operator">=</span> id
- <span class="hljs-keyword">WHERE</span> ord <span class="hljs-operator">=</span> <span class="hljs-number">1</span>
- <span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> id, name
-<span class="hljs-keyword">HAVING</span> <span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-operator">&gt;=</span> <span class="hljs-number">10</span>;
-</code></pre>
-</li>
-<li data-marpit-fragment="5">Kaj pa, če nas zanima tudi, v koliko filmih so bili glavni igralci?</li>
-</ul>
-</section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="18" data-marpit-fragments="5" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="glavni-igralci">Glavni igralci</h1>
 <ul>
 <li data-marpit-fragment="1">Zanimajo nas naslovi in glavni igralci vseh tistih filmov, kjer Al Pacino <em>ni</em> bil v glavni vlogi.</li>
@@ -437,7 +357,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="19" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="15" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="seznam-filmov-z-alom-pacinom">Seznam filmov z Alom Pacinom</h1>
 <ul>
 <li data-marpit-fragment="1">Potrebujemo tabeli <code>casting</code> in <code>actor</code>.</li>
@@ -449,7 +369,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="20" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="16" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="re%C5%A1itev">Rešitev</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> title, name <span class="hljs-keyword">FROM</span> movie
   <span class="hljs-keyword">JOIN</span> casting <span class="hljs-keyword">ON</span> movie.id <span class="hljs-operator">=</span> movieid
@@ -464,7 +384,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
  
 </code></pre>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="21" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="17" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="vrstni-red-izvajanja">Vrstni red izvajanja</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> [<span class="hljs-keyword">DISTINCT</span>]                       <span class="hljs-comment">-- 8</span>
     stolpci, združevalne_funkcije       <span class="hljs-comment">-- 7</span>
@@ -478,7 +398,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
  LIMIT število;                         <span class="hljs-comment">-- 10</span>
 </code></pre>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="22" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="18" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="primer">Primer</h1>
 <span class="small">
 <ul>
@@ -588,7 +508,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </ul>
 </span>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="23" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="19" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="poizvedba">Poizvedba</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> narocnik_id, ime, priimek,
          <span class="hljs-built_in">COUNT</span>(narocilo_id) <span class="hljs-keyword">AS</span> stevilo,
@@ -602,8 +522,8 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
  <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> stevilo;
 </code></pre>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="24" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
-<h1 id="stikanje-1">Stikanje</h1>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="20" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+<h1 id="stikanje">Stikanje</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql">...
 <span class="hljs-keyword">FROM</span> narocnik <span class="hljs-keyword">LEFT</span> <span class="hljs-keyword">OUTER</span> <span class="hljs-keyword">JOIN</span> narocilo <span class="hljs-keyword">USING</span> (narocnik_id)
 ...
@@ -659,7 +579,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </table>
 </span>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="25" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="21" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="filtriranje">Filtriranje</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql">...
 <span class="hljs-keyword">WHERE</span> priimek <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Kmetec&#x27;</span>
@@ -709,7 +629,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </table>
 </span>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="26" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="22" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="zdru%C5%BEevanje">Združevanje</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql">...
 <span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> narocnik_id, ime, priimek
@@ -759,7 +679,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </table>
 </span>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="27" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="23" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="filtriranje-skupin">Filtriranje skupin</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql">...
 <span class="hljs-keyword">HAVING</span> <span class="hljs-built_in">COALESCE</span>(<span class="hljs-built_in">SUM</span>(kolicina), <span class="hljs-number">0</span>) <span class="hljs-operator">&lt;=</span> <span class="hljs-number">3</span>
@@ -814,7 +734,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </table>
 </span>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="28" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="24" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="izra%C4%8Dun-stolpcev">Izračun stolpcev</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> narocnik_id, ime, priimek,
          <span class="hljs-built_in">COUNT</span>(narocilo_id) <span class="hljs-keyword">AS</span> stevilo,
@@ -849,7 +769,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </tbody>
 </table>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="29" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="25" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="urejanje">Urejanje</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql">...
  <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> stevilo;
@@ -882,7 +802,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </tbody>
 </table>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="30" data-marpit-fragments="5" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="26" data-marpit-fragments="5" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="%C5%A1e-nekaj-primerov">Še nekaj primerov</h1>
 <ul>
 <li data-marpit-fragment="1">Baza filmov (SQLite)</li>
@@ -899,7 +819,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="31" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="27" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="povpre%C4%8Dna-ocena-in-dol%C5%BEina-po-%C5%BEanrih">Povprečna ocena in dolžina po žanrih</h1>
 <ul>
 <li data-marpit-fragment="1">Ocene in dolžine so v tabeli <code>film</code>.</li>
@@ -916,7 +836,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="32" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="28" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="filmi-z-ve%C4%8D-kot-enim-re%C5%BEiserjem">Filmi z več kot enim režiserjem</h1>
 <span class="small">
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> naslov, <span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-keyword">AS</span> st_reziserjev
@@ -941,7 +861,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </ul>
 </span>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="33" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="29" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="romanti%C4%8Dne-komedije">Romantične komedije</h1>
 <ul>
 <li data-marpit-fragment="1">Zanimajo nas filmi, ki imajo med žanri <em>Comedy</em> in <em>Romance</em>.</li>
@@ -955,7 +875,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 <li data-marpit-fragment="3">Želimo tiste filme, za katere obstaja tako vrstica z <code>zanr = 4</code> kot tudi z <code>zanr = 8</code>!</li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="34" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="30" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="romanti%C4%8Dne-komedije-2">Romantične komedije (2)</h1>
 <ul>
 <li data-marpit-fragment="1">Dobimo ID-je vseh filmov, za katere se pojavita oba žanra.<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> film <span class="hljs-keyword">FROM</span> pripada
@@ -975,7 +895,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="35" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="31" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="igralec-in-re%C5%BEiser-v-istem-filmu">Igralec in režiser v istem filmu</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> naslov, ime <span class="hljs-keyword">FROM</span> film
   <span class="hljs-keyword">JOIN</span> vloga <span class="hljs-keyword">ON</span> film.id <span class="hljs-operator">=</span> film
@@ -989,7 +909,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 <li data-marpit-fragment="3">Ali pa če se nekdo večkrat pojavi kot igralec (npr. več likov v istem filmu)?</li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="36" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="32" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="igralec-in-re%C5%BEiser-v-istem-filmu-2">Igralec in režiser v istem filmu (2)</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">WITH</span> reziser <span class="hljs-keyword">AS</span> (
        <span class="hljs-keyword">SELECT</span> <span class="hljs-operator">*</span> <span class="hljs-keyword">FROM</span> vloga
@@ -1005,7 +925,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
   <span class="hljs-keyword">JOIN</span> oseba <span class="hljs-keyword">ON</span> oseba.id <span class="hljs-operator">=</span> oseba;
 </code></pre>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="37" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="33" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="kaj-po%C4%8Dne-ta-poizvedba">Kaj počne ta poizvedba?</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> film.<span class="hljs-operator">*</span>
   <span class="hljs-keyword">FROM</span> pripada <span class="hljs-keyword">AS</span> prvi
@@ -1017,18 +937,18 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
  <span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> film.glasovi <span class="hljs-keyword">DESC</span>;
 </code></pre>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="38" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="34" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="primer-er-diagrama---%C5%A1ola">Primer ER diagrama - šola</h1>
 <p><img src="slike/er-sola.png" alt="" style="width:1000px;" /></p>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="39" data-marpit-fragments="1" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="35" data-marpit-fragments="1" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="primer-er-diagrama---knji%C5%BEnica">Primer ER diagrama - knjižnica</h1>
 <p><img src="slike/er-knjiznica.png" alt="" style="width:1000px;" /></p>
 <ul>
 <li data-marpit-fragment="1">Kakšne so težave s tem modelom?</li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="40" data-marpit-fragments="1" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="36" data-marpit-fragments="1" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="primer-na%C4%8Drtovanja-baze-banka">Primer načrtovanja baze: banka</h1>
 <ul>
 <li data-marpit-fragment="1">Hraniti želimo podatke o komitentih banke ter njihovih računih in transakcijah.
@@ -1040,11 +960,11 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="41" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="37" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="konceptualni-model">Konceptualni model</h1>
 <p><img src="slike/er-banka.png" alt="" style="height:500px;" /></p>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="42" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="38" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="logi%C4%8Dni-model-sqlite">Logični model (SQLite)</h1>
 <span class="columns small col2">
 <span>
@@ -1085,7 +1005,7 @@ ocene_gospodarjev <span class="hljs-keyword">AS</span> (
 </span>
 </span>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="43" data-marpit-fragments="4" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="39" data-marpit-fragments="4" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="kako-deluje-internet">Kako deluje internet</h1>
 <span class="small">
 <ul>
@@ -1112,7 +1032,7 @@ www.google.com has IPv6 address 2a00:1450:400d:80e::2004
 </ul>
 </span>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="44" data-marpit-fragments="5" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="40" data-marpit-fragments="5" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="dns---domain-name-system">DNS - <em>Domain Name System</em></h1>
 <span class="small">
 <ul>
@@ -1134,7 +1054,7 @@ www.google.com has IPv6 address 2a00:1450:400d:80e::2004
 </ul>
 </span>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="45" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="41" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="protokoli-in-vrata">Protokoli in vrata</h1>
 <ul>
 <li data-marpit-fragment="1">Za pošiljanje podatkov med računalniki se uporabljata omrežna protokola IPv4 in IPv6 (<em>Internet Protocol</em>, različici 4 in 6).</li>
@@ -1153,7 +1073,7 @@ www.google.com has IPv6 address 2a00:1450:400d:80e::2004
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="46" data-marpit-fragments="4" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="42" data-marpit-fragments="4" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="kaj-se-zgodi-ko-v-brskalnik-vtipkamo-httpswwwgooglecom">Kaj se zgodi, ko v brskalnik vtipkamo <code>https://www.google.com/</code></h1>
 <ul>
 <li data-marpit-fragment="1">Operacijski sistem pošlje zahtevo imenskemu strežniku po protokolu DNS za IP naslov, ki ustreza imenu <code>www.google.com</code>.

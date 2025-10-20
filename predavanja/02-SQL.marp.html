@@ -1012,7 +1012,7 @@ this is incompatible with sql_mode=only_full_group_by
 </code></pre>
 <ul>
 <li>Najprej tabelo razdelimo na skupine po celinah.</li>
-<li><code>SUM(population)</code> potem seštejo prebivalstvo na posamezni celini.</li>
+<li><code>SUM(population)</code> potem sešteje prebivalstvo na posamezni celini.</li>
 <li>Pogoj pri <code>HAVING</code> preverja vrstice, ki jo dobimo za vsako skupino.</li>
 </ul>
 </li>
@@ -1593,7 +1593,87 @@ this is incompatible with sql_mode=only_full_group_by
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="60" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="60" data-marpit-fragments="5" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+<h1 id="ve%C4%8D-tabel">Več tabel</h1>
+<ul>
+<li data-marpit-fragment="1">Baza <a href="https://sqlzoo.net/wiki/More_JOIN_operations">filmov</a> na SQLZoo
+<ul>
+<li><code>movie(id, title, yr, score, votes, director)</code></li>
+<li><code>actor(id, name)</code></li>
+<li><code>casting(movieid, actorid, ord)</code></li>
+</ul>
+</li>
+<li data-marpit-fragment="2">Izpiši naslove filmov, kjer je igral <em>John Wayne</em>.</li>
+<li data-marpit-fragment="3">Za naslove potrebujemo tabelo <code>movie</code>.</li>
+<li data-marpit-fragment="4">Imena igralcev so v tabeli <code>actor</code>.</li>
+<li data-marpit-fragment="5">Tabela <code>casting</code> povezuje igralce in filme.
+<ul>
+<li>Odnos tipa več-na-več med tabelama <code>movie</code> in <code>actor</code> (igralec je igral v več filmih, filmi pa imajo več igralcev)</li>
+</ul>
+</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="61" data-marpit-fragments="1" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+<h1 id="stikanje">Stikanje</h1>
+<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> title <span class="hljs-keyword">FROM</span> movie
+  <span class="hljs-keyword">JOIN</span> casting <span class="hljs-keyword">ON</span> movie.id <span class="hljs-operator">=</span> movieid
+  <span class="hljs-keyword">JOIN</span> actor   <span class="hljs-keyword">ON</span> actorid <span class="hljs-operator">=</span> actor.id
+ <span class="hljs-keyword">WHERE</span> actor.name <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;John Wayne&#x27;</span>;
+</code></pre>
+<ul>
+<li data-marpit-fragment="1">Najprej sestavimo tabelo s stikanjem, nato jo filtriramo z <code>WHERE</code>.
+<ul>
+<li>Vzamemo vrstico tabele <code>movie</code>.</li>
+<li>Staknemo jo s tistimi vrsticami tabele <code>casting</code>, ki imajo vrednost v stolpcu <code>movieid</code> enako vrednosti stolpca <code>id</code> tabele <code>movie</code>.</li>
+<li>Dobljene vrstice staknemo s tistimi vrsticami tabele <code>actor</code>, ki imajo vrednost v stolpcu <code>id</code> enako vrednosti stolpca <code>actorid</code> tabele <code>casting</code>.</li>
+<li>Od dobljenih vrstic vzamemo le tiste, kjer je vrednost stolpca <code>name</code> v tabeli <code>actor</code> enaka <em>John Wayne</em>.</li>
+</ul>
+</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="62" data-marpit-fragments="5" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+<h1 id="igralci-v-filmu-velikan">Igralci v filmu Velikan</h1>
+<ul>
+<li data-marpit-fragment="1">Zanima nas, kdo je poleg Jamesa Deana še igral v filmu Velikan (<em>Giant</em>).</li>
+<li data-marpit-fragment="2">Zasedbo dobimo iz tabele <code>casting</code>.
+<ul>
+<li>Tu so le ID-ji filmov in igralcev!</li>
+</ul>
+</li>
+<li data-marpit-fragment="3">Potrebujemo ID filma, poznamo pa le njegov naslov, ki se nahaja v tabeli <code>movie</code>.</li>
+<li data-marpit-fragment="4">Imena igralcev bomo dobili iz tabele <code>actor</code>.</li>
+<li data-marpit-fragment="5">Uredili bomo po vrstnem redu igralcev v filmu (<code>casting.ord</code>).<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> name <span class="hljs-keyword">FROM</span> movie
+  <span class="hljs-keyword">JOIN</span> casting <span class="hljs-keyword">ON</span> movie.id <span class="hljs-operator">=</span> movieid
+  <span class="hljs-keyword">JOIN</span> actor   <span class="hljs-keyword">ON</span> actor.id <span class="hljs-operator">=</span> actorid
+<span class="hljs-keyword">WHERE</span> title <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Giant&#x27;</span> <span class="hljs-keyword">AND</span>
+      name <span class="hljs-operator">&lt;&gt;</span> <span class="hljs-string">&#x27;James Dean&#x27;</span>
+<span class="hljs-keyword">ORDER</span> <span class="hljs-keyword">BY</span> ord;
+</code></pre>
+</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="63" data-marpit-fragments="5" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+<h1 id="najve%C4%8Dje-zvezde">Največje zvezde</h1>
+<ul>
+<li data-marpit-fragment="1">Kateri igralci so bili glavni igralci v vsaj 10 filmih?</li>
+<li data-marpit-fragment="2">V tabeli <code>casting</code> se pojavijo vsaj desetkrat z <code>ord = 1</code>.
+<ul>
+<li><code>WHERE ord = 1</code></li>
+<li><code>HAVING COUNT(*) &gt;= 10</code></li>
+</ul>
+</li>
+<li data-marpit-fragment="3">Imena igralcev bomo dobili iz tabele <code>actor</code>.</li>
+<li data-marpit-fragment="4">Podatkov o filmih ne bomo potrebovali!<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">SELECT</span> name <span class="hljs-keyword">FROM</span> actor
+  <span class="hljs-keyword">JOIN</span> casting <span class="hljs-keyword">ON</span> actorid <span class="hljs-operator">=</span> id
+ <span class="hljs-keyword">WHERE</span> ord <span class="hljs-operator">=</span> <span class="hljs-number">1</span>
+ <span class="hljs-keyword">GROUP</span> <span class="hljs-keyword">BY</span> id, name
+<span class="hljs-keyword">HAVING</span> <span class="hljs-built_in">COUNT</span>(<span class="hljs-operator">*</span>) <span class="hljs-operator">&gt;=</span> <span class="hljs-number">10</span>;
+</code></pre>
+</li>
+<li data-marpit-fragment="5">Kaj pa, če nas zanima tudi, v koliko filmih so bili glavni igralci?</li>
+</ul>
+</section>
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="64" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="ustvarjanje-baz">Ustvarjanje baz</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">CREATE</span> DATABASE baza;
 </code></pre>
@@ -1602,7 +1682,7 @@ this is incompatible with sql_mode=only_full_group_by
 <li data-marpit-fragment="2">V SQLite ta korak ni potreben - baza se ustvari kot datoteka.</li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="61" data-marpit-fragments="1" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="65" data-marpit-fragments="1" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="ustvarjanje-tabel">Ustvarjanje tabel</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">CREATE TABLE</span> tabela (
   stolpec1 tip
@@ -1624,7 +1704,7 @@ this is incompatible with sql_mode=only_full_group_by
 <li data-marpit-fragment="1">Različni RDBMS poznajo še druga določila, npr. <code>AUTOINCREMENT</code> pri SQLite.</li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="62" data-marpit-fragments="4" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="66" data-marpit-fragments="4" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="podatkovni-tipi">Podatkovni tipi</h1>
 <ul>
 <li data-marpit-fragment="1">Številski tipi:
@@ -1649,7 +1729,7 @@ this is incompatible with sql_mode=only_full_group_by
 <li data-marpit-fragment="4">Detajli se razlikujejo med različnimi RDBMS.</li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="63" data-marpit-fragments="4" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="67" data-marpit-fragments="4" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="omejitve-1">Omejitve</h1>
 <ul>
 <li data-marpit-fragment="1">RDBMS lahko ob spreminjanju podatkov v bazi preverja, ali držijo omejitve, predpisane ob ustvarjanju tabele.
@@ -1671,7 +1751,7 @@ this is incompatible with sql_mode=only_full_group_by
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="64" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="68" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="omejitve-2">Omejitve (2)</h1>
 <ul>
 <li data-marpit-fragment="1"><code>CHECK</code> - pogoj, ki mora veljati v vsaki vrstici tabele.</li>
@@ -1688,7 +1768,7 @@ this is incompatible with sql_mode=only_full_group_by
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="65" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="69" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="privzete-vrednosti">Privzete vrednosti</h1>
 <ul>
 <li data-marpit-fragment="1">Včasih so določene vrednosti stolpca zelo pogoste.
@@ -1706,7 +1786,7 @@ this is incompatible with sql_mode=only_full_group_by
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="66" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="70" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="primer-sqlite">Primer (SQLite)</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">CREATE TABLE</span> kupec (
   id_kupec        <span class="hljs-type">integer</span>  <span class="hljs-keyword">PRIMARY KEY</span> AUTOINCREMENT,
@@ -1727,7 +1807,7 @@ this is incompatible with sql_mode=only_full_group_by
 );
 </code></pre>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="67" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="71" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="vstavljanje-podatkov">Vstavljanje podatkov</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">INSERT INTO</span> tabela [(stolpec1, stolpec2, ...)]
 <span class="hljs-keyword">VALUES</span> (vrednost1, vrednost2, ...), ...;
@@ -1746,7 +1826,7 @@ this is incompatible with sql_mode=only_full_group_by
 <li data-marpit-fragment="3">Če stolpcev ne naštejemo, se smatra, da smo našteli vse stolpce v vrstnem redu iz definicije tabele.</li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="68" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="72" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="vstavljanje-izpeljanih-podatkov">Vstavljanje izpeljanih podatkov</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">INSERT INTO</span> tabela [(stolpec1, stolpec2, ...)]
 <span class="hljs-keyword">SELECT</span> ...;
@@ -1760,7 +1840,7 @@ this is incompatible with sql_mode=only_full_group_by
 <li data-marpit-fragment="2">Stavek <code>SELECT</code> je lahko poljuben (<code>WHERE</code>, <code>JOIN</code>, <code>GROUP BY</code>, <code>WITH</code>, ...).</li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="69" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="73" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="primeri">Primeri</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">INSERT INTO</span> kupec (uporabnisko_ime, ime, priimek, datum_rojstva)
 <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;janez&#x27;</span>, <span class="hljs-string">&#x27;Janez&#x27;</span>, <span class="hljs-string">&#x27;Novak&#x27;</span>, <span class="hljs-string">&#x27;1978-03-24&#x27;</span>); <span class="hljs-comment">-- dobi id_kupec = 1</span>
@@ -1782,7 +1862,7 @@ this is incompatible with sql_mode=only_full_group_by
 <span class="hljs-keyword">VALUES</span> (<span class="hljs-number">1</span>, <span class="hljs-number">3</span>), (<span class="hljs-number">2</span>, <span class="hljs-number">4</span>), (<span class="hljs-number">2</span>, <span class="hljs-number">2</span>), (<span class="hljs-number">1</span>, <span class="hljs-number">5</span>); <span class="hljs-comment">-- dobijo id_narocilo = 2, 3, 4, 5</span>
 </code></pre>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="70" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="74" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="spreminjanje-obstoje%C4%8Dih-podatkov">Spreminjanje obstoječih podatkov</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">UPDATE</span> tabela
    <span class="hljs-keyword">SET</span> stolpec1 <span class="hljs-operator">=</span> vrednost1, stolpec2 <span class="hljs-operator">=</span> vrednost2, ...
@@ -1802,7 +1882,7 @@ this is incompatible with sql_mode=only_full_group_by
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="71" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="75" data-marpit-fragments="2" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="brisanje-podatkov">Brisanje podatkov</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">DELETE</span> <span class="hljs-keyword">FROM</span> tabela
  <span class="hljs-keyword">WHERE</span> pogoj;
@@ -1812,7 +1892,7 @@ this is incompatible with sql_mode=only_full_group_by
 <li data-marpit-fragment="2">Če izpustimo <code>WHERE</code>, bomo pobrisali vse vrstice!</li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="72" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="76" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="primeri-1">Primeri</h1>
 <pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">UPDATE</span> narocilo
    <span class="hljs-keyword">SET</span> stevilo <span class="hljs-operator">=</span> stevilo <span class="hljs-operator">-</span> <span class="hljs-number">1</span>
@@ -1822,7 +1902,7 @@ this is incompatible with sql_mode=only_full_group_by
  <span class="hljs-keyword">WHERE</span> stevilo <span class="hljs-operator">&lt;</span> <span class="hljs-number">1</span>;
 </code></pre>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="73" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="77" data-marpit-fragments="3" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="transakcije">Transakcije</h1>
 <ul>
 <li data-marpit-fragment="1">Začetek transakcije:<pre is="marp-pre" data-auto-scaling="downscale-only"><code class="language-sql"><span class="hljs-keyword">BEGIN</span> [TRANSACTION];
@@ -1837,7 +1917,7 @@ this is incompatible with sql_mode=only_full_group_by
 </li>
 </ul>
 </section>
-</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="74" data-marpit-fragments="4" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
+</foreignObject></svg><svg data-marpit-svg="" viewBox="0 0 1280 720"><foreignObject width="1280" height="720"><section id="78" data-marpit-fragments="4" data-style="@import url('style.css')" lang="sl-SI" style="--style:@import url('style.css');">
 <h1 id="spremembe-in-transakcije">Spremembe in transakcije</h1>
 <ul>
 <li data-marpit-fragment="1">Spomnimo: ko se transakcija uspešno zaključi, so nastale spremembe stalne.
