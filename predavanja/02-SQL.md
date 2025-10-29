@@ -1288,7 +1288,7 @@ CREATE TABLE tabela (
   - Še en primer: ob dodajanju v tabelo naj se zapiše trenutni čas.
 * Če pri vstavljanju podatka ne navedemo, se uporabi privzeta vrednost.
 * Poseben primer: avtomatsko številčenje.
-  - V SQLite uporabimo določilo `AUTOINCREMENT` takoj za `PRIMARY KEY` pri stolpcu tipa `ìnteger`.
+  - V SQLite uporabimo določilo `AUTOINCREMENT` takoj za `PRIMARY KEY` pri stolpcu tipa `integer`.
   - Nekateri RDBMS v ta namen uporabijo števce.
 
 ---
