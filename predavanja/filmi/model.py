@@ -120,7 +120,7 @@ class Oznaka(Tabela, Entiteta):
     Razred za oznako filma.
     """
 
-    kratica: str
+    kratica: str = field(default=None)
 
     IME = 'kratica'
 
@@ -207,15 +207,18 @@ class Film(Tabela, Entiteta):
         """
         with Kazalec(cur) as cur:
             for vrstica in cls.preberi_vir():
-                cur.execute("""
-                    SELECT kratica FROM oznaka
-                    WHERE kratica = :oznaka;
-                """, vrstica)
-                if not cur.fetchone():
+                if vrstica['oznaka']:
                     cur.execute("""
-                        INSERT INTO oznaka (kratica) VALUES (:oznaka);
+                        SELECT kratica FROM oznaka
+                        WHERE kratica = :oznaka;
                     """, vrstica)
-                    vrstica["zanr"] = cur.lastrowid
+                    if not cur.fetchone():
+                        cur.execute("""
+                            INSERT INTO oznaka (kratica) VALUES (:oznaka);
+                        """, vrstica)
+                        vrstica["zanr"] = cur.lastrowid
+                else:
+                    vrstica['oznaka'] = None
                 cur.execute("""
                     INSERT INTO film (id, naslov, dolzina, leto, ocena,
                                     metascore, glasovi, zasluzek, oznaka, opis)
@@ -233,7 +236,7 @@ class Film(Tabela, Entiteta):
               FROM film
              WHERE leto = ?
              ORDER BY ocena DESC
-             LIMIT ?
+             LIMIT ?;
         """
         with Kazalec() as cur:
             cur.execute(sql, [leto, n])
@@ -282,7 +285,7 @@ class Oseba(Tabela, Entiteta):
         with Kazalec(cur) as cur:
             cur.executemany("""
                 INSERT INTO oseba (id, ime)
-                VALUES (:id, :ime)
+                VALUES (:id, :ime);
             """, cls.preberi_vir())
 
     def poisci_vloge(self):
@@ -296,7 +299,7 @@ class Oseba(Tabela, Entiteta):
               FROM film
               JOIN vloga ON film.id = vloga.film
              WHERE vloga.oseba = ?
-             ORDER BY leto
+             ORDER BY leto;
         """
         with Kazalec() as cur:
             cur.execute(sql, [self.id])
@@ -309,7 +312,7 @@ class Oseba(Tabela, Entiteta):
         Vrni vse osebe, ki v imenu vsebujejo dani niz.
         """
         sql = """
-            SELECT id, ime FROM oseba WHERE ime LIKE ?
+            SELECT id, ime FROM oseba WHERE ime LIKE ?;
         """
         with Kazalec() as cur:
             cur.execute(sql, ['%' + niz + '%'])
@@ -407,7 +410,7 @@ class Vloga(Tabela):
         with Kazalec(cur) as cur:
             cur.executemany("""
                 INSERT INTO vloga (film, oseba, tip, mesto)
-                VALUES (:film, :oseba, :tip, :mesto)
+                VALUES (:film, :oseba, :tip, :mesto);
             """, cls.preberi_vir())
 
     @property
@@ -465,19 +468,19 @@ class Pripada(Tabela):
             for vrstica in cls.preberi_vir():
                 cur.execute("""
                     SELECT id FROM zanr
-                    WHERE naziv = :naziv
+                    WHERE naziv = :naziv;
                 """, vrstica)
                 rezultat = cur.fetchone()
                 if rezultat:
                     vrstica["zanr"], = rezultat
                 else:
                     cur.execute("""
-                        INSERT INTO zanr (naziv) VALUES (:naziv)
+                        INSERT INTO zanr (naziv) VALUES (:naziv);
                     """, vrstica)
                     vrstica["zanr"] = cur.lastrowid
                 cur.execute("""
                     INSERT INTO pripada (film, zanr)
-                    VALUES (:film, :zanr)
+                    VALUES (:film, :zanr);
                 """, vrstica)
 
 
@@ -512,12 +515,13 @@ def ustvari_bazo(pobrisi=False, cur=None):
     """
     Ustvari tabele in uvozi podatke.
     """
-    try:
-        with conn:
-            conn.execute("PRAGMA foreign_keys = OFF;")
-            if pobrisi:
-                pobrisi_tabele()
-            ustvari_tabele()
-            uvozi_podatke()
-    finally:
-        conn.execute("PRAGMA foreign_keys = ON;")
+    with Kazalec(cur) as cur:
+        try:
+            with conn:
+                cur.execute("PRAGMA foreign_keys = OFF;")
+                if pobrisi:
+                    pobrisi_tabele(cur=cur)
+                ustvari_tabele(cur=cur)
+                uvozi_podatke(cur=cur)
+        finally:
+            cur.execute("PRAGMA foreign_keys = ON;")
