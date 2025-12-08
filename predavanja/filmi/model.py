@@ -241,6 +241,24 @@ class Film(Tabela, Entiteta):
             cur.execute(sql, [leto, n])
             yield from (Film(*vrstica) for vrstica in cur)
 
+    def zasedba(self):
+        """
+        Vrni seznam vseh oseb,
+        ki so sodelovale pri filmu self:
+        najprej režiserji, potem igralci,
+        v ustreznem vrstnem redu
+        """
+        sql = """
+            SELECT oseba.id, oseba.ime, vloga.tip, vloga.mesto
+              FROM oseba
+              JOIN vloga ON oseba.id = vloga.oseba
+             WHERE vloga.film = ?
+             ORDER BY tip DESC, mesto;
+        """
+        with Kazalec() as cur:
+            cur.execute(sql, [self.id])
+            yield from (Vloga(self, Oseba(oid, ime), tip, mesto)
+                        for oid, ime, tip, mesto in cur)
 
 @dataclass
 class Oseba(Tabela, Entiteta):

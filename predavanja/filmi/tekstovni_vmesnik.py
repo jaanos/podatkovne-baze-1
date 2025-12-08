@@ -80,7 +80,9 @@ def najboljsi_filmi():
         print(f'Za leto {leto} ni podatkov o filmih')
         return
     film = vnesi_izbiro(filmi, lambda film: f'{film.naslov} ({film.ocena}/10)')
-    print(film)
+    print(f'{film} ({film.leto})')
+    for vloga in film.zasedba():
+        print(f'- {vloga.oseba.ime} ({vloga.tip_vloge})')
 
 
 def glavni_meni():
