@@ -216,7 +216,6 @@ class Film(Tabela, Entiteta):
                         cur.execute("""
                             INSERT INTO oznaka (kratica) VALUES (:oznaka);
                         """, vrstica)
-                        vrstica["zanr"] = cur.lastrowid
                 else:
                     vrstica['oznaka'] = None
                 cur.execute("""
