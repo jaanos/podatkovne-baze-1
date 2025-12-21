@@ -5,6 +5,7 @@
 #   Prirejeno po M. Pretnar, 2019, M. Lokar, dec. 2020
 #
 
+import bcrypt
 import csv
 import sqlite3 as dbapi
 from dataclasses import dataclass, field
@@ -112,6 +113,140 @@ class Entiteta:
         """
         super().__init_subclass__(**kwargs)
         cls.NULL = cls()
+
+
+@dataclass
+class Uporabnik(Tabela, Entiteta):
+    """
+    Razred za uporabnika.
+    """
+    id: int = field(default=None)
+    uporabnisko_ime: str = field(default=None)
+    admin: bool = field(default=False)
+    geslo: bytes = field(default=None)
+
+    IME = 'uporabnisko_ime'
+    VIR = 'uporabnik.csv'
+
+    @classmethod
+    def ustvari_tabelo(cls, cur=None):
+        """
+        Ustvari tabelo "uporabnik".
+        """
+        with Kazalec(cur) as cur:
+            cur.execute("""
+                CREATE TABLE uporabnik (
+                    id              INTEGER PRIMARY KEY,
+                    uporabnisko_ime TEXT    NOT NULL,
+                    admin           INTEGER NOT NULL DEFAULT 0,
+                    geslo           BLOB
+                );
+            """)
+
+    @classmethod
+    def pobrisi_tabelo(cls, cur=None):
+        """
+        Pobriši tabelo "uporabnik".
+        """
+        with Kazalec(cur) as cur:
+            cur.execute("""
+                DROP TABLE IF EXISTS uporabnik;
+            """)
+
+    @classmethod
+    def uvozi_podatke(cls, cur=None):
+        """
+        Uvozi podatke v tabelo "uporabnik".
+        """
+        with Kazalec(cur) as cur:
+            for vrstica in cls.preberi_vir():
+                if vrstica["geslo"]:
+                    vrstica["geslo"] = cls.zgostitev(vrstica["geslo"])
+                else:
+                    vrstica["geslo"] = None
+                cur.execute("""
+                    INSERT INTO uporabnik (uporabnisko_ime, admin, geslo)
+                    VALUES (:uporabnisko_ime, :admin, :geslo);
+                """, vrstica)
+
+    @staticmethod
+    def prijavi(uporabnisko_ime, geslo):
+        """
+        Vrni uporabnika z navedenim uporabniškim imenom in geslom.
+        Če takega uporabnika ni, vrni neprijavljenega uporabnika.
+        """
+        sql = """
+          SELECT id, uporabnisko_ime, admin, geslo
+            FROM uporabnik WHERE uporabnisko_ime = ?;
+        """
+        with Kazalec() as cur:
+            cur.execute(sql, [uporabnisko_ime])
+            vrstica = cur.fetchone()
+            if vrstica is None:
+                return Uporabnik.NULL
+            *data, zgostitev = vrstica
+            if zgostitev and bcrypt.checkpw(geslo.encode("utf-8"), zgostitev):
+                return Uporabnik(*data)
+            else:
+                return Uporabnik.NULL
+
+    @staticmethod
+    def z_id(idu):
+        """
+        Vrni uporabnika z navedenim ID-jem.
+        Če takega uporabnika ni, vrni neprijavljenega uporabnika.
+        """
+        sql = """
+          SELECT id, uporabnisko_ime, admin
+            FROM uporabnik WHERE id = ?;
+        """
+        with Kazalec() as cur:
+            cur.execute(sql, [idu])
+            vrstica = cur.fetchone()
+            if vrstica is None:
+                return Uporabnik.NULL
+            return Uporabnik(*vrstica)
+
+    @staticmethod
+    def zgostitev(geslo):
+        """
+        Vrni zgostitev podanega gesla.
+        """
+        sol = bcrypt.gensalt()
+        return bcrypt.hashpw(geslo.encode("utf-8"), sol)
+
+    def dodaj(self, geslo):
+        """
+        Dodaj uporabnika v bazo z navedenim geslom.
+        """
+        assert not self.id, "Uporabnik je že vpisan v bazo!"
+        assert self.uporabnisko_ime, "Uporabniško ime ni določeno!"
+        sql = """
+          INSERT INTO uporabnik (uporabnisko_ime, geslo, admin)
+          VALUES (?, ?, ?);
+        """
+        zgostitev = self.zgostitev(geslo)
+        with Kazalec() as cur:
+            try:
+                with conn:
+                    cur.execute(sql, [self.uporabnisko_ime, zgostitev, self.admin])
+                self.id = cur.lastrowid
+            except dbapi.IntegrityError:
+                raise ValueError("Uporabniško ime že obstaja!")
+
+    def spremeni_geslo(self, geslo):
+        """
+        Spremeni uporabnikovo geslo.
+        """
+        assert self.id, "Uporabnik še ni vpisan v bazo!"
+        sql = """
+          UPDATE uporabnik SET geslo = ?
+           WHERE id = ?;
+        """
+        zgostitev = self.zgostitev(geslo)
+        with Kazalec() as cur:
+            with conn:
+                cur.execute(sql, [zgostitev, self.id])
 
 
 @dataclass
