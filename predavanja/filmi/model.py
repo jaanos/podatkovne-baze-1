@@ -137,7 +137,7 @@ class Uporabnik(Tabela, Entiteta):
             cur.execute("""
                 CREATE TABLE uporabnik (
                     id              INTEGER PRIMARY KEY,
-                    uporabnisko_ime TEXT    NOT NULL,
+                    uporabnisko_ime TEXT    UNIQUE NOT NULL,
                     admin           INTEGER NOT NULL DEFAULT 0,
                     geslo           BLOB
                 );
