@@ -81,7 +81,7 @@ class Tabela:
         """
         Preberi vir v obliki CSV in vračaj slovarje za vsako vrstico.
         """
-        with open(f"podatki/{cls.VIR}") as f:
+        with open(f"podatki/{cls.VIR}", encoding='utf-8') as f:
             rd = csv.reader(f)
             stolpci = next(rd)
             for vrstica in rd:
@@ -190,8 +190,8 @@ class Uporabnik(Tabela, Entiteta):
             else:
                 return Uporabnik.NULL
 
-    @staticmethod
-    def z_id(idu):
+    @classmethod
+    def z_id(cls, idu):
         """
         Vrni uporabnika z navedenim ID-jem.
         Če takega uporabnika ni, vrni neprijavljenega uporabnika.
@@ -204,8 +204,8 @@ class Uporabnik(Tabela, Entiteta):
             cur.execute(sql, [idu])
             vrstica = cur.fetchone()
             if vrstica is None:
-                return Uporabnik.NULL
-            return Uporabnik(*vrstica)
+                return cls.NULL
+            return cls(*vrstica)
 
     @staticmethod
     def zgostitev(geslo):
@@ -360,6 +360,24 @@ class Film(Tabela, Entiteta):
                             :metascore, :glasovi, :zasluzek, :oznaka, :opis);
                 """, vrstica)
 
+    @classmethod
+    def z_id(cls, idf):
+        """
+        Vrni film z navedenim ID-jem.
+        Če takega filma ni, sproži napako.
+        """
+        sql = """
+          SELECT id, naslov, dolzina, leto, ocena,
+                 metascore, glasovi, zasluzek, oznaka, opis
+            FROM film WHERE id = ?;
+        """
+        with Kazalec() as cur:
+            cur.execute(sql, [idf])
+            vrstica = cur.fetchone()
+            if vrstica is None:
+                raise ValueError(f"Film z ID-jem {idf} ne obstaja!")
+            return Film(*vrstica)
+
     @staticmethod
     def najboljsi_v_letu(leto, n=10):
         """
@@ -439,6 +457,23 @@ class Oseba(Tabela, Entiteta):
                 INSERT INTO oseba (id, ime)
                 VALUES (:id, :ime);
             """, cls.preberi_vir())
+
+    @classmethod
+    def z_id(cls, ido):
+        """
+        Vrni oseob z navedenim ID-jem.
+        Če take osebe ni, sproži napako.
+        """
+        sql = """
+          SELECT id, ime
+            FROM oseba WHERE id = ?;
+        """
+        with Kazalec() as cur:
+            cur.execute(sql, [ido])
+            vrstica = cur.fetchone()
+            if vrstica is None:
+                raise ValueError(f"Oseba z ID-jem {ido} ne obstaja!")
+            return Oseba(*vrstica)
 
     def poisci_vloge(self):
         """

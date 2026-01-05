@@ -194,6 +194,52 @@ def odjava(uporabnik):
     odjavi_uporabnika()
 
 
+@bottle.get('/filmi/najbolje-ocenjeni/')
+@bottle.view('filmi.najbolje-ocenjeni.html')
+def filmi_najbolje_ocenjeni():
+    leto = bottle.request.query.leto
+    return dict(leto=leto, filmi=Film.najboljsi_v_letu(leto))
+
+
+@bottle.get('/filmi/podatki/<idf:int>/')
+@bottle.view('filmi.podatki.html')
+def filmi_podatki(idf):
+    film = Film.z_id(idf)
+    igralec = []
+    reziser = []
+    for vloga in film.zasedba():
+        if vloga.tip == 'I':
+            igralec.append(vloga)
+        else:
+            reziser.append(vloga)
+    return dict(film=film, igralec=igralec, reziser=reziser)
+
+
+@bottle.get('/osebe/poisci/')
+@bottle.view('osebe.poisci.html')
+def osebe_poisci():
+    ime = bottle.request.query.ime
+    if ime:
+        osebe = Oseba.poisci(ime)
+    else:
+        osebe = None
+    return dict(ime=ime, osebe=osebe)
+
+
+@bottle.get('/osebe/podatki/<ido:int>/')
+@bottle.view('osebe.podatki.html')
+def osebe_podatki(ido):
+    oseba = Oseba.z_id(ido)
+    igralec = []
+    reziser = []
+    for vloga in oseba.poisci_vloge():
+        if vloga.tip == 'I':
+            igralec.append(vloga)
+        else:
+            reziser.append(vloga)
+    return dict(oseba=oseba, igralec=igralec, reziser=reziser)
+
+
 bottle.BaseTemplate.defaults['prijavljeni_uporabnik'] = prijavljeni_uporabnik
 bottle.BaseTemplate.defaults['preberi_sporocilo'] = preberi_sporocilo
 bottle.BaseTemplate.defaults['preberi_obrazec'] = preberi_obrazec

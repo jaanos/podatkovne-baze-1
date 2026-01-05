@@ -1,0 +1,31 @@
+% rebase('osnova.html', naslov='Iskanje oseb')
+
+<h1 class="title">Iskanje oseb</h1>
+
+<form action="/osebe/poisci/" method="GET">
+    <div class="field has-addons">
+        <p class="control has-icons-left">
+            <input class="input" type="text" name="ime" placeholder="Vpiši ime osebe" value="{{ime}}" />
+            <span class="icon is-small is-left">
+                <i class="fas fa-person"></i>
+            </span>
+        </p>
+        <p class="control">
+            <button class="button is-success">
+            Išči
+            </button>
+        </p>
+    </div>
+</form>
+
+% if osebe:
+<div class="content">
+    <ul>
+        % for oseba in osebe:
+        <li>
+            <a href="/osebe/podatki/{{oseba.id}}/">{{oseba}}</a>
+        </li>
+        % end
+    </ul>
+</div>
+% end

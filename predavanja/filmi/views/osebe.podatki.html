@@ -1,0 +1,34 @@
+% rebase('osnova.html', naslov=oseba)
+
+<h1 class="title">{{oseba}}</h1>
+
+<div class="content">
+    <div class="columns">
+        % if igralec:
+        <div class="column">
+            <h2 class="subtitle">Igralec</h2>
+            <ul>
+                % for vloga in igralec:
+                <li>
+                    <a href="/filmi/podatki/{{vloga.film.id}}/">{{vloga.film}}</a>
+                    ({{vloga.film.leto}})
+                </li>
+                % end
+            </ul>
+        </div>
+        % end
+        % if reziser:
+        <div class="column">
+            <h2 class="subtitle">Režiser</h2>
+            <ul>
+                % for vloga in reziser:
+                <li>
+                    <a href="/filmi/podatki/{{vloga.film.id}}/">{{vloga.film}}</a>
+                    ({{vloga.film.leto}})
+                </li>
+                % end
+            </ul>
+        </div>
+        % end
+    </div>
+</div>
