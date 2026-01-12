@@ -1,6 +1,48 @@
 % rebase('osnova.html', naslov=f'{film} ({film.leto})')
 
-<h1 class="title">{{film}}</h1>
+<div class="level">
+    <div class="level-left">
+        <div class="level-item">
+            <h1 class="title">{{film}} ({{film.leto}})</h1>
+        </div>
+    </div>
+    % if uporabnik.admin:
+    <div class="level-right">
+        <div class="level-item">
+            <a href="/filmi/uredi/{{film.id}}/" class="button is-primary">Uredi</a>
+        </div>
+        <div class="level-item">
+            <form action="/filmi/izbrisi/{{film.id}}/" method="POST">
+                <button class="button is-danger" onclick="return confirm('Ali želiš res izbrisati film z ID-jem {{film.id}}?')">Izbriši</button>
+            </form>
+        </div>
+    </div>
+    % end
+</div>
+
+<div class="block">
+    <ul>
+        <li>Dolžina: {{film.dolzina}} minut</li>
+        <li>Ocena: {{film.ocena}}/10</li>
+        % if film.metascore:
+        <li>Metascore: {{film.metascore}}</li>
+        % end
+        <li>Glasovi: {{film.glasovi}}</li>
+        % if film.zasluzek:
+        <li>Zaslužek: {{film.zasluzek}}</li>
+        % end
+        % if film.oznaka:
+        <li>Oznaka: {{film.oznaka}}</li>
+        % end
+    </ul>
+</div>
+
+% if film.opis:
+<div class="block">
+    <h2 class="subtitle">Opis</h2>
+    <p>{{film.opis}}</p>
+</div>
+% end
 
 <div class="content">
     <div class="columns">

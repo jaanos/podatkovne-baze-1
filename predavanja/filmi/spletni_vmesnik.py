@@ -126,6 +126,14 @@ def prijavljen(uporabnik):
 
 
 @status
+def kdorkoli(uporabnik):
+    """
+    Dekorirana funkcija kot prvi argument sprejme prijavljenega uporabnika.
+    """
+    return (uporabnik, )
+
+
+@status
 def odjavljen(uporabnik):
     """
     Preveri, ali je uporabnik odjavljen.
@@ -203,7 +211,8 @@ def filmi_najbolje_ocenjeni():
 
 @bottle.get('/filmi/podatki/<idf:int>/')
 @bottle.view('filmi.podatki.html')
-def filmi_podatki(idf):
+@kdorkoli
+def filmi_podatki(uporabnik, idf):
     film = Film.z_id(idf)
     igralec = []
     reziser = []
