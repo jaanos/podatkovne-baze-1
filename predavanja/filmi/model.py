@@ -9,6 +9,7 @@ import bcrypt
 import csv
 import sqlite3 as dbapi
 from dataclasses import dataclass, field
+from dataclasses_json import dataclass_json
 
 
 conn = dbapi.connect('filmi.sqlite')
@@ -115,6 +116,7 @@ class Entiteta:
         cls.NULL = cls()
 
 
+@dataclass_json
 @dataclass
 class Uporabnik(Tabela, Entiteta):
     """
@@ -249,6 +251,7 @@ class Uporabnik(Tabela, Entiteta):
                 cur.execute(sql, [zgostitev, self.id])
 
 
+@dataclass_json
 @dataclass
 class Oznaka(Tabela, Entiteta):
     """
@@ -281,7 +284,17 @@ class Oznaka(Tabela, Entiteta):
                 DROP TABLE IF EXISTS oznaka;
             """)
 
+    @staticmethod
+    def seznam():
+        sql = """
+            SELECT kratica FROM oznaka
+            ORDER BY kratica;
+        """
+        with Kazalec() as cur:
+            cur.execute(sql)
+            yield from (Oznaka(kratica) for kratica, in cur)
 
+@dataclass_json
 @dataclass
 class Film(Tabela, Entiteta):
     """
@@ -378,6 +391,63 @@ class Film(Tabela, Entiteta):
                 raise ValueError(f"Film z ID-jem {idf} ne obstaja!")
             return Film(*vrstica)
 
+    def dodaj(self):
+        """
+        Dodaj film v bazo.
+        """
+        assert self.id is None, "Film je že v bazi!"
+        sql = """
+            INSERT INTO film (naslov, dolzina, leto, ocena,
+                metascore, glasovi, zasluzek, oznaka, opis)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+        """
+        try:
+            with Kazalec() as cur:
+                with conn:
+                    cur.execute(sql, [self.naslov, self.dolzina, self.leto,
+                                    self.ocena, self.metascore, self.glasovi,
+                                    self.zasluzek, self.oznaka, self.opis])
+                    self.id = cur.lastrowid
+        except dbapi.IntegrityError:
+            raise ValueError("Dodajanje filma ni bilo uspešno!")
+
+    def posodobi(self):
+        """
+        Posodobi film v bazi.
+        """
+        assert self.id is not None, "Filma še ni v bazi!"
+        sql = """
+            UPDATE film SET naslov = ?, dolzina = ?, leto = ?,
+                ocena = ?, metascore = ?, glasovi = ?,
+                zasluzek = ?, oznaka = ?, opis = ?
+            WHERE id = ?;
+        """
+        try:
+            with Kazalec() as cur:
+                with conn:
+                    cur.execute(sql, [self.naslov, self.dolzina, self.leto,
+                                    self.ocena, self.metascore, self.glasovi,
+                                    self.zasluzek, self.oznaka, self.opis, self.id])
+        except dbapi.IntegrityError:
+            raise ValueError("Posodabljanje filma ni bilo uspešno!")
+
+    def izbrisi(self):
+        """
+        Izbriši film v bazi.
+        """
+        assert self.id is not None, "Filma še ni v bazi!"
+        sql = """
+            DELETE FROM film
+            WHERE id = ?;
+        """
+        try:
+            with Kazalec() as cur:
+                with conn:
+                    cur.execute(sql, [self.id])
+                    self.id = None
+        except dbapi.IntegrityError:
+            raise ValueError("Brisanje filma ni bilo uspešno!")
+
     @staticmethod
     def najboljsi_v_letu(leto, n=10):
         """
@@ -413,6 +483,7 @@ class Film(Tabela, Entiteta):
             yield from (Vloga(self, Oseba(oid, ime), tip, mesto)
                         for oid, ime, tip, mesto in cur)
 
+@dataclass_json
 @dataclass
 class Oseba(Tabela, Entiteta):
     """
@@ -506,6 +577,7 @@ class Oseba(Tabela, Entiteta):
             yield from (Oseba(*vrstica) for vrstica in cur)
 
 
+@dataclass_json
 @dataclass
 class Zanr(Tabela, Entiteta):
     """
@@ -541,6 +613,7 @@ class Zanr(Tabela, Entiteta):
             """)
 
 
+@dataclass_json
 @dataclass
 class Vloga(Tabela):
     """
@@ -605,6 +678,7 @@ class Vloga(Tabela):
         return self.VLOGE[self.tip]
 
 
+@dataclass_json
 @dataclass
 class Pripada(Tabela):
     """

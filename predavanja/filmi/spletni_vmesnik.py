@@ -42,14 +42,17 @@ def nastavi_obrazec(piskotek, obrazec):
     nastavi_sporocilo(json.dumps(obrazec), piskotek)
 
 
-def preberi_obrazec(piskotek, privzeto={}, izbrisi=True):
+def preberi_obrazec(piskotek, privzeto=None, izbrisi=True):
     """
     Preberi vrednosti obrazca in pobriši pripadajoči piškotek.
     """
+    if privzeto is None:
+        privzeto = {}
     try:
-        return json.loads(preberi_sporocilo(piskotek, izbrisi))
+        privzeto.update(json.loads(preberi_sporocilo(piskotek, izbrisi)))
     except (TypeError, json.JSONDecodeError):
-        return privzeto
+        pass
+    return privzeto
 
 
 def prijavljeni_uporabnik():
@@ -224,6 +227,80 @@ def filmi_podatki(uporabnik, idf):
     return dict(film=film, igralec=igralec, reziser=reziser)
 
 
+@bottle.get("/filmi/dodaj/")
+@bottle.view("filmi.dodaj.html")
+@admin
+def filmi_dodaj(uporabnik):
+    pass
+
+
+@bottle.post("/filmi/dodaj/")
+@admin
+def filmi_dodaj_post(uporabnik):
+    naslov = bottle.request.forms.naslov
+    dolzina = bottle.request.forms.dolzina
+    leto = bottle.request.forms.leto
+    ocena = bottle.request.forms.ocena
+    metascore = bottle.request.forms.metascore
+    glasovi = bottle.request.forms.glasovi
+    zasluzek = bottle.request.forms.zasluzek
+    oznaka = bottle.request.forms.oznaka
+    opis = bottle.request.forms.opis
+    film = Film(naslov=naslov, dolzina=dolzina, leto=leto,
+                ocena=ocena, metascore=metascore, glasovi=glasovi,
+                zasluzek=zasluzek, oznaka=oznaka, opis=opis)
+    try:
+        film.dodaj()
+        bottle.redirect(f'/filmi/podatki/{film.id}/')
+    except ValueError:
+        nastavi_sporocilo("Dodajanje filma ni uspelo!")
+        nastavi_obrazec('filmi_dodaj', film.to_dict())
+        bottle.redirect('/filmi/dodaj/')
+
+
+@bottle.get("/filmi/uredi/<idf:int>/")
+@bottle.view("filmi.uredi.html")
+@admin
+def filmi_uredi(uporabnik, idf):
+    return dict(film=Film.z_id(idf))
+
+
+@bottle.post("/filmi/uredi/<idf:int>/")
+@admin
+def filmi_uredi_post(uporabnik, idf):
+    naslov = bottle.request.forms.naslov
+    dolzina = bottle.request.forms.dolzina
+    leto = bottle.request.forms.leto
+    ocena = bottle.request.forms.ocena
+    metascore = bottle.request.forms.metascore
+    glasovi = bottle.request.forms.glasovi
+    zasluzek = bottle.request.forms.zasluzek
+    oznaka = bottle.request.forms.oznaka
+    opis = bottle.request.forms.opis
+    film = Film(id=idf, naslov=naslov, dolzina=dolzina, leto=leto,
+                ocena=ocena, metascore=metascore, glasovi=glasovi,
+                zasluzek=zasluzek, oznaka=oznaka, opis=opis)
+    try:
+        film.posodobi()
+        bottle.redirect(f'/filmi/podatki/{film.id}/')
+    except ValueError:
+        nastavi_sporocilo("Posodabljanje filma ni uspelo!")
+        nastavi_obrazec('filmi_uredi', film.to_dict())
+        bottle.redirect(f'/filmi/uredi/{idf}/')
+
+
+@bottle.post("/filmi/izbrisi/<idf:int>/")
+@admin
+def filmi_izbrisi(uporabnik, idf):
+    film = Film(id=idf)
+    try:
+        film.izbrisi()
+        bottle.redirect('/')
+    except ValueError:
+        nastavi_sporocilo("Brisanje filma ni uspelo!")
+        bottle.redirect(f'/filmi/podatki/{idf}/')
+
+
 @bottle.get('/osebe/poisci/')
 @bottle.view('osebe.poisci.html')
 def osebe_poisci():
@@ -252,6 +329,9 @@ def osebe_podatki(ido):
 bottle.BaseTemplate.defaults['prijavljeni_uporabnik'] = prijavljeni_uporabnik
 bottle.BaseTemplate.defaults['preberi_sporocilo'] = preberi_sporocilo
 bottle.BaseTemplate.defaults['preberi_obrazec'] = preberi_obrazec
+bottle.BaseTemplate.defaults['Film'] = Film
+bottle.BaseTemplate.defaults['Oseba'] = Oseba
+bottle.BaseTemplate.defaults['Oznaka'] = Oznaka
 
 if __name__ == '__main__':
     bottle.run(debug=True, reloader=True)

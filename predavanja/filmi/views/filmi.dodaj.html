@@ -1,0 +1,13 @@
+% rebase('osnova.html', naslov='Dodaj film')
+% obrazec = preberi_obrazec('filmi_dodaj')
+
+<form action="/filmi/dodaj/" method="POST">
+    % include('filmi.obrazec.html')
+    <div class="field">
+        <p class="control">
+            <button class="button is-success">
+                Dodaj film
+            </button>
+        </p>
+    </div>
+</form>

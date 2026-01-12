@@ -1,0 +1,13 @@
+% rebase('osnova.html', naslov='Uredi film')
+% obrazec = preberi_obrazec('filmi_uredi', film.to_dict())
+
+<form action="/filmi/uredi/{{film.id}}/" method="POST">
+    % include('filmi.obrazec.html')
+    <div class="field">
+        <p class="control">
+            <button class="button is-success">
+                Posodobi film
+            </button>
+        </p>
+    </div>
+</form>

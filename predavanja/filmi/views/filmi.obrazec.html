@@ -1,0 +1,80 @@
+<div class="field">
+    <label class="label">Naslov</label>
+    <p class="control has-icons-left">
+        <input class="input" type="text" name="naslov" placeholder="Naslov filma" required value="{{obrazec.get('naslov', '')}}" />
+        <span class="icon is-small is-left">
+            <i class="fas fa-film"></i>
+        </span>
+    </p>
+</div>
+<div class="field">
+    <label class="label">Dolžina</label>
+    <p class="control has-icons-left">
+        <input class="input" type="number" min="0" name="dolzina" placeholder="Dolžina filma" required value="{{obrazec.get('dolzina', '')}}" />
+        <span class="icon is-small is-left">
+            <i class="fas fa-clock"></i>
+        </span>
+    </p>
+</div>
+<div class="field">
+    <label class="label">Leto</label>
+    <p class="control has-icons-left">
+        <input class="input" type="number" min="1900" name="leto" placeholder="Leto izida" required value="{{obrazec.get('leto', '')}}" />
+        <span class="icon is-small is-left">
+            <i class="fas fa-calendar"></i>
+        </span>
+    </p>
+</div>
+<div class="field">
+    <label class="label">Ocena</label>
+    <p class="control has-icons-left">
+        <input class="input" type="number" min="0" max="10" step="0.1" name="ocena" placeholder="Ocena filma" value="{{obrazec.get('ocena', '')}}" />
+        <span class="icon is-small is-left">
+            <i class="fas fa-star"></i>
+        </span>
+    </p>
+</div>
+<div class="field">
+    <label class="label">Metascore</label>
+    <p class="control has-icons-left">
+        <input class="input" type="number" min="0" name="metascore" placeholder="Metascore" value="{{obrazec.get('metascore', '')}}" />
+        <span class="icon is-small is-left">
+            <i class="fas fa-star"></i>
+        </span>
+    </p>
+</div>
+<div class="field">
+    <label class="label">Glasovi</label>
+    <p class="control has-icons-left">
+        <input class="input" type="number" min="0" name="glasovi" placeholder="Glasovi" required value="{{obrazec.get('glasovi', '')}}" />
+        <span class="icon is-small is-left">
+            <i class="fas fa-star"></i>
+        </span>
+    </p>
+</div>
+<div class="field">
+    <label class="label">Zaslužek</label>
+    <p class="control has-icons-left">
+        <input class="input" type="number" min="0" name="zasluzek" placeholder="Zaslužek" value="{{obrazec.get('zasluzek', '')}}" />
+        <span class="icon is-small is-left">
+            <i class="fas fa-coins"></i>
+        </span>
+    </p>
+</div>
+<div class="field">
+    <label class="label">Oznaka</label>
+    <div class="select">
+        <select name="oznaka">
+            <option value="">---</option>
+            % for oznaka in Oznaka.seznam():
+            <option value="{{oznaka.kratica}}" {{'selected' if str(obrazec.get('oznaka', '')) == oznaka.kratica else ''}}>{{oznaka}}</option>
+            % end
+        </select>
+    </div>
+</div>
+<div class="field">
+    <label class="label">Opis</label>
+    <p class="control has-icons-left">
+        <textarea class="textarea" name="opis" placeholder="Opis filma">{{obrazec.get('opis', '')}}</textarea>
+    </p>
+</div>
