@@ -8,10 +8,9 @@ style: "@import url('style.css')"
 * Predavanja:
   - Janoš Vidali ([janos.vidali@fmf.uni-lj.si](mailto:janos.vidali@fmf.uni-lj.si)), kabinet 1.14
   - ponedeljek 10-12 v predavalnici 3.04
-  - ponedeljek 12-13 v predavalnici 3.04 (seminar, za 3. letnike)
 * Vaje:
   - Ajda Lampe ([ajda.lampe@fmf.uni-lj.si](mailto:ajda.lampe@fmf.uni-lj.si)), kabinet 1.09
-  - četrtek 9-11 v predavalnici 3.11
+  - torek 10-12 v predavalnici 3.10
 
 ---
 

@@ -3,7 +3,7 @@ marp: true
 style: "@import url('style.css')"
 ---
 
-# Podatkovne baze 1 - seminar
+# Podatkovne baze 1 - dodatna gradiva
 
 ---
 
