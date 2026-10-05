@@ -140,7 +140,7 @@ ACID: **A**tomicity, **C**onsistency, **I**solation, **D**urability
 * Je to možno zagotoviti z ustrezno kodo v programih?
   - Seveda!
   - A za kakšno ceno?
-* Zakaj ne bi vzeli sistema, ki to že "zna", in ge le uporabili?
+* Zakaj ne bi vzeli sistema, ki to že "zna", in ga le uporabili?
 
 ---
 

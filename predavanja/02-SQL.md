@@ -60,12 +60,12 @@ SELECT * FROM knjige
 
 ---
 
-# SQLiteStudio
+# Letos (prej SQLiteStudio)
 
 <span class="small">
 
 * Program za delo z RDBMS [SQLite](https://www.sqlite.org/)
-* Na voljo kot [samostojen program](https://sqlitestudio.pl/) ali kot [različica za nameščanje](https://github.com/pawelsalawa/sqlitestudio/releases)
+* Na voljo kot [samostojen program](https://letos.org/) ali kot [različica za nameščanje](https://github.com/pawelsalawa/letos/releases)
 
   ![](slike/sqlitestudio1.png) ![height:400px](slike/sqlitestudio2.png)
 
