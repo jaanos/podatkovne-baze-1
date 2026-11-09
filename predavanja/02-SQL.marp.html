@@ -1794,15 +1794,14 @@ this is incompatible with sql_mode=only_full_group_by
   ime             text     <span class="hljs-keyword">NOT NULL</span>,
   priimek         text     <span class="hljs-keyword">NOT NULL</span>,
   naslov          text,
-  datum_rojstva   <span class="hljs-type">date</span>     <span class="hljs-keyword">CHECK</span> (datum_rojstva <span class="hljs-operator">&lt;</span> DATETIME(<span class="hljs-string">&#x27;now&#x27;</span>, <span class="hljs-string">&#x27;-18 years&#x27;</span>)),
-                           <span class="hljs-comment">-- kupec mora biti starejši od 18 let</span>
+  datum_rojstva   <span class="hljs-type">date</span>,
   <span class="hljs-keyword">CHECK</span> (LENGTH(ime) <span class="hljs-operator">+</span> LENGTH(priimek) <span class="hljs-operator">&lt;=</span> <span class="hljs-number">30</span>)
 );
 
 <span class="hljs-keyword">CREATE TABLE</span> narocilo (
   id_narocilo     <span class="hljs-type">integer</span>  <span class="hljs-keyword">PRIMARY KEY</span> AUTOINCREMENT,
   id_kupec        <span class="hljs-type">integer</span>  <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">REFERENCES</span> kupec(id_kupec),
-  stevilo         <span class="hljs-type">integer</span>  <span class="hljs-keyword">DEFAULT</span> (<span class="hljs-number">1</span>),
+  stevilo         <span class="hljs-type">integer</span>  <span class="hljs-keyword">NOT NULL</span> <span class="hljs-keyword">DEFAULT</span> (<span class="hljs-number">1</span>),
   datum           datetime <span class="hljs-keyword">DEFAULT</span> (DATETIME(<span class="hljs-string">&#x27;now&#x27;</span>))
 );
 </code></pre>
@@ -1846,14 +1845,14 @@ this is incompatible with sql_mode=only_full_group_by
 <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;janez&#x27;</span>, <span class="hljs-string">&#x27;Janez&#x27;</span>, <span class="hljs-string">&#x27;Novak&#x27;</span>, <span class="hljs-string">&#x27;1978-03-24&#x27;</span>); <span class="hljs-comment">-- dobi id_kupec = 1</span>
 
 <span class="hljs-keyword">INSERT INTO</span> kupec (uporabnisko_ime, ime, priimek, datum_rojstva)
-<span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;micka&#x27;</span>, <span class="hljs-string">&#x27;Micka&#x27;</span>, <span class="hljs-string">&#x27;Kovač&#x27;</span>, <span class="hljs-string">&#x27;2008-07-11&#x27;</span>); <span class="hljs-comment">-- napaka!</span>
+<span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;micka&#x27;</span>, <span class="hljs-string">&#x27;Micka&#x27;</span>, <span class="hljs-string">&#x27;Kovač in še en zelo dolg priimek&#x27;</span>, <span class="hljs-string">&#x27;2008-07-11&#x27;</span>); <span class="hljs-comment">-- napaka!</span>
 
 <span class="hljs-keyword">INSERT INTO</span> kupec (uporabnisko_ime, ime, priimek, datum_rojstva)
 <span class="hljs-keyword">VALUES</span> (<span class="hljs-string">&#x27;micka&#x27;</span>, <span class="hljs-string">&#x27;Micka&#x27;</span>, <span class="hljs-string">&#x27;Kovač&#x27;</span>, <span class="hljs-string">&#x27;1998-07-11&#x27;</span>); <span class="hljs-comment">-- dobi id_kupec = 2</span>
 
 <span class="hljs-keyword">INSERT INTO</span> narocilo (id_kupec)
 <span class="hljs-keyword">SELECT</span> id_kupec <span class="hljs-keyword">FROM</span> kupec
- <span class="hljs-keyword">WHERE</span> priimek <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Novak&#x27;</span>;  <span class="hljs-comment">-- ena vrstica, dobi id_narocilo = 1</span>
+ <span class="hljs-keyword">WHERE</span> priimek <span class="hljs-operator">=</span> <span class="hljs-string">&#x27;Novak&#x27;</span>; <span class="hljs-comment">-- ena vrstica, dobi id_narocilo = 1</span>
 
 <span class="hljs-keyword">INSERT INTO</span> narocilo (id_kupec, stevilo)
 <span class="hljs-keyword">VALUES</span> (<span class="hljs-number">1</span>, <span class="hljs-number">3</span>), (<span class="hljs-number">2</span>, <span class="hljs-number">4</span>), (<span class="hljs-number">2</span>, <span class="hljs-number">2</span>), (<span class="hljs-number">3</span>, <span class="hljs-number">6</span>), (<span class="hljs-number">1</span>, <span class="hljs-number">5</span>); <span class="hljs-comment">-- napaka!</span>

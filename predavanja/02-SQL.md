@@ -1302,15 +1302,14 @@ CREATE TABLE kupec (
   ime             text     NOT NULL,
   priimek         text     NOT NULL,
   naslov          text,
-  datum_rojstva   date     CHECK (datum_rojstva < DATETIME('now', '-18 years')),
-                           -- kupec mora biti starejši od 18 let
+  datum_rojstva   date,
   CHECK (LENGTH(ime) + LENGTH(priimek) <= 30)
 );
 
 CREATE TABLE narocilo (
   id_narocilo     integer  PRIMARY KEY AUTOINCREMENT,
   id_kupec        integer  NOT NULL REFERENCES kupec(id_kupec),
-  stevilo         integer  DEFAULT (1),
+  stevilo         integer  NOT NULL DEFAULT (1),
   datum           datetime DEFAULT (DATETIME('now'))
 );
 ```
@@ -1352,14 +1351,14 @@ INSERT INTO kupec (uporabnisko_ime, ime, priimek, datum_rojstva)
 VALUES ('janez', 'Janez', 'Novak', '1978-03-24'); -- dobi id_kupec = 1
 
 INSERT INTO kupec (uporabnisko_ime, ime, priimek, datum_rojstva)
-VALUES ('micka', 'Micka', 'Kovač', '2008-07-11'); -- napaka!
+VALUES ('micka', 'Micka', 'Kovač in še en zelo dolg priimek', '2008-07-11'); -- napaka!
 
 INSERT INTO kupec (uporabnisko_ime, ime, priimek, datum_rojstva)
 VALUES ('micka', 'Micka', 'Kovač', '1998-07-11'); -- dobi id_kupec = 2
 
 INSERT INTO narocilo (id_kupec)
 SELECT id_kupec FROM kupec
- WHERE priimek = 'Novak';  -- ena vrstica, dobi id_narocilo = 1
+ WHERE priimek = 'Novak'; -- ena vrstica, dobi id_narocilo = 1
 
 INSERT INTO narocilo (id_kupec, stevilo)
 VALUES (1, 3), (2, 4), (2, 2), (3, 6), (1, 5); -- napaka!
